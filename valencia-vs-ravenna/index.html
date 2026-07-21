@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Valencia 2019 vs Ravenna 2025 — Confronto preparazioni</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #0b1120; }
+  #root { min-height: 100vh; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.15.0/Recharts.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.26.4/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  ReferenceLine, ScatterChart, Scatter, ZAxis, Legend, Cell,
+} = Recharts;
+
+const V = "#34d399", Vd = "#0f766e", R = "#fb923c", Rd = "#9a3412";
+const BG = "#0b1120", PANEL = "#111a2e", LINE = "#1e293b", TXT = "#e2e8f0", MUT = "#7c8aa5";
+const fmtPace = (s) => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, "0")}`;
+
+const weekly = [
+  { wk: "17", V: 43.0, R: 35.3 }, { wk: "16", V: 65.0, R: 45.9 },
+  { wk: "15", V: 74.3, R: 60.2 }, { wk: "14", V: 68.8, R: 38.2 },
+  { wk: "13", V: 75.6, R: 0.0 },  { wk: "12", V: 74.2, R: 66.3 },
+  { wk: "11", V: 83.6, R: 54.6 }, { wk: "10", V: 75.7, R: 40.1 },
+  { wk: "9",  V: 88.2, R: 78.6 }, { wk: "8",  V: 73.6, R: 70.7 },
+  { wk: "7",  V: 100.5, R: 74.5 }, { wk: "6", V: 82.8, R: 36.4 },
+  { wk: "5",  V: 107.8, R: 91.6 }, { wk: "4", V: 87.6, R: 83.5 },
+  { wk: "3",  V: 106.7, R: 88.3 }, { wk: "2", V: 88.8, R: 80.6 },
+  { wk: "1",  V: 86.4, R: 78.1 }, { wk: "Gara", V: 85.7, R: 85.5 },
+];
+const kpis = [
+  { label: "Km totali (16 sett.)", V: "1340", R: "987" },
+  { label: "Media km / sett.", V: "83,7", R: "61,7" },
+  { label: "Picco settimanale", V: "107,8", R: "91,6" },
+  { label: "Settimane \u2265 100 km", V: "3", R: "0" },
+  { label: "Corse / settimana", V: "6,1", R: "5,1" },
+];
+const tempo = [
+  { prep: "V", lab: "01/11 \u00b7 14k", pace: 255, hr: 163 },
+  { prep: "V", lab: "07/11 \u00b7 16k", pace: 254, hr: 159 },
+  { prep: "V", lab: "14/11 \u00b7 16k", pace: 249, hr: 162 },
+  { prep: "V", lab: "21/11 \u00b7 16k", pace: 252, hr: 162 },
+  { prep: "R", lab: "09/10 \u00b7 14k", pace: 258, hr: 171 },
+  { prep: "R", lab: "16/10 \u00b7 16k", pace: 261, hr: 170 },
+  { prep: "R", lab: "23/10 \u00b7 16k", pace: 258, hr: 167 },
+  { prep: "R", lab: "31/10 \u00b7 16k", pace: 262, hr: 169 },
+];
+const longr = [
+  { prep: "V", lab: "29/09 \u00b7 24k", pace: 278, hr: 156 },
+  { prep: "V", lab: "13/10 \u00b7 27k", pace: 282, hr: 152 },
+  { prep: "V", lab: "27/10 \u00b7 27k", pace: 274, hr: 154 },
+  { prep: "V", lab: "10/11 \u00b7 27k", pace: 268, hr: 149 },
+  { prep: "R", lab: "07/09 \u00b7 23k", pace: 290, hr: 155 },
+  { prep: "R", lab: "21/09 \u00b7 25k", pace: 311, hr: 159 },
+  { prep: "R", lab: "04/10 \u00b7 27k", pace: 289, hr: 163 },
+  { prep: "R", lab: "19/10 \u00b7 27k", pace: 284, hr: 156 },
+];
+const playbook = [
+  ["Volume = leva n.1", "Base continua 75\u201385 km/sett. PRIMA del blocco; 2\u20133 settimane \u2265 100 km."],
+  ["Continuit\u00e0", "6 giorni/sett. ogni settimana, zero buche. Correre attraverso viaggi e trekking."],
+  ["Tempo alla FC giusta", "Passo maratona a FC 160\u2013163, non 167\u2013171. Tieni il margine sotto soglia."],
+  ["Long run", "~27 km a FC \u2264 155. Chiudili sempre, mai \u201cshitty\u201d o dnf."],
+  ["WU + CD pieni", "3 + 3 km su ogni qualit\u00e0: ~50 km aerobici extra sul blocco."],
+  ["Sub-soglia (Norwegian)", "1\u00d7/sett. a FC ~160\u2013163 per alzare la soglia e riaprire il cuscinetto."],
+  ["Fuel & recupero", "Proteggi sonno e fueling di lunghi e tempo. I \u201cdnf/meh\u201d = sotto-recupero."],
+  ["Semaforo verde sub-3", "16 km tempo a 4:12\u20134:15 @ FC 160\u2013162 \u2192 pronto. \u00c8 il tuo test di forma."],
+];
+
+function Dot({ c }) {
+  return <span style={{ display: "inline-block", width: 10, height: 10, borderRadius: 9, background: c, marginRight: 7 }} />;
+}
+function VolumeTip({ active, payload, label }) {
+  if (!active || !payload || !payload.length) return null;
+  return (
+    <div style={{ background: "#0a1426", border: `1px solid ${LINE}`, borderRadius: 10, padding: "9px 12px", fontSize: 12.5, color: TXT }}>
+      <div style={{ color: MUT, marginBottom: 4 }}>{label === "Gara" ? "Settimana di gara" : `${label} settimane alla gara`}</div>
+      <div><Dot c={V} />Valencia <b style={{ fontVariantNumeric: "tabular-nums" }}>{payload[0] && payload[0].value} km</b></div>
+      <div><Dot c={R} />Ravenna <b style={{ fontVariantNumeric: "tabular-nums" }}>{payload[1] && payload[1].value} km</b></div>
+    </div>
+  );
+}
+function ScatterTip({ active, payload }) {
+  if (!active || !payload || !payload.length) return null;
+  const p = payload[0].payload;
+  return (
+    <div style={{ background: "#0a1426", border: `1px solid ${LINE}`, borderRadius: 10, padding: "9px 12px", fontSize: 12.5, color: TXT }}>
+      <div style={{ marginBottom: 3 }}><Dot c={p.prep === "V" ? V : R} />{p.lab}</div>
+      <div style={{ fontVariantNumeric: "tabular-nums" }}>{fmtPace(p.pace)}/km \u00b7 FC {p.hr}</div>
+    </div>
+  );
+}
+function EfficiencyChart({ data, title, paceDomain, hrDomain, avgV, avgR }) {
+  return (
+    <div style={{ flex: "1 1 320px", minWidth: 0 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
+        <h4 style={{ margin: 0, fontSize: 14, letterSpacing: ".02em" }}>{title}</h4>
+        <span style={{ fontSize: 11, color: MUT }}>\u2199 pi\u00f9 efficiente</span>
+      </div>
+      <ResponsiveContainer width="100%" height={240}>
+        <ScatterChart margin={{ top: 8, right: 14, bottom: 28, left: 4 }}>
+          <CartesianGrid stroke={LINE} strokeDasharray="2 4" />
+          <XAxis type="number" dataKey="pace" domain={paceDomain} reversed
+            tickFormatter={fmtPace} tick={{ fill: MUT, fontSize: 11 }} stroke={LINE}
+            label={{ value: "passo (mm:ss/km) \u00b7 pi\u00f9 veloce \u2192", position: "bottom", offset: 12, fill: MUT, fontSize: 11 }} />
+          <YAxis type="number" dataKey="hr" domain={hrDomain} reversed
+            tick={{ fill: MUT, fontSize: 11 }} stroke={LINE}
+            label={{ value: "FC media", angle: -90, position: "insideLeft", fill: MUT, fontSize: 11, dy: 24 }} />
+          <ZAxis range={[120, 121]} />
+          <Tooltip content={<ScatterTip />} cursor={{ stroke: LINE }} />
+          <Scatter data={data.filter((d) => d.prep === "V")} fill={V} />
+          <Scatter data={data.filter((d) => d.prep === "R")} fill={R} />
+          <ReferenceLine x={avgV.pace} stroke={V} strokeDasharray="4 4" strokeOpacity={0.5} />
+          <ReferenceLine y={avgV.hr} stroke={V} strokeDasharray="4 4" strokeOpacity={0.5} />
+          <ReferenceLine x={avgR.pace} stroke={R} strokeDasharray="4 4" strokeOpacity={0.5} />
+          <ReferenceLine y={avgR.hr} stroke={R} strokeDasharray="4 4" strokeOpacity={0.5} />
+        </ScatterChart>
+      </ResponsiveContainer>
+      <div style={{ display: "flex", gap: 16, fontSize: 11.5, color: MUT, marginTop: 2, fontVariantNumeric: "tabular-nums" }}>
+        <span><Dot c={V} />media {fmtPace(avgV.pace)} \u00b7 FC {avgV.hr}</span>
+        <span><Dot c={R} />media {fmtPace(avgR.pace)} \u00b7 FC {avgR.hr}</span>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <div style={{ background: BG, color: TXT, minHeight: "100%", fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>
+      <style>{`
+        * { box-sizing: border-box; }
+        .wrap { max-width: 980px; margin: 0 auto; padding: 28px 20px 56px; }
+        .panel { background: ${PANEL}; border: 1px solid ${LINE}; border-radius: 16px; padding: 22px; }
+        .eyebrow { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: ${MUT}; }
+        .kpiGrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+        .twoCol { display: flex; gap: 22px; flex-wrap: wrap; }
+        .raceGrid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; }
+        .pbList { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        @media (max-width: 720px) {
+          .kpiGrid { grid-template-columns: repeat(2, 1fr); }
+          .raceGrid { grid-template-columns: 1fr; text-align: left; }
+          .raceGrid .vs { display: none; }
+          .pbList { grid-template-columns: 1fr; }
+        }
+        h2 { font-size: 19px; margin: 0 0 2px; letter-spacing: -.01em; }
+        .num { font-variant-numeric: tabular-nums; }
+      `}</style>
+      <div className="wrap">
+        <div className="eyebrow">Confronto preparazioni \u00b7 metodo Hanson</div>
+        <h1 style={{ fontSize: 30, margin: "6px 0 16px", letterSpacing: "-.02em", lineHeight: 1.1 }}>
+          Valencia 2019 <span style={{ color: MUT, fontWeight: 400 }}>vs</span> Ravenna 2025
+        </h1>
+        <div className="panel raceGrid" style={{ marginBottom: 20 }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 9 }}><Dot c={V} /><b>Valencia</b><span style={{ color: MUT, fontSize: 13 }}>\u00b7 1 dic 2019</span></div>
+            <div className="num" style={{ fontSize: 34, fontWeight: 700, color: V, marginTop: 4 }}>2:59:31</div>
+            <div className="num" style={{ color: MUT, fontSize: 13 }}>~4:11/km \u00b7 passo costante</div>
+          </div>
+          <div className="vs" style={{ textAlign: "center" }}>
+            <div style={{ fontSize: 11, color: MUT, letterSpacing: ".1em" }}>SCARTO</div>
+            <div className="num" style={{ fontSize: 22, fontWeight: 700, color: "#f8fafc" }}>+7:09</div>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 9, justifyContent: "flex-end" }}><b>Ravenna</b><span style={{ color: MUT, fontSize: 13 }}>\u00b7 9 nov 2025</span><Dot c={R} /></div>
+            <div className="num" style={{ fontSize: 34, fontWeight: 700, color: R, marginTop: 4 }}>3:06:40</div>
+            <div className="num" style={{ color: MUT, fontSize: 13 }}>~4:24/km \u00b7 1\u00aa 4:20 / 2\u00aa 4:28</div>
+          </div>
+        </div>
+        <div className="panel" style={{ marginBottom: 20 }}>
+          <h2>Il volume settimanale</h2>
+          <p style={{ color: MUT, fontSize: 13.5, margin: "0 0 14px" }}>
+            La storia in un grafico: le due linee si separano e non si richiudono pi\u00f9. Valencia costruisce con continuit\u00e0 fino a 108 km; Ravenna parte pi\u00f9 in basso, con buche (incl. una settimana a 0 km) e nessuna settimana sopra i 100.
+          </p>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={weekly} margin={{ top: 8, right: 16, bottom: 22, left: -8 }}>
+              <CartesianGrid stroke={LINE} strokeDasharray="2 4" />
+              <XAxis dataKey="wk" tick={{ fill: MUT, fontSize: 11 }} stroke={LINE}
+                label={{ value: "settimane alla gara", position: "bottom", offset: 8, fill: MUT, fontSize: 11 }} />
+              <YAxis tick={{ fill: MUT, fontSize: 11 }} stroke={LINE} domain={[0, 120]}
+                label={{ value: "km", angle: -90, position: "insideLeft", fill: MUT, fontSize: 11, dy: -4 }} />
+              <Tooltip content={<VolumeTip />} />
+              <ReferenceLine y={100} stroke={MUT} strokeDasharray="5 5" strokeOpacity={0.6}
+                label={{ value: "100 km", fill: MUT, fontSize: 10, position: "right" }} />
+              <Line type="monotone" dataKey="V" name="Valencia" stroke={V} strokeWidth={2.6} dot={{ r: 2.5, fill: V }} activeDot={{ r: 5 }} />
+              <Line type="monotone" dataKey="R" name="Ravenna" stroke={R} strokeWidth={2.6} dot={{ r: 2.5, fill: R }} activeDot={{ r: 5 }} />
+            </LineChart>
+          </ResponsiveContainer>
+          <div style={{ display: "flex", gap: 18, fontSize: 12.5, marginTop: 4 }}>
+            <span><Dot c={V} />Valencia 2019</span><span><Dot c={R} />Ravenna 2025</span>
+          </div>
+        </div>
+        <div className="kpiGrid" style={{ marginBottom: 20 }}>
+          {kpis.map((k) => (
+            <div key={k.label} className="panel" style={{ padding: "16px 14px" }}>
+              <div style={{ fontSize: 11.5, color: MUT, minHeight: 30, lineHeight: 1.25 }}>{k.label}</div>
+              <div className="num" style={{ fontSize: 22, fontWeight: 700, color: V, marginTop: 8 }}>{k.V}</div>
+              <div className="num" style={{ fontSize: 16, fontWeight: 600, color: R }}>{k.R}</div>
+            </div>
+          ))}
+        </div>
+        <div className="panel" style={{ marginBottom: 20 }}>
+          <h2>La qualit\u00e0 delle sedute chiave</h2>
+          <p style={{ color: MUT, fontSize: 13.5, margin: "0 0 16px" }}>
+            Ogni punto \u00e8 una seduta (porzione di lavoro isolata dai lap, senza WU/CD). Pi\u00f9 una seduta sta in basso a sinistra, pi\u00f9 \u00e8 efficiente: <i>veloce a FC bassa</i>. Valencia occupa stabilmente quell'angolo su entrambi i tipi.
+          </p>
+          <div className="twoCol">
+            <EfficiencyChart title="Tempo run (passo maratona)" data={tempo}
+              paceDomain={[266, 245]} hrDomain={[174, 148]}
+              avgV={{ pace: 253, hr: 161.5 }} avgR={{ pace: 260, hr: 169.2 }} />
+            <EfficiencyChart title="Long run (~27 km)" data={longr}
+              paceDomain={[315, 265]} hrDomain={[166, 146]}
+              avgV={{ pace: 276, hr: 152.9 }} avgR={{ pace: 293, hr: 158.1 }} />
+          </div>
+          <div style={{ display: "flex", gap: 18, fontSize: 12, color: MUT, marginTop: 12, flexWrap: "wrap" }}>
+            <span className="num">\u0394 Tempo: <b style={{ color: TXT }}>7&quot;/km pi\u00f9 veloce a 7,7 bpm pi\u00f9 bassi</b></span>
+            <span className="num">\u0394 Long: <b style={{ color: TXT }}>17&quot;/km pi\u00f9 veloce a 5 bpm pi\u00f9 bassi</b></span>
+          </div>
+        </div>
+        <div className="panel" style={{ marginBottom: 20, borderColor: "#3b2a14", background: "#1a1408" }}>
+          <div className="eyebrow" style={{ color: R }}>Diagnosi</div>
+          <p style={{ fontSize: 14.5, lineHeight: 1.5, margin: "8px 0 0" }}>
+            Lo scarto di <b>7 minuti</b> non \u00e8 una giornata storta: a Ravenna i tempo giravano a <b className="num">FC 167\u2013171</b>, cio\u00e8 <b>in soglia</b>. Passo maratona e passo soglia si erano sovrapposti \u2014 niente cuscinetto, niente durabilit\u00e0. Nel 2019 i tempo a <b className="num">FC 159\u2013163</b> stavano nettamente sotto la soglia: quel margine \u00e8 ci\u00f2 che regge 42 km. La causa a monte \u00e8 una sola: <b>pi\u00f9 volume, pi\u00f9 continuit\u00e0</b> \u2192 motore aerobico pi\u00f9 grande.
+          </p>
+        </div>
+        <div className="panel">
+          <div className="eyebrow" style={{ color: V }}>Playbook \u00b7 Maratona di Roma \u2014 marzo 2027 \u00b7 obiettivo sub-3</div>
+          <h2 style={{ marginTop: 6 }}>Cosa portiamo nel prossimo blocco</h2>
+          <div className="pbList" style={{ marginTop: 14 }}>
+            {playbook.map((row, i) => (
+              <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <div className="num" style={{ flex: "0 0 auto", width: 26, height: 26, borderRadius: 8, background: "#0a1426", border: `1px solid ${LINE}`, color: V, fontSize: 13, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>{i + 1}</div>
+                <div>
+                  <div style={{ fontSize: 13.5, fontWeight: 600 }}>{row[0]}</div>
+                  <div style={{ fontSize: 12.5, color: MUT, lineHeight: 1.4 }}>{row[1]}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div style={{ textAlign: "center", color: MUT, fontSize: 11.5, marginTop: 22 }}>
+          Dati Strava \u00b7 porzione di lavoro letta dai lap reali (no auto-lap) \u00b7 Coach AI
+        </div>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
