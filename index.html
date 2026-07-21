@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artifacts — Marco</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;450;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #eceef2;
+    --surface: #ffffff;
+    --ink: #14171d;
+    --muted: #767c88;
+    --faint: #aab0bb;
+    --line: #dde1e8;
+    --accent: #2d43e0;
+    --accent-soft: #eaecfb;
+    --live: #12a670;
+    --radius: 14px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    min-height: 100vh;
+    padding: clamp(1.25rem, 5vw, 4rem) 1.25rem 3rem;
+    display: flex;
+    justify-content: center;
+  }
+  .wrap { width: 100%; max-width: 680px; }
+
+  /* Header */
+  header { margin-bottom: 2.25rem; }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.1rem;
+  }
+  .eyebrow .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--live);
+    box-shadow: 0 0 0 0 rgba(18,166,112,0.5);
+    animation: pulse 2.4s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(18,166,112,0.45); }
+    70% { box-shadow: 0 0 0 7px rgba(18,166,112,0); }
+    100% { box-shadow: 0 0 0 0 rgba(18,166,112,0); }
+  }
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(2.4rem, 9vw, 3.4rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 0.85rem;
+  }
+  .sub {
+    font-size: 0.95rem;
+    color: var(--muted);
+    max-width: 30rem;
+  }
+  .count {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* List */
+  .list { border-top: 1px solid var(--line); }
+  a.entry {
+    display: grid;
+    grid-template-columns: 2.6rem 1fr auto;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 1.15rem 0.9rem 1.15rem 0.4rem;
+    border-bottom: 1px solid var(--line);
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    transition: background 0.18s ease, padding 0.18s ease;
+  }
+  a.entry::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--accent);
+    transform: scaleY(0);
+    transform-origin: center;
+    transition: transform 0.18s ease;
+  }
+  a.entry:hover {
+    background: var(--surface);
+    padding-left: 1rem;
+    border-radius: var(--radius);
+    border-bottom-color: transparent;
+  }
+  a.entry:hover::before { transform: scaleY(0.55); }
+  a.entry:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: var(--radius);
+  }
+  .idx {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    font-weight: 500;
+    text-align: right;
+  }
+  .body { min-width: 0; }
+  .name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.12rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .path {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.76rem;
+    color: var(--faint);
+    margin-top: 0.15rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .arrow {
+    color: var(--faint);
+    transition: transform 0.18s ease, color 0.18s ease;
+    flex-shrink: 0;
+  }
+  a.entry:hover .arrow { transform: translateX(3px); color: var(--accent); }
+
+  /* Reveal */
+  a.entry { opacity: 0; transform: translateY(6px); animation: rise 0.45s ease forwards; }
+  @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+
+  /* States */
+  .state {
+    padding: 2.5rem 0.4rem;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+  .state code {
+    font-family: 'IBM Plex Mono', monospace;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 0.1rem 0.4rem;
+    border-radius: 5px;
+    font-size: 0.85em;
+  }
+  .skeleton {
+    height: 1px; background: var(--line); margin: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 1.15rem 0;
+  }
+  .retry {
+    margin-top: 0.8rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    background: none; border: 1px solid var(--line);
+    padding: 0.45rem 0.9rem; border-radius: 8px;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .retry:hover { background: var(--accent-soft); }
+
+  footer {
+    margin-top: 2rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--faint);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--accent); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+    .eyebrow .dot { animation: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="eyebrow"><span class="dot"></span>mboniz.github.io / artifacts</div>
+      <h1>Artifacts</h1>
+      <p class="sub">Tutto quello che costruisco in chat, pubblicato e in un posto solo. <span class="count" id="count">—</span></p>
+    </header>
+
+    <main>
+      <div class="list" id="list">
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+      </div>
+    </main>
+
+    <footer>
+      <span id="updated">Aggiornata in tempo reale dal repo</span>
+      <a href="https://github.com/Mboniz/artifacts" target="_blank" rel="noopener">Mboniz/artifacts →</a>
+    </footer>
+  </div>
+
+<script>
+  // Cartelle da NON mostrare in home (aggiungi qui slug da nascondere)
+  const EXCLUDE = ['hello'];
+  const API = 'https://api.github.com/repos/Mboniz/artifacts/contents/';
+
+  const listEl = document.getElementById('list');
+  const countEl = document.getElementById('count');
+
+  function prettify(slug) {
+    return slug.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  function render(dirs) {
+    if (!dirs.length) {
+      listEl.innerHTML = '<div class="state">Ancora niente qui. Pubblica il primo artifact dalla chat e comparirà da solo.</div>';
+      countEl.textContent = '0 live';
+      return;
+    }
+    countEl.textContent = dirs.length + (dirs.length === 1 ? ' live' : ' live');
+    listEl.innerHTML = '';
+    dirs.forEach((slug, i) => {
+      const a = document.createElement('a');
+      a.className = 'entry';
+      a.href = slug + '/';
+      a.style.animationDelay = (i * 45) + 'ms';
+      a.innerHTML =
+        '<span class="idx">' + String(i + 1).padStart(2, '0') + '</span>' +
+        '<span class="body">' +
+          '<span class="name" data-slug="' + slug + '">' + prettify(slug) + '</span>' +
+          '<span class="path">/' + slug + '/</span>' +
+        '</span>' +
+        '<svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+      listEl.appendChild(a);
+      // Migliora il nome leggendo il <title> reale della pagina (same-origin, nessun rate limit)
+      upgradeTitle(slug, a.querySelector('.name'));
+    });
+  }
+
+  async function upgradeTitle(slug, nameEl) {
+    try {
+      const res = await fetch(slug + '/', { cache: 'no-store' });
+      if (!res.ok) return;
+      const html = await res.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const t = doc.querySelector('title');
+      if (t && t.textContent.trim()) {
+        // pulisce eventuali suffissi tipo " — Marco" o " | ..."
+        const clean = t.textContent.trim().split(/\s[—|·]\s/)[0].trim();
+        if (clean) nameEl.textContent = clean;
+      }
+    } catch (e) { /* fallback: resta lo slug prettificato */ }
+  }
+
+  function showError(rateLimited) {
+    countEl.textContent = '—';
+    listEl.innerHTML =
+      '<div class="state">' +
+      (rateLimited
+        ? 'GitHub ha temporaneamente limitato le richieste (troppi refresh ravvicinati). Riprova tra un minuto.'
+        : 'Non riesco a leggere la lista dal repo in questo momento.') +
+      '<br><button class="retry" onclick="load()">Riprova</button></div>';
+  }
+
+  async function load() {
+    listEl.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>';
+    try {
+      const res = await fetch(API, { headers: { 'Accept': 'application/vnd.github+json' }, cache: 'no-store' });
+      if (res.status === 403) { showError(true); return; }
+      if (!res.ok) { showError(false); return; }
+      const data = await res.json();
+      const dirs = data
+        .filter(x => x.type === 'dir' && !EXCLUDE.includes(x.name))
+        .map(x => x.name)
+        .sort((a, b) => a.localeCompare(b));
+      render(dirs);
+    } catch (e) {
+      showError(false);
+    }
+  }
+
+  load();
+</script>
+</body>
+</html>
