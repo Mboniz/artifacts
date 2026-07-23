@@ -311,11 +311,11 @@
     <div class="gate-card">
       <div class="gate-lock">🔒</div>
       <h2>Artifacts</h2>
-      <p>Inserisci la password del giorno</p>
+      <p>Accesso riservato</p>
       <input id="pwd" type="password" inputmode="numeric" autocomplete="off"
-             autocorrect="off" spellcheck="false" maxlength="8" placeholder="GGMMAAAA" aria-label="Password">
+             autocorrect="off" spellcheck="false" maxlength="8" placeholder="••••••••" aria-label="Password">
       <button class="gate-btn" id="gateBtn">Entra</button>
-      <div class="gate-msg" id="gateMsg">Password non valida</div>
+      <div class="gate-msg" id="gateMsg">Accesso negato</div>
     </div>
   </div>
 
@@ -420,12 +420,12 @@
     }
   }
 
-  /* ---- Gate: password = data odierna in formato GGMMAAAA ---- */
+  /* ---- Gate ---- */
   const gate = document.getElementById('gate');
   const pwd = document.getElementById('pwd');
-  const KEY = 'artifacts-unlocked';
+  const KEY = '_ax';
 
-  function today() {
+  function k() {
     const d = new Date();
     return String(d.getDate()).padStart(2, '0')
          + String(d.getMonth() + 1).padStart(2, '0')
@@ -435,12 +435,12 @@
   function unlock() {
     document.body.classList.remove('locked');
     document.body.classList.add('unlocked');
-    try { localStorage.setItem(KEY, today()); } catch (e) {}
+    try { localStorage.setItem(KEY, k()); } catch (e) {}
     load();
   }
 
   function attempt() {
-    if (pwd.value.trim() === today()) {
+    if (pwd.value.trim() === k()) {
       unlock();
     } else {
       gate.classList.add('error');
@@ -454,10 +454,10 @@
   pwd.addEventListener('keydown', e => { if (e.key === 'Enter') attempt(); });
   pwd.addEventListener('input', () => gate.classList.remove('error'));
 
-  // Se già sbloccata oggi, salta il gate (lo sblocco scade a mezzanotte)
+  
   let saved = null;
   try { saved = localStorage.getItem(KEY); } catch (e) {}
-  if (saved === today()) {
+  if (saved === k()) {
     unlock();
   } else {
     pwd.focus();
