@@ -205,6 +205,90 @@
     a.entry { opacity: 1 !important; transform: none !important; }
   }
 
+  /* Gate */
+  body.locked { overflow: hidden; }
+  .wrap { display: none; }
+  body.unlocked .wrap { display: block; }
+  #gate {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    z-index: 50;
+  }
+  body.unlocked #gate { display: none; }
+  .gate-card {
+    width: 100%;
+    max-width: 22rem;
+    text-align: center;
+  }
+  .gate-lock { font-size: 2rem; line-height: 1; margin-bottom: 1.1rem; }
+  .gate-card h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+  }
+  .gate-card p {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+  }
+  #pwd {
+    width: 100%;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.25rem;
+    letter-spacing: 0.35em;
+    text-align: center;
+    padding: 0.9rem 0.6rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  #pwd::placeholder { letter-spacing: 0.2em; color: var(--faint); }
+  #pwd:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  #gate.error #pwd { border-color: #d93b3b; box-shadow: 0 0 0 3px rgba(217,59,59,0.12); }
+  #gate.error .gate-card { animation: shake 0.35s ease; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-7px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(2px); }
+  }
+  .gate-msg {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: #d93b3b;
+    margin-top: 0.9rem;
+    min-height: 1rem;
+    visibility: hidden;
+  }
+  #gate.error .gate-msg { visibility: visible; }
+  .gate-btn {
+    margin-top: 1rem;
+    width: 100%;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+    background: var(--accent);
+    border: none;
+    padding: 0.8rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .gate-btn:hover { opacity: 0.88; }
+
   /* Mobile: righe più leggibili, colonne compatte */
   @media (max-width: 520px) {
     a.entry {
@@ -222,7 +306,19 @@
   }
 </style>
 </head>
-<body>
+<body class="locked">
+  <div id="gate">
+    <div class="gate-card">
+      <div class="gate-lock">🔒</div>
+      <h2>Artifacts</h2>
+      <p>Inserisci la password del giorno</p>
+      <input id="pwd" type="password" inputmode="numeric" autocomplete="off"
+             autocorrect="off" spellcheck="false" maxlength="8" placeholder="GGMMAAAA" aria-label="Password">
+      <button class="gate-btn" id="gateBtn">Entra</button>
+      <div class="gate-msg" id="gateMsg">Password non valida</div>
+    </div>
+  </div>
+
   <div class="wrap">
     <header>
       <div class="eyebrow"><span class="dot"></span>mboniz.github.io / artifacts</div>
@@ -324,7 +420,48 @@
     }
   }
 
-  load();
+  /* ---- Gate: password = data odierna in formato GGMMAAAA ---- */
+  const gate = document.getElementById('gate');
+  const pwd = document.getElementById('pwd');
+  const KEY = 'artifacts-unlocked';
+
+  function today() {
+    const d = new Date();
+    return String(d.getDate()).padStart(2, '0')
+         + String(d.getMonth() + 1).padStart(2, '0')
+         + d.getFullYear();
+  }
+
+  function unlock() {
+    document.body.classList.remove('locked');
+    document.body.classList.add('unlocked');
+    try { localStorage.setItem(KEY, today()); } catch (e) {}
+    load();
+  }
+
+  function attempt() {
+    if (pwd.value.trim() === today()) {
+      unlock();
+    } else {
+      gate.classList.add('error');
+      pwd.value = '';
+      pwd.focus();
+      setTimeout(() => gate.classList.remove('error'), 2500);
+    }
+  }
+
+  document.getElementById('gateBtn').addEventListener('click', attempt);
+  pwd.addEventListener('keydown', e => { if (e.key === 'Enter') attempt(); });
+  pwd.addEventListener('input', () => gate.classList.remove('error'));
+
+  // Se già sbloccata oggi, salta il gate (lo sblocco scade a mezzanotte)
+  let saved = null;
+  try { saved = localStorage.getItem(KEY); } catch (e) {}
+  if (saved === today()) {
+    unlock();
+  } else {
+    pwd.focus();
+  }
 </script>
 </body>
 </html>
