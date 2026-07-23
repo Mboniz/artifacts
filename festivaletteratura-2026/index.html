@@ -121,6 +121,10 @@ select.fsel{width:100%;padding:9px 10px;border:1.5px solid var(--linea);border-r
 .persona{display:inline-block;background:var(--carta);border:1.5px solid var(--linea);border-radius:18px;
   padding:4px 11px;margin:0 5px 6px 0;font-size:12.5px;font-weight:600}
 .persona small{color:var(--grigio);font-weight:500}
+.persona.link{border-color:var(--blu);color:var(--blu);cursor:pointer;transition:background .12s,transform .12s}
+.persona.link:active{background:var(--blu);color:#fff;transform:scale(.96)}
+.persona.link:active small{color:#fff}
+.pfreccia{font-weight:800;opacity:.6}
 .sdesc{font-size:14px;line-height:1.55;margin-top:10px}
 .snote{font-size:12.5px;color:var(--grigio);font-style:italic;margin-top:10px;border-top:1px solid var(--linea);padding-top:8px}
 .sheet-actions{display:flex;gap:8px;margin:14px 0 4px}
@@ -337,6 +341,16 @@ function viewEventi(){
 }
 function setDay(k){ ST.day=k; render(); window.scrollTo(0,0); }
 function tgSet(s,v){ s.has(v)?s.delete(v):s.add(v); render(); }
+function goAutore(ai){
+  const n=AUTORI[ai].n;
+  ST.qa=''; ST.openA.clear(); ST.openA.add(n);
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('sheet').classList.remove('open');
+  document.body.style.overflow='';
+  tab='autori'; render();
+  setTimeout(()=>{ const el=document.querySelector(`[data-a="${ai}"]`);
+    if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); },60);
+}
 function tgA(i){ const n=AUTORI[i].n; ST.openA.has(n)?ST.openA.delete(n):ST.openA.add(n);
   const el=document.getElementById('ares'); if(el) el.innerHTML=autoriRes(); else render(); }
 function tgL(i){ const k=LKEYS[i]; ST.openL.has(k)?ST.openL.delete(k):ST.openL.add(k);
@@ -347,7 +361,8 @@ function resetF(){ ST.fasce.clear(); ST.tags.clear(); ST.luogo=''; render(); }
 /* ---------- modale dettaglio ---------- */
 function openSheet(i){
   const e=EV[i], l=e.l?LU[e.l]:null, g=GMAP[e.d]||{};
-  const persone=(e.p||[]).map(p=>`<span class="persona">${esc(p[0])}${p[1]?' <small>· conduce</small>':''}</span>`).join('');
+  const persone=(e.p||[]).map(p=>{ const ai=AUTORI.findIndex(a=>a.n===p[0]);
+    return `<span class="persona ${ai>=0?'link':''}" ${ai>=0?`onclick="goAutore(${ai})"`:''}>${esc(p[0])}${p[1]?' <small>· conduce</small>':''}${ai>=0?' <span class="pfreccia">›</span>':''}</span>`; }).join('');
   const rif = e.v ? EV.find(x=>x.n===e.v.replace('vedi n. ','') && x.de) : null;
   const desc = e.de || (rif?rif.de:'');
   document.getElementById('sheet').innerHTML=`
@@ -405,7 +420,7 @@ function autoriRes(){
     if(L!==last && !q){ html+=`<div class="aletter">${L}</div>`; last=L; }
     const ai=AUTORI.indexOf(a);
     const open=ST.openA.has(a.n);
-    html+=`<div class="arow ${open?'open':''}">
+    html+=`<div class="arow ${open?'open':''}" data-a="${ai}" style="scroll-margin-top:70px">
       <div class="arow-h" onclick="tgA(${ai})">
         <span>${esc(a.n)}</span><span class="cnt">${a.evs.length}</span></div>
       <div class="arow-ev">${a.evs.map(x=>{ const e=EV[x.i], g=GMAP[e.d]||{};
