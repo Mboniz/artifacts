@@ -337,8 +337,10 @@ function viewEventi(){
 }
 function setDay(k){ ST.day=k; render(); window.scrollTo(0,0); }
 function tgSet(s,v){ s.has(v)?s.delete(v):s.add(v); render(); }
-function tgA(i){ tgSet(ST.openA, AUTORI[i].n); }
-function tgL(i){ tgSet(ST.openL, LKEYS[i]); }
+function tgA(i){ const n=AUTORI[i].n; ST.openA.has(n)?ST.openA.delete(n):ST.openA.add(n);
+  const el=document.getElementById('ares'); if(el) el.innerHTML=autoriRes(); else render(); }
+function tgL(i){ const k=LKEYS[i]; ST.openL.has(k)?ST.openL.delete(k):ST.openL.add(k);
+  const el=document.getElementById('lres'); if(el) el.innerHTML=luoghiRes(); else render(); }
 function tgTag(i){ tgSet(ST.tags, TAGS[i]); }
 function resetF(){ ST.fasce.clear(); ST.tags.clear(); ST.luogo=''; render(); }
 
@@ -394,7 +396,7 @@ const AUTORI = (()=>{ const m={};
 function ordEv(e){ const d={mer:0,gio:1,ven:2,sab:3,dom:4,tutti:5}[e.d]??9; return d*10000+mins(e.h); }
 function cognome(n){ return n.split(' ').slice(-1)[0]; }
 function normTxt(s){ return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
-function viewAutori(){
+function autoriRes(){
   const q=normTxt(ST.qa);
   const list=AUTORI.filter(a=>!q||normTxt(a.n).includes(q));
   let html='',last='';
@@ -412,22 +414,25 @@ function viewAutori(){
           <span class="mt">${esc(e.t)}${x.ruolo?' <span class="mruolo">(conduce)</span>':''}</span></div>`; }).join('')}</div>
     </div>`;
   });
-  return `<div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-    <input type="search" placeholder="Cerca per nome o cognome…" value="${esc(ST.qa)}" oninput="ST.qa=this.value;render();this.focus();this.setSelectionRange(this.value.length,this.value.length)"></div>
-  <div class="count">${list.length} autrici e autori</div>
-  ${html || '<div class="vuoto">Nessun autore trovato.</div>'}`;
+  return `<div class="count">${list.length} autrici e autori</div>` + (html || '<div class="vuoto">Nessun autore trovato.</div>');
 }
+function viewAutori(){
+  return `<div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+    <input type="search" autocomplete="off" placeholder="Cerca per nome o cognome…" value="${esc(ST.qa)}" oninput="qAut(this.value)"></div>
+  <div id="ares">${autoriRes()}</div>`;
+}
+let debT=null;
+function qAut(v){ ST.qa=v; clearTimeout(debT);
+  debT=setTimeout(()=>{ const el=document.getElementById('ares'); if(el) el.innerHTML=autoriRes(); },90); }
 
 /* ---------- vista LUOGHI ---------- */
 const PERLUOGO=(()=>{ const m={}; EV.forEach(e=>{ if(e.l)(m[e.l]=m[e.l]||[]).push(e.i); });
   Object.values(m).forEach(a=>a.sort((x,y)=>ordEv(EV[x])-ordEv(EV[y]))); return m; })();
-function viewLuoghi(){
+function luoghiRes(){
   const q=normTxt(ST.ql);
   const keys=LKEYS.filter(k=>PERLUOGO[k]&&(!q||normTxt(LU[k].nome).includes(q)));
-  return `<div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-    <input type="search" placeholder="Cerca un luogo…" value="${esc(ST.ql)}" oninput="ST.ql=this.value;render();this.focus();this.setSelectionRange(this.value.length,this.value.length)"></div>
-  <div class="count">${keys.length} luoghi del Festival</div>
-  ${keys.map(k=>{ const l=LU[k], open=ST.openL.has(k), li=LKEYS.indexOf(k);
+  return `<div class="count">${keys.length} luoghi del Festival</div>` +
+  (keys.map(k=>{ const l=LU[k], open=ST.openL.has(k), li=LKEYS.indexOf(k);
     return `<div class="arow ${open?'open':''}">
       <div class="arow-h" onclick="tgL(${li})">
         <span>${esc(l.nome)}<div class="lrow-addr">${esc(l.ind)}</div></span><span class="cnt">${PERLUOGO[k].length}</span></div>
@@ -437,8 +442,16 @@ function viewLuoghi(){
           return `<div class="mini-ev" onclick="openSheet(${e.i})">
             <span class="md">${e.d==='tutti'?'sempre':g.label+' '+g.num+(e.h?' '+e.h:'')}</span>
             <span class="mt">${esc(e.t)}</span></div>`; }).join('')}
-      </div></div>`; }).join('')}`;
+      </div></div>`; }).join('') || '<div class="vuoto">Nessun luogo trovato.</div>');
 }
+function viewLuoghi(){
+  return `<div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+    <input type="search" autocomplete="off" placeholder="Cerca un luogo…" value="${esc(ST.ql)}" oninput="qLuo(this.value)"></div>
+  <div id="lres">${luoghiRes()}</div>`;
+}
+let debT2=null;
+function qLuo(v){ ST.ql=v; clearTimeout(debT2);
+  debT2=setTimeout(()=>{ const el=document.getElementById('lres'); if(el) el.innerHTML=luoghiRes(); },90); }
 
 /* ---------- vista DIARIO ---------- */
 let map=null, mapLayer=null;
