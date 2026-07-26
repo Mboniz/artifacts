@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Achille sx — protocollo HSR</title>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="robots" content="noai, noimageai">
+<style>
+  :root{
+    --bg:#f5f6f4; --card:#fff; --line:#eef0f2; --ink:#1a1a1a; --mut:#6b7280;
+    --faint:#a8a29e; --hsr:#2563eb; --warn:#92400e;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;
+    font-size:15px;line-height:1.45;padding:16px}
+  .wrap{max-width:640px;margin:0 auto;padding-bottom:40px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px}
+  h1{font-size:25px;font-weight:700;margin:4px 0 0;line-height:1.15}
+  h2{font-size:15px;font-weight:700;margin:0 0 4px}
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
+  .sub{font-size:12.5px;color:var(--faint);line-height:1.45}
+  .num{font-variant-numeric:tabular-nums}
+  button{font-family:inherit;cursor:pointer;border:none}
+  .seg{display:flex;gap:8px;margin-top:14px}
+  .seg button{flex:1;padding:9px 8px;border-radius:10px;font-size:13px;font-weight:700;
+    background:transparent;border:1px solid rgba(255,255,255,.3);color:#bae6fd}
+  .seg button.on{background:#fff;color:#0c4a6e;border-color:transparent}
+  .hdr{background:linear-gradient(135deg,#0c4a6e,#1e3a8a);border-radius:18px;padding:22px 20px;color:#fff;margin-bottom:14px}
+  .hdr .eyebrow{color:#bae6fd}
+  .bar{height:9px;background:rgba(255,255,255,.2);border-radius:10px;overflow:hidden;margin-top:6px}
+  .bar>div{height:100%;background:#38bdf8;border-radius:10px;transition:width .3s}
+  .sectitle{font-size:12px;font-weight:800;color:#78716c;text-transform:uppercase;letter-spacing:1.2px;margin:20px 4px 10px}
+  .ex{display:flex;gap:12px;padding:12px 14px;background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:7px}
+  .ex.done{opacity:.55;background:#f8faf9}
+  .cb{width:24px;height:24px;border-radius:7px;flex:0 0 auto;margin-top:1px;display:flex;
+    align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:800;background:transparent}
+  .exhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .exname{font-size:15px;font-weight:600;line-height:1.35}
+  .ex.done .exname{text-decoration:line-through}
+  .presc{font-size:13px;font-weight:800;white-space:nowrap;flex:0 0 auto}
+  .tgt{font-size:12.5px;font-weight:600;margin-top:3px}
+  .load{font-size:13px;color:var(--mut);margin-top:2px}
+  .pill{margin-top:8px;padding:5px 12px;border-radius:20px;font-size:12.5px;font-weight:700;display:inline-block}
+  .desc{font-size:13.5px;color:#374151;margin-top:8px;line-height:1.55;padding:10px 12px;border-radius:8px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .grid4 button{padding:9px 4px;border-radius:10px;font-size:12px;font-weight:700;line-height:1.3;
+    background:#fafbfc;border:1px solid #e7e5e4;color:#78716c}
+  .grid4 button.on{background:var(--hsr);color:#fff;border-color:transparent}
+  .scale{display:flex;gap:5px;flex-wrap:wrap;margin-top:14px}
+  .scale button{width:30px;height:34px;border-radius:8px;font-size:13.5px;font-weight:700;
+    background:#fafbfc;border:1px solid #e7e5e4;color:#78716c}
+  .chart{display:flex;gap:2px;align-items:flex-end;height:56px;margin-top:16px}
+  .chart div{flex:1;border-radius:3px;min-width:1px}
+  .note{margin-top:14px;padding:10px 12px;border-radius:8px;font-size:13px;line-height:1.45}
+  .ok{background:#ecfdf5;border-left:3px solid #10b981;color:#065f46}
+  .bad{background:#fef2f2;border-left:3px solid #dc2626;color:#991b1b}
+  .neutral{background:#f8fafc;border-left:3px solid #94a3b8;color:#334155}
+  input[type=number],input[type=date]{font-family:inherit;font-size:15px;padding:8px 10px;
+    border:1px solid #e7e5e4;border-radius:9px;background:#fafbfc;color:var(--ink);width:100%}
+  .row{display:flex;gap:8px;align-items:center;margin-top:8px}
+  .row label{font-size:12.5px;color:var(--mut);flex:0 0 auto}
+  .btn{padding:9px 14px;border-radius:10px;font-size:13px;font-weight:700}
+  .btnP{background:var(--hsr);color:#fff}
+  .btnG{background:#fafbfc;border:1px solid #e7e5e4;color:#57534e}
+  .hist{font-size:12px;color:var(--faint);margin-top:8px;line-height:1.5}
+  .rules{background:#1c1917;border-radius:16px;padding:16px 18px;color:#d6d3d1;margin-top:18px}
+  .rules div.r{display:flex;gap:9px;font-size:13.5px;line-height:1.45;margin-bottom:8px}
+  .foot{text-align:center;font-size:11px;color:var(--faint);margin-top:14px;line-height:1.6}
+  .warncard{background:#fffbeb;border:1px solid #fde68a;border-radius:16px;padding:16px 18px;margin-bottom:14px;color:#78350f}
+  textarea{width:100%;height:170px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;
+    border:1px solid #e7e5e4;border-radius:10px;padding:10px;background:#fafbfc;margin-top:10px}
+  button:focus-visible,input:focus-visible{outline:2px solid var(--hsr);outline-offset:2px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+/* ===================== DATI PROTOCOLLO ===================== */
+const PHASES=[
+ {label:"Sett. 1–2",wk:[1,2],sets:3,reps:"15",hint:'Impara il tempo 3"-3". Carico medio: le ultime 2 rip devono costare.'},
+ {label:"Sett. 3–5",wk:[3,5],sets:4,reps:"12",hint:"Sali di carico. Se 12 rip sono facili, il peso è sbagliato."},
+ {label:"Sett. 6–8",wk:[6,8],sets:4,reps:"10",hint:"Qui il bilaterale con 16 kg finisce → passa al monopodalico."},
+ {label:"Sett. 9–12",wk:[9,99],sets:4,reps:"8 → 6",hint:"Carico massimo. Monopodalico più zaino zavorrato."}
+];
+const HSR=[
+ {id:"h1",name:"Calf raise in piedi — ginocchio DRITTO",tgt:"Gastrocnemio",load:"KB 16 kg nella mano sx, o zaino caricato",
+  desc:"In piedi, ginocchia completamente distese. Sali sulle punte in 3 secondi fino alla massima estensione della caviglia, pausa breve in cima, scendi in 3 secondi. A ginocchio dritto il gastrocnemio è teso e prende il carico. Mid-portion: lavora sul bordo del gradino con discesa sotto il livello del piede. Inserzionale: resta su terra piatta, mai sotto il neutro."},
+ {id:"h2",name:"Calf raise seduto — ginocchio a 90°",tgt:"Soleo",load:"KB 16 kg appoggiata sul ginocchio sx",
+  desc:"Seduto, avampiede sx su un rialzo, ginocchio a 90°. KB sopra il ginocchio tenuta con le mani. Sali in 3\", scendi in 3\". Con il ginocchio flesso il gastrocnemio è accorciato e fuori gioco: lavora il soleo, il muscolo che regge il picco di carico nella corsa e il grande dimenticato dei protocolli fai-da-te. Non saltarlo."},
+ {id:"h3",name:"Calf raise monopodalico SX",tgt:"Progressione di carico",load:"Corpo libero → KB 16 kg → zaino",
+  desc:"Stessa esecuzione del calf raise in piedi ma su un piede solo, mano al muro per l'equilibrio, non per scaricare peso. Sostituisce il bilaterale zavorrato quando 16 kg non bastano più a raggiungere il cedimento nel range previsto. Confronta sempre con il destro: la differenza tra i due lati è il tuo indicatore di recupero più onesto."}
+];
+const ISO={id:"iso",name:"Isometrico — spinta sulle punte",tgt:"Fase reattiva",load:'5 × 45" · recupero 2\' · 1–2 volte al giorno',
+ desc:"Sali sulle punte bilaterale zavorrato con la KB e mantieni la posizione alta per 45 secondi, spingendo con intensità elevata ma sostenibile. Effetto analgesico documentato, mantiene tensione senza il carico eccentrico che irrita in fase reattiva. Usalo 1–2 settimane, poi passa alla progressione normale."};
+const FORZA=[
+ {id:"f1",name:"KB Goblet squat",presc:"4 × 12",tint:"#0d9488",desc:"KB per il campanello vicina al petto, schiena verticale, scendi sotto il parallelo. Ginocchio sx mai bloccato in iperestensione in cima."},
+ {id:"f2",name:"Bulgarian split squat — SX davanti",presc:"3 × 10",tint:"#ea580c",desc:"Piede dx sulla sedia dietro, gamba sx davanti che lavora. KB in goblet. Scendi finché il ginocchio dx quasi tocca terra."},
+ {id:"f3",name:"Bulgarian split squat — DX davanti",presc:"3 × 10",tint:"#ea580c",desc:"Speculare, per la simmetria. Il piede sx dietro chiede anche mobilità di caviglia: bonus propriocettivo."},
+ {id:"f4",name:"KB Romanian deadlift bilaterale",presc:"3 × 12",tint:"#db2777",desc:"Hip hinge con ginocchia leggermente piegate, schiena dritta, KB che scorre vicino alle gambe. Fermati allo stretch degli ischio-crurali."},
+ {id:"f5",name:"Leg curl con palla (stile Ronaldo)",presc:"3 × 12",tint:"#db2777",desc:"Seduto sul bordo del tavolo, palla incastrata sotto dove arriva il tallone sx. Spingi il tallone indietro e in basso contro la palla, torna lento."},
+ {id:"f6",name:"Ponte glutei monopodalico SX su cuscino",presc:"3 × 10",tint:"#db2777",desc:"Supino, piede sx su cuscino instabile, gamba dx sollevata. Spingi attraverso il piede sx fino a linea retta spalle-ginocchio."},
+ {id:"f7",name:"Monopodalica SX su cuscino — occhi chiusi",presc:'3 × 15"',tint:"#7c3aed",desc:"Cuscino sotto il piede sx, muro vicino, occhi chiusi. Senza riferimento visivo il sistema propriocettivo lavora da solo."},
+ {id:"f8",name:"RDL monopodalico SX — dinamico",presc:"3 × 8",tint:"#7c3aed",desc:"In piedi sul piede sx, hip hinge in avanti mentre la gamba dx si solleva dietro a controbilanciare. Senza peso finché non è stabile, poi KB."}
+];
+const RULES=[
+ "Dolore durante il lavoro: fino a 5/10 è accettabile e non danneggia il tendine.",
+ "La sera stessa il dolore deve essere tornato al livello di partenza.",
+ "La rigidità mattutina del giorno dopo non deve essere peggiore di quella precedente.",
+ "Settimana su settimana la rigidità mattutina deve calare. Se non cala in 3–4 settimane, chiama Ronaldo.",
+ "Se sfori: scendi di una fase, non fermarti. Il riposo completo peggiora le tendinopatie.",
+ "Rientro corsa: 3 mattine pulite + 25 heel raise monopodalici + 20 saltelli, tutto senza dolore."
+];
+
+/* ===================== STATO ===================== */
+const KEY="achille-hsr-v1";
+const DEF={start:"",site:"",reactive:false,mode:"full",phase:null,stiff:{},loads:{},tests:[],window:30};
+let S=Object.assign({},DEF);
+let checks={}, open={};
+
+function load(){
+  try{const r=localStorage.getItem(KEY); if(r) S=Object.assign({},DEF,JSON.parse(r));}catch(e){}
+}
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(S));}
+  catch(e){alert("Non riesco a salvare i dati su questo dispositivo. Controlla che il browser non sia in navigazione privata.");}
+}
+const iso=d=>{const x=d||new Date();return new Date(x.getTime()-x.getTimezoneOffset()*6e4).toISOString().slice(0,10);};
+const TODAY=iso();
+const short=s=>{const d=new Date(s+"T12:00:00");return d.getDate()+"/"+(d.getMonth()+1);};
+
+/* settimana di protocollo e fase suggerita */
+function weekNum(){
+  if(!S.start) return null;
+  const diff=Math.floor((new Date(TODAY)-new Date(S.start))/864e5);
+  return diff<0?null:Math.floor(diff/7)+1;
+}
+function autoPhase(){
+  const w=weekNum(); if(w===null) return null;
+  for(let i=0;i<PHASES.length;i++){if(w>=PHASES[i].wk[0]&&w<=PHASES[i].wk[1])return i;}
+  return 3;
+}
+function curPhase(){ return S.phase!==null?S.phase:(autoPhase()??0); }
+
+/* ===================== AUDIO + TIMER ===================== */
+function beep(){
+  try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();
+  o.connect(g);g.connect(c.destination);o.frequency.value=880;o.type="sine";
+  g.gain.setValueAtTime(1e-4,c.currentTime);g.gain.exponentialRampToValueAtTime(.3,c.currentTime+.02);
+  g.gain.exponentialRampToValueAtTime(1e-4,c.currentTime+.5);o.start();o.stop(c.currentTime+.5);}catch(e){}
+}
+let timerId=null,timerLeft=0,timerTotal=150;
+function tickTimer(){
+  timerLeft--;
+  if(timerLeft<=0){clearInterval(timerId);timerId=null;beep();}
+  const el=document.getElementById("restbtn");
+  if(el) el.textContent=timerId?fmtT(timerLeft):"▶ Recupero "+fmtT(timerTotal);
+}
+const fmtT=s=>Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
+function toggleTimer(){
+  if(timerId){clearInterval(timerId);timerId=null;}
+  else{timerLeft=timerTotal;timerId=setInterval(tickTimer,1000);}
+  render();
+}
+
+/* ===================== ANALISI DIARIO ===================== */
+function stiffColor(v){
+  if(v===undefined) return "#e7e5e4";
+  if(v===0) return "#10b981";
+  if(v<=3) return "#84cc16";
+  if(v<=5) return "#f59e0b";
+  return "#dc2626";
+}
+function lastDays(n){
+  const out=[];
+  for(let i=n-1;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=iso(d);out.push({k,v:S.stiff[k]});}
+  return out;
+}
+function mean(a){return a.length?a.reduce((x,y)=>x+y,0)/a.length:null;}
+function trend(){
+  const d=lastDays(14).map(x=>x.v).filter(v=>v!==undefined);
+  const rec=lastDays(7).map(x=>x.v).filter(v=>v!==undefined);
+  const prev=lastDays(14).slice(0,7).map(x=>x.v).filter(v=>v!==undefined);
+  return {n:d.length,rec:mean(rec),prev:mean(prev)};
+}
+function cleanStreak(){
+  const d=lastDays(5).filter(x=>x.v!==undefined).slice(-3).map(x=>x.v);
+  return d.length===3&&d.every(v=>v===0);
+}
+function risingStreak(){
+  const d=lastDays(5).filter(x=>x.v!==undefined).slice(-3).map(x=>x.v);
+  return d.length===3&&d[2]>d[1]&&d[1]>d[0];
+}
+
+/* ===================== EXPORT ===================== */
+function buildExport(){
+  const w=weekNum(),P=PHASES[curPhase()],t=trend();
+  let o="## Achille sx — riepilogo al "+short(TODAY)+"\n";
+  o+="Protocollo iniziato: "+(S.start?short(S.start):"non impostato")+(w?" · settimana "+w:"")+"\n";
+  o+="Fase corrente: "+P.label+" ("+P.sets+"×"+P.reps+")"+(S.reactive?" — IN FASE REATTIVA, isometrici":"")+"\n";
+  o+="Zona: "+(S.site==="mid"?"mid-portion":S.site==="ins"?"inserzionale":"non determinata")+"\n\n";
+
+  o+="### Rigidità mattutina (0–10)\n";
+  const d14=lastDays(14).filter(x=>x.v!==undefined);
+  o+=d14.length?d14.map(x=>short(x.k)+": "+x.v).join(" · ")+"\n":"nessun dato\n";
+  if(t.rec!==null){
+    o+="Media ultimi 7 gg: "+t.rec.toFixed(1);
+    if(t.prev!==null) o+=" · 7 gg precedenti: "+t.prev.toFixed(1)+" → "+(t.rec<t.prev?"in calo":t.rec>t.prev?"IN SALITA":"stabile");
+    o+="\n";
+  }
+  o+="\n### Carichi HSR\n";
+  let any=false;
+  HSR.forEach(e=>{
+    const L=(S.loads[e.id]||[]).slice(-6);
+    if(L.length){any=true;o+="- "+e.name.split(" — ")[0]+": "+L.map(r=>short(r.d)+" "+r.kg+"kg×"+r.reps).join(" → ")+"\n";}
+  });
+  if(!any) o+="nessun carico registrato\n";
+
+  o+="\n### Test di rientro\n";
+  if(S.tests.length){
+    S.tests.slice(-4).forEach(t2=>{
+      o+="- "+short(t2.d)+": heel raise sx "+t2.sx+" / dx "+t2.dx+" (asimmetria "+(t2.dx-t2.sx)+") · hop "+(t2.hop?"ok":"dolore")+"\n";
+    });
+  } else o+="nessun test registrato\n";
+  return o;
+}
+function copyExport(){
+  const txt=buildExport();
+  const done=()=>{const b=document.getElementById("copybtn");if(b){b.textContent="✓ Copiato";setTimeout(()=>{b.textContent="Copia riepilogo";},1800);}};
+  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(done).catch(showFallback);}
+  else showFallback();
+  function showFallback(){
+    const ta=document.getElementById("exportarea");
+    if(ta){ta.style.display="block";ta.value=txt;ta.select();}
+  }
+}
+
+/* ===================== RENDER ===================== */
+function h(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+
+function exCard(e,presc,tint,logging){
+  const on=!!checks[e.id],op=!!open[e.id];
+  const L=S.loads[e.id]||[],last=L[L.length-1];
+  return `<div class="ex ${on?"done":""}">
+    <button class="cb" data-check="${e.id}" aria-label="segna come fatto"
+      style="border:${on?"none":"2px solid "+tint};background:${on?tint:"transparent"}">${on?"✓":""}</button>
+    <div style="flex:1;min-width:0">
+      <div class="exhead"><span class="exname">${h(e.name)}</span><span class="presc" style="color:${tint}">${presc}</span></div>
+      ${e.tgt?`<div class="tgt" style="color:${tint}">${h(e.tgt)}</div>`:""}
+      ${e.load?`<div class="load">${h(e.load)}</div>`:""}
+      <button class="pill" data-open="${e.id}"
+        style="background:${op?tint:tint+"12"};color:${op?"#fff":tint}">${op?"▲ Nascondi":"ℹ Come si esegue"}</button>
+      ${op?`<div class="desc" style="background:${tint}0a;border-left:3px solid ${tint}">${h(e.desc)}</div>`:""}
+      ${logging?`
+        <div class="row">
+          <label for="kg-${e.id}">kg</label><input type="number" id="kg-${e.id}" inputmode="decimal" step="0.5" value="${last?last.kg:16}">
+          <label for="rp-${e.id}">rip</label><input type="number" id="rp-${e.id}" inputmode="numeric" value="${last?last.reps:""}">
+          <button class="btn btnP" data-log="${e.id}" style="white-space:nowrap">Salva</button>
+        </div>
+        ${L.length?`<div class="hist">${L.slice(-5).map(r=>short(r.d)+" · "+r.kg+"kg×"+r.reps).join("  →  ")}</div>`:""}
+      `:""}
+    </div>
+  </div>`;
+}
+
+function render(){
+  const P=PHASES[curPhase()],W=weekNum();
+  const hsrItems=S.reactive?[ISO]:HSR;
+  const items=S.mode==="full"?[...hsrItems,...FORZA]:hsrItems;
+  const done=items.filter(i=>checks[i.id]).length,pct=Math.round(done/items.length*100);
+  const win=S.window,days=lastDays(win),t=trend();
+
+  let html=`
+  <div class="hdr">
+    <div class="eyebrow">Achille sx · Heavy Slow Resistance</div>
+    <h1>${S.mode==="hsr"?"Solo tendine · ~15'":"Tendine + forza · ~40'"}</h1>
+    <div class="sub" style="color:#bae6fd;margin-top:6px">HSR 3×/sett a giorni alterni. Forza generale su 2 delle 3 sessioni.${W?" Sei alla settimana "+W+" del protocollo.":""}</div>
+    <div class="seg">
+      <button data-mode="hsr" class="${S.mode==="hsr"?"on":""}">Solo HSR</button>
+      <button data-mode="full" class="${S.mode==="full"?"on":""}">HSR + forza</button>
+    </div>
+    <div style="margin-top:16px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <span style="font-size:12px;color:#bae6fd;font-weight:600">Avanzamento</span>
+        <span class="num" style="font-size:15px;font-weight:800">${done}/${items.length} · ${pct}%</span>
+      </div>
+      <div class="bar"><div style="width:${pct}%;background:${pct===100?"#fbbf24":"#38bdf8"}"></div></div>
+    </div>
+  </div>`;
+
+  /* DIARIO */
+  html+=`<div class="card">
+    <h2>Rigidità mattutina — Achille sx</h2>
+    <div class="sub">Registra i primi passi a freddo, prima di qualsiasi cosa. È l'unico vero termometro: se sale per due mattine di fila hai caricato troppo.</div>
+    <div class="scale">${[0,1,2,3,4,5,6,7,8,9,10].map(v=>{
+      const sel=S.stiff[TODAY]===v;
+      return `<button data-stiff="${v}" class="${sel?"on":""}" style="${sel?"background:"+stiffColor(v)+";color:#fff;border-color:transparent":""}">${v}</button>`;}).join("")}</div>
+    <div class="sub" style="margin-top:6px">0 = primi passi normali · 10 = zoppichi fino a doccia fatta</div>
+    <div class="chart">${days.map(d=>`<div title="${short(d.k)}${d.v!==undefined?": "+d.v:""}" style="height:${d.v===undefined?4:4+d.v*4.8}px;background:${stiffColor(d.v)}"></div>`).join("")}</div>
+    <div style="display:flex;gap:6px;margin-top:10px">
+      ${[14,30,90].map(n=>`<button class="btn ${win===n?"btnP":"btnG"}" data-win="${n}">${n} gg</button>`).join("")}
+      <span class="sub" style="margin-left:auto;align-self:center">${days.filter(d=>d.v!==undefined).length} registrazioni</span>
+    </div>
+    ${t.rec!==null?`<div class="note neutral"><b>Media 7 gg: ${t.rec.toFixed(1)}</b>${t.prev!==null?` · settimana precedente ${t.prev.toFixed(1)} → ${t.rec<t.prev?"in calo, il protocollo funziona":t.rec>t.prev?"in salita, alleggerisci":"stabile"}`:""}</div>`:""}
+    ${cleanStreak()?`<div class="note ok"><b>3 mattine pulite di fila.</b> Fai il test dei 25 heel raise e l'hop test qui sotto: se passano, riparti a correre.</div>`:""}
+    ${risingStreak()?`<div class="note bad"><b>Trend in salita su 3 mattine.</b> Scendi di una fase nella progressione HSR e togli il lungo della settimana. Non fermarti del tutto.</div>`:""}
+  </div>`;
+
+  /* SETUP + TRIAGE */
+  html+=`<div class="card">
+    <h2>Impostazioni protocollo</h2>
+    <div class="row"><label for="startd" style="min-width:110px">Inizio protocollo</label><input type="date" id="startd" value="${S.start}"></div>
+    <div class="sub" style="margin-top:6px">${S.start?`Settimana ${W} · fase suggerita: ${PHASES[autoPhase()].label}${S.phase!==null?" (stai forzando "+P.label+")":""}`:"Imposta la data e la fase si aggiorna da sola ogni settimana."}</div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn ${S.site==="mid"?"btnP":"btnG"}" data-site="mid" style="flex:1">Mid-portion</button>
+      <button class="btn ${S.site==="ins"?"btnP":"btnG"}" data-site="ins" style="flex:1">Inserzionale</button>
+    </div>
+    <div class="sub" style="margin-top:8px">${S.site==="mid"?"Dolore 2–6 cm sopra il tallone: puoi scendere sotto il livello del gradino."
+      :S.site==="ins"?"Dolore attaccato all'osso: MAI sotto il neutro, e rialzo 8–10 mm sotto il tallone anche nelle scarpe di tutti i giorni."
+      :"Pizzica il tendine tra pollice e indice e scegli dove fa male: cambia il protocollo."}</div>
+  </div>`;
+
+  html+=`<div class="warncard">
+    <div style="font-size:14px;font-weight:700">Fase reattiva</div>
+    <div style="font-size:13.5px;margin-top:6px">Se il test di carico (25 heel raise) provoca dolore, sostituisci l'HSR con gli isometrici per 1–2 settimane.</div>
+    <button class="btn" data-reactive="1" style="margin-top:12px;background:${S.reactive?"#dc2626":"#fef3c7"};color:${S.reactive?"#fff":"#92400e"}">
+      ${S.reactive?"✓ Isometrici attivi — torna all'HSR":"Attiva gli isometrici"}</button>
+  </div>`;
+
+  /* FASE */
+  if(!S.reactive){
+    html+=`<div class="card">
+      <h2>Fase della progressione</h2>
+      <div class="grid4" style="margin-top:10px">${PHASES.map((p,i)=>
+        `<button data-phase="${i}" class="${curPhase()===i?"on":""}">${p.label}<br><span style="font-size:11px;opacity:.85">${p.sets}×${p.reps}</span></button>`).join("")}</div>
+      <div class="sub" style="color:var(--mut);margin-top:10px">${h(P.hint)}</div>
+      <div style="font-size:13px;color:var(--hsr);font-weight:700;margin-top:8px">Tempo di ogni ripetizione: 3" su · 3" giù.</div>
+      <button class="btn ${timerId?"btnP":"btnG"}" id="restbtn" data-timer="1" style="margin-top:10px">${timerId?fmtT(timerLeft):"▶ Recupero "+fmtT(timerTotal)}</button>
+      ${S.phase!==null?`<button class="btn btnG" data-phase="auto" style="margin-top:10px;margin-left:6px">↺ Torna all'automatico</button>`:""}
+    </div>`;
+  }
+
+  /* HSR */
+  html+=`<div class="sectitle">${S.reactive?"Fase reattiva — isometrici":"Blocco tendine — ogni sessione"}</div>`;
+  html+=hsrItems.map(e=>exCard(e,S.reactive?'5 × 45"':P.sets+" × "+P.reps,"#2563eb",!S.reactive)).join("");
+
+  /* FORZA */
+  if(S.mode==="full"){
+    html+=`<div class="sectitle">Blocco forza generale — 2 sessioni su 3</div>`;
+    html+=FORZA.map(e=>exCard(e,e.presc,e.tint,false)).join("");
+  }
+
+  /* TEST RIENTRO */
+  html+=`<div class="card" style="margin-top:18px">
+    <h2>Test di rientro alla corsa</h2>
+    <div class="sub">Heel raise monopodalici a esaurimento, un lato per volta. Servono 25 puliti a sinistra. L'asimmetria fra i due lati è l'indicatore più onesto che hai.</div>
+    <div class="row">
+      <label for="tsx" style="min-width:26px">SX</label><input type="number" id="tsx" inputmode="numeric" placeholder="rip">
+      <label for="tdx" style="min-width:26px">DX</label><input type="number" id="tdx" inputmode="numeric" placeholder="rip">
+    </div>
+    <div class="row">
+      <button class="btn btnG" data-test="ok" style="flex:1">Salva · hop test ok</button>
+      <button class="btn btnG" data-test="no" style="flex:1">Salva · hop doloroso</button>
+    </div>
+    ${S.tests.length?`<div class="hist">${S.tests.slice(-5).map(t2=>`${short(t2.d)} — sx ${t2.sx} / dx ${t2.dx} (Δ${t2.dx-t2.sx}) · hop ${t2.hop?"ok":"dolore"}`).join("<br>")}</div>`:""}
+    ${(()=>{const l=S.tests[S.tests.length-1];if(!l)return"";
+      return l.sx>=25&&l.hop?`<div class="note ok"><b>Criteri di rientro superati.</b> Se anche le 3 mattine sono pulite, puoi correre.</div>`
+      :`<div class="note neutral">Mancano ${Math.max(0,25-l.sx)} ripetizioni a sinistra${!l.hop?" e l'hop test è ancora doloroso":""}.</div>`;})()}
+  </div>`;
+
+  /* EXPORT */
+  html+=`<div class="card">
+    <h2>Riepilogo per il coach</h2>
+    <div class="sub">Copia e incolla in chat il lunedì: contiene diario, carichi e test.</div>
+    <button class="btn btnP" id="copybtn" data-copy="1" style="margin-top:10px">Copia riepilogo</button>
+    <textarea id="exportarea" style="display:none" readonly aria-label="riepilogo da copiare"></textarea>
+  </div>`;
+
+  /* REGOLE */
+  html+=`<div class="rules">
+    <div style="font-size:13px;font-weight:700;color:#fbbf24;margin-bottom:10px">Le regole che governano tutto</div>
+    ${RULES.map(r=>`<div class="r"><span style="color:#78716c">—</span><span>${h(r)}</span></div>`).join("")}
+  </div>
+  <button class="btn btnG" data-reset="1" style="width:100%;margin-top:14px;background:transparent;border:1px solid #d6d3d1;color:#78716c;padding:12px">↺ Azzera i check di oggi</button>
+  <div class="foot">Protocollo HSR: Beyer et al., <i>Am J Sports Med</i> 2015 · monitoraggio del dolore: Silbernagel<br>
+  Diario, carichi e test restano salvati su questo dispositivo.</div>`;
+
+  document.getElementById("app").innerHTML=html;
+}
+
+/* ===================== EVENTI ===================== */
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  const d=b.dataset;
+  if(d.check){checks[d.check]=!checks[d.check];return render();}
+  if(d.open){open[d.open]=!open[d.open];return render();}
+  if(d.mode){S.mode=d.mode;save();return render();}
+  if(d.win){S.window=+d.win;save();return render();}
+  if(d.stiff!==undefined){S.stiff[TODAY]=+d.stiff;save();return render();}
+  if(d.site){S.site=S.site===d.site?"":d.site;save();return render();}
+  if(d.reactive){S.reactive=!S.reactive;save();return render();}
+  if(d.phase){S.phase=d.phase==="auto"?null:+d.phase;save();return render();}
+  if(d.timer){return toggleTimer();}
+  if(d.reset){checks={};return render();}
+  if(d.copy){return copyExport();}
+  if(d.log){
+    const kg=parseFloat(document.getElementById("kg-"+d.log).value);
+    const rp=parseInt(document.getElementById("rp-"+d.log).value,10);
+    if(isNaN(kg)||isNaN(rp)){alert("Inserisci sia i kg che le ripetizioni.");return;}
+    S.loads[d.log]=S.loads[d.log]||[];
+    const arr=S.loads[d.log],last=arr[arr.length-1];
+    if(last&&last.d===TODAY){last.kg=kg;last.reps=rp;} else arr.push({d:TODAY,kg,reps:rp});
+    checks[d.log]=true;save();return render();
+  }
+  if(d.test){
+    const sx=parseInt(document.getElementById("tsx").value,10);
+    const dx=parseInt(document.getElementById("tdx").value,10);
+    if(isNaN(sx)||isNaN(dx)){alert("Inserisci le ripetizioni di entrambi i lati.");return;}
+    S.tests.push({d:TODAY,sx,dx,hop:d.test==="ok"});save();return render();
+  }
+});
+document.addEventListener("change",e=>{
+  if(e.target.id==="startd"){S.start=e.target.value;S.phase=null;save();render();}
+});
+
+load();render();
+</script>
+</body>
+</html>
