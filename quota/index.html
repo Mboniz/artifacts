@@ -142,6 +142,23 @@
 
   .righello{height:1px;background:var(--linea);margin:14px 0 12px}
   .opzioni{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .opzioni + .opzioni{margin-top:11px}
+  .velo{display:flex;align-items:center;gap:6px;width:100%}
+  .velo .etichetta{
+    font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--nebbia);
+    margin-right:2px;
+  }
+  .velo button{
+    flex:1;font-family:"IBM Plex Mono",monospace;font-size:11px;
+    background:transparent;color:var(--nebbia);
+    border:1px solid var(--linea);border-radius:7px;
+    padding:5px 6px;cursor:pointer;transition:.15s;
+  }
+  .velo button:hover{border-color:rgba(159,231,245,.4);color:var(--ghiaccio)}
+  .velo button[aria-pressed=true]{
+    background:rgba(159,231,245,.14);border-color:var(--glacier);color:var(--glacier);
+  }
+  .velo button:focus-visible{outline:2px solid var(--glacier);outline-offset:2px}
   .interruttore{
     display:flex;align-items:center;gap:8px;cursor:pointer;
     font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--nebbia);
@@ -238,6 +255,15 @@
   <div class="righello"></div>
 
   <div class="opzioni">
+    <div class="velo" id="velo" role="group" aria-label="Intensità del velo sotto soglia">
+      <span class="etichetta">velo</span>
+      <button data-v="leggero">leggero</button>
+      <button data-v="medio" aria-pressed="true">medio</button>
+      <button data-v="forte">forte</button>
+    </div>
+  </div>
+
+  <div class="opzioni">
     <label class="interruttore">
       <input type="checkbox" id="fasce">
       <span>fasce sopra soglia</span>
@@ -257,6 +283,8 @@
   var ZOOM_DEM = 12;          // zoom massimo dei dati di quota
   var soglia = 1000;
   var fasce = false;
+  var velo = 'medio';
+  var VELI = { leggero:[38,26], medio:[62,40], forte:[92,58] };
   var mioPunto = null;
   var deposito = new Map();   // chiave tile -> {ctx, quote}
   var avvisato = false;
@@ -280,12 +308,13 @@
     if(!rec.quote) return;
     var out = rec.ctx.createImageData(LATO, LATO);
     var d = out.data, q = rec.quote, t = soglia;
+    var a0 = VELI[velo][0], a1 = VELI[velo][1];
     for(var i=0, p=0; i<q.length; i++, p+=4){
       var h = q[i];
       if(h < t){
-        var giu = (t - h) / 500; if(giu > 1) giu = 1;
-        d[p]=13; d[p+1]=19; d[p+2]=26;
-        d[p+3]= 128 + 92*giu;
+        var giu = (t - h) / 900; if(giu > 1) giu = 1;
+        d[p]=42; d[p+1]=54; d[p+2]=68;
+        d[p+3]= a0 + a1*giu;
       } else if(fasce){
         var su = (h - t) / 900; if(su > 1) su = 1;
         d[p]=159; d[p+1]=231; d[p+2]=245;
@@ -462,6 +491,15 @@
     d.style.left = 'calc(6px + ' + pc + '% - ' + (pc * 0.12) + 'px)';
     d.innerHTML = '<i></i><span>' + r.testo + '</span>';
     tacche.appendChild(d);
+  });
+
+  var pulsantiVelo = Array.prototype.slice.call(document.querySelectorAll('#velo button'));
+  pulsantiVelo.forEach(function(b){
+    b.addEventListener('click', function(){
+      velo = b.dataset.v;
+      pulsantiVelo.forEach(function(o){ o.setAttribute('aria-pressed', String(o === b)); });
+      ridipingi();
+    });
   });
 
   document.getElementById('fasce').addEventListener('change', function(e){
