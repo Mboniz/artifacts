@@ -126,62 +126,21 @@
   .tacca.casa i{background:var(--glacier);height:7px}
   .tacca.casa span{color:var(--glacier-dim)}
 
-  /* ---- scorciatoie ---- */
-  .scorciatoie{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 0}
-  .scorciatoie button{
-    font-family:"IBM Plex Mono",monospace;font-size:11px;
-    background:transparent;color:var(--nebbia);
-    border:1px solid var(--linea);border-radius:999px;
-    padding:5px 11px;cursor:pointer;transition:.15s;
+  .righello{height:1px;background:var(--linea);margin:16px 0 12px}
+  .azioni{display:flex;gap:7px}
+  .azioni button{
+    flex:1;font-family:"IBM Plex Mono",monospace;font-size:11.5px;
+    background:transparent;color:var(--ghiaccio);
+    border:1px solid var(--linea);border-radius:8px;
+    padding:9px 8px;cursor:pointer;transition:.15s;line-height:1.2;
   }
-  .scorciatoie button:hover{border-color:rgba(159,231,245,.4);color:var(--ghiaccio)}
-  .scorciatoie button[aria-pressed=true]{
-    background:rgba(159,231,245,.14);border-color:var(--glacier);color:var(--glacier);
+  .azioni button:hover{border-color:rgba(159,231,245,.45)}
+  .azioni button:focus-visible{outline:2px solid var(--glacier);outline-offset:2px}
+  .azioni button.primaria{
+    background:rgba(159,231,245,.13);border-color:rgba(159,231,245,.42);color:var(--glacier);
   }
-  .scorciatoie button:focus-visible{outline:2px solid var(--glacier);outline-offset:2px}
-
-  .righello{height:1px;background:var(--linea);margin:14px 0 12px}
-  .opzioni{display:flex;align-items:center;justify-content:space-between;gap:10px}
-  .opzioni + .opzioni{margin-top:11px}
-  .velo{display:flex;align-items:center;gap:6px;width:100%}
-  .velo .etichetta{
-    font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--nebbia);
-    margin-right:2px;
-  }
-  .velo button{
-    flex:1;font-family:"IBM Plex Mono",monospace;font-size:11px;
-    background:transparent;color:var(--nebbia);
-    border:1px solid var(--linea);border-radius:7px;
-    padding:5px 6px;cursor:pointer;transition:.15s;
-  }
-  .velo button:hover{border-color:rgba(159,231,245,.4);color:var(--ghiaccio)}
-  .velo button[aria-pressed=true]{
-    background:rgba(159,231,245,.14);border-color:var(--glacier);color:var(--glacier);
-  }
-  .velo button:focus-visible{outline:2px solid var(--glacier);outline-offset:2px}
-  .interruttore{
-    display:flex;align-items:center;gap:8px;cursor:pointer;
-    font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--nebbia);
-  }
-  .interruttore input{
-    appearance:none;-webkit-appearance:none;margin:0;
-    width:30px;height:17px;border-radius:999px;
-    background:#1B2732;border:1px solid var(--linea);position:relative;cursor:pointer;transition:.18s;
-  }
-  .interruttore input::after{
-    content:"";position:absolute;top:2px;left:2px;width:11px;height:11px;border-radius:50%;
-    background:var(--nebbia);transition:.18s;
-  }
-  .interruttore input:checked{background:rgba(159,231,245,.2);border-color:var(--glacier)}
-  .interruttore input:checked::after{left:15px;background:var(--glacier)}
-  .interruttore input:focus-visible{outline:2px solid var(--glacier);outline-offset:2px}
-  .posizione{
-    font-family:"IBM Plex Mono",monospace;font-size:11px;
-    background:transparent;color:var(--glacier);border:1px solid var(--linea);
-    border-radius:999px;padding:5px 11px;cursor:pointer;transition:.15s;white-space:nowrap;
-  }
-  .posizione:hover{border-color:var(--glacier)}
-  .posizione:focus-visible{outline:2px solid var(--glacier);outline-offset:2px}
+  .azioni button.primaria:hover{border-color:var(--glacier)}
+  .azioni button[disabled]{opacity:.5;cursor:default}
 
   /* ---- sonda ---- */
   .sonda{
@@ -205,6 +164,11 @@
     width:14px;height:14px;border-radius:50%;
     background:var(--glacier);border:2px solid #06343E;
     box-shadow:0 0 0 4px rgba(159,231,245,.22);
+  }
+  .pin-meta{
+    width:16px;height:16px;border-radius:50%;
+    background:rgba(159,231,245,.28);border:2px solid var(--glacier);
+    box-shadow:0 0 0 5px rgba(159,231,245,.14),0 2px 10px rgba(0,0,0,.6);
   }
   .pin-sonda{
     width:12px;height:12px;border-radius:2px;transform:rotate(45deg);
@@ -250,25 +214,11 @@
     <div class="tacche" id="tacche"></div>
   </div>
 
-  <div class="scorciatoie" id="scorciatoie"></div>
-
   <div class="righello"></div>
 
-  <div class="opzioni">
-    <div class="velo" id="velo" role="group" aria-label="Intensità del velo sotto soglia">
-      <span class="etichetta">velo</span>
-      <button data-v="leggero">leggero</button>
-      <button data-v="medio" aria-pressed="true">medio</button>
-      <button data-v="forte">forte</button>
-    </div>
-  </div>
-
-  <div class="opzioni">
-    <label class="interruttore">
-      <input type="checkbox" id="fasce">
-      <span>fasce sopra soglia</span>
-    </label>
-    <button class="posizione" id="btnPos">dove sono</button>
+  <div class="azioni">
+    <button id="btnPos">dove sono</button>
+    <button id="btnCerca" class="primaria">il fresco più vicino</button>
   </div>
 
   <div class="sonda" id="sonda">Tocca un punto sulla mappa per leggerne la quota.</div>
@@ -282,9 +232,6 @@
   var LATO = 256;
   var ZOOM_DEM = 12;          // zoom massimo dei dati di quota
   var soglia = 1000;
-  var fasce = false;
-  var velo = 'medio';
-  var VELI = { leggero:[38,26], medio:[62,40], forte:[92,58] };
   var mioPunto = null;
   var deposito = new Map();   // chiave tile -> {ctx, quote}
   var avvisato = false;
@@ -308,17 +255,12 @@
     if(!rec.quote) return;
     var out = rec.ctx.createImageData(LATO, LATO);
     var d = out.data, q = rec.quote, t = soglia;
-    var a0 = VELI[velo][0], a1 = VELI[velo][1];
     for(var i=0, p=0; i<q.length; i++, p+=4){
       var h = q[i];
       if(h < t){
         var giu = (t - h) / 900; if(giu > 1) giu = 1;
         d[p]=42; d[p+1]=54; d[p+2]=68;
-        d[p+3]= a0 + a1*giu;
-      } else if(fasce){
-        var su = (h - t) / 900; if(su > 1) su = 1;
-        d[p]=159; d[p+1]=231; d[p+2]=245;
-        d[p+3]= 14 + 62*su;
+        d[p+3]= 38 + 26*giu;
       }
     }
     rec.ctx.putImageData(out, 0, 0);
@@ -448,29 +390,11 @@
 
   var campo = document.getElementById('soglia');
   var valore = document.getElementById('valore');
-  var bottoni = [];
 
-  function aggiorna(v, daBottone){
-    soglia = v;
-    valore.textContent = v;
-    campo.value = v;
-    bottoni.forEach(function(b){
-      b.setAttribute('aria-pressed', String(Number(b.dataset.q) === v));
-    });
+  campo.addEventListener('input', function(){
+    soglia = Number(campo.value);
+    valore.textContent = soglia;
     ridipingi();
-    if(daBottone) campo.dispatchEvent(new Event('sync'));
-  }
-
-  campo.addEventListener('input', function(){ aggiorna(Number(campo.value), false); });
-
-  [600, 800, 1000, 1200, 1500, 2000].forEach(function(q){
-    var b = document.createElement('button');
-    b.textContent = q + ' m';
-    b.dataset.q = q;
-    b.setAttribute('aria-pressed', String(q === soglia));
-    b.addEventListener('click', function(){ aggiorna(q, true); });
-    bottoni.push(b);
-    document.getElementById('scorciatoie').appendChild(b);
   });
 
   // tacche di riferimento sulla rotaia
@@ -493,20 +417,6 @@
     tacche.appendChild(d);
   });
 
-  var pulsantiVelo = Array.prototype.slice.call(document.querySelectorAll('#velo button'));
-  pulsantiVelo.forEach(function(b){
-    b.addEventListener('click', function(){
-      velo = b.dataset.v;
-      pulsantiVelo.forEach(function(o){ o.setAttribute('aria-pressed', String(o === b)); });
-      ridipingi();
-    });
-  });
-
-  document.getElementById('fasce').addEventListener('change', function(e){
-    fasce = e.target.checked;
-    ridipingi();
-  });
-
   document.getElementById('btnPos').addEventListener('click', function(){
     var b = this;
     b.textContent = 'cerco…';
@@ -526,6 +436,122 @@
     map.once('locationerror', function(){
       b.textContent = 'dove sono';
       sonda.textContent = 'Posizione non disponibile. Puoi comunque toccare la mappa.';
+    });
+  });
+
+  /* ---------------- il fresco più vicino ---------------- */
+
+  var Z_CERCA = 10;          // ~110 m per pixel a 45° di latitudine
+  var RAGGIO_TILE = 8;       // ~220 km di raggio massimo
+  var memo = new Map();
+  var pinMeta = null, rotta = null;
+
+  function quoteTile(z, x, y, cb){
+    var k = z+':'+x+':'+y;
+    if(memo.has(k)){ cb(memo.get(k)); return; }
+    var img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function(){
+      var q = null;
+      try{ q = decodifica(img); }catch(e){}
+      if(memo.size > 90) memo.clear();
+      memo.set(k, q); cb(q);
+    };
+    img.onerror = function(){ memo.set(k, null); cb(null); };
+    img.src = urlDem(z, x, y);
+  }
+
+  function cercaFresco(origine, fatto){
+    var z = Z_CERCA;
+    var o = map.project(origine, z);
+    var mpp = 156543.03392 * Math.cos(origine.lat * Math.PI/180) / Math.pow(2, z);
+    var tx0 = Math.floor(o.x/LATO), ty0 = Math.floor(o.y/LATO);
+
+    var coda = [];
+    for(var dx=-RAGGIO_TILE; dx<=RAGGIO_TILE; dx++){
+      for(var dy=-RAGGIO_TILE; dy<=RAGGIO_TILE; dy++){
+        var tx = tx0+dx, ty = ty0+dy;
+        var x0 = tx*LATO, x1 = x0+LATO-1, y0 = ty*LATO, y1 = y0+LATO-1;
+        var ax = o.x < x0 ? x0-o.x : (o.x > x1 ? o.x-x1 : 0);
+        var ay = o.y < y0 ? y0-o.y : (o.y > y1 ? o.y-y1 : 0);
+        coda.push({tx:tx, ty:ty, min:Math.sqrt(ax*ax + ay*ay)});
+      }
+    }
+    coda.sort(function(a,b){ return a.min - b.min; });
+
+    var mgl = null, mglD = Infinity, mglH = 0, i = 0;
+
+    function passo(){
+      if(i >= coda.length || coda[i].min > mglD){
+        fatto(mgl ? {
+          latlng: map.unproject(L.point(mgl.x + 0.5, mgl.y + 0.5), z),
+          metri: mglD * mpp,
+          quota: mglH
+        } : null);
+        return;
+      }
+      var t = coda[i++];
+      quoteTile(z, t.tx, t.ty, function(q){
+        if(q){
+          for(var y=0; y<LATO; y++){
+            var gy = t.ty*LATO + y, ay = gy - o.y;
+            for(var x=0; x<LATO; x++){
+              var h = q[y*LATO + x];
+              if(h >= soglia){
+                var ax = (t.tx*LATO + x) - o.x;
+                var d = Math.sqrt(ax*ax + ay*ay);
+                if(d < mglD){ mglD = d; mgl = {x:t.tx*LATO + x, y:gy}; mglH = h; }
+              }
+            }
+          }
+        }
+        setTimeout(passo, 0);
+      });
+    }
+    passo();
+  }
+
+  var btnCerca = document.getElementById('btnCerca');
+
+  btnCerca.addEventListener('click', function(){
+    var origine = mioPunto || map.getCenter();
+    var daCentro = !mioPunto;
+
+    btnCerca.disabled = true;
+    btnCerca.textContent = 'cerco…';
+    sonda.textContent = daCentro
+      ? 'Cerco dal centro della mappa (posizione non attiva)…'
+      : 'Cerco il punto più vicino sopra i ' + soglia + ' m…';
+
+    cercaFresco(origine, function(res){
+      btnCerca.disabled = false;
+      btnCerca.textContent = 'il fresco più vicino';
+
+      if(!res){
+        sonda.textContent = 'Niente sopra i ' + soglia + ' m entro 220 km. Abbassa la soglia.';
+        return;
+      }
+
+      if(pinMeta) map.removeLayer(pinMeta);
+      if(rotta) map.removeLayer(rotta);
+      pinMeta = L.marker(res.latlng, {
+        icon: L.divIcon({className:'', html:'<div class="pin-meta"></div>', iconSize:[16,16], iconAnchor:[8,8]})
+      }).addTo(map);
+      rotta = L.polyline([origine, res.latlng], {
+        color:'#9FE7F5', weight:1.5, opacity:.75, dashArray:'5 5'
+      }).addTo(map);
+      map.fitBounds(L.latLngBounds([origine, res.latlng]).pad(0.28));
+
+      var km = res.metri/1000;
+      var lat = res.latlng.lat.toFixed(5), lon = res.latlng.lng.toFixed(5);
+      sonda.innerHTML =
+        '<b class="su">' + Math.round(res.quota) + ' m</b> · ' +
+        (km < 10 ? km.toFixed(1) : Math.round(km)) + ' km in linea d\'aria' +
+        (daCentro ? ' dal centro mappa' : ' da te') +
+        '<br><a href="https://www.google.com/maps/dir/?api=1&origin=' +
+        origine.lat.toFixed(5) + ',' + origine.lng.toFixed(5) +
+        '&destination=' + lat + ',' + lon + '&travelmode=driving" target="_blank" rel="noopener">' +
+        'strada e tempo in auto</a>';
     });
   });
 
