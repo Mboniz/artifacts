@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quota — dove inizia il fresco</title>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="robots" content="noai, noimageai">
+<meta name="AdsBot-Google" content="noindex, nofollow">
+<meta name="GPTBot" content="noindex, nofollow">
+<meta name="CCBot" content="noindex, nofollow">
+<meta name="description" content="Mappa con soglia di quota regolabile: sotto la soglia si spegne, sopra resta accesa.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0B1016;
+    --vetro:rgba(11,16,22,.88);
+    --ghiaccio:#E7F1F5;
+    --nebbia:#8A98A6;
+    --glacier:#9FE7F5;
+    --glacier-dim:#3E6C79;
+    --linea:rgba(159,231,245,.16);
+    --ombra:0 18px 44px rgba(0,0,0,.5);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--ink);
+    color:var(--ghiaccio);
+    font-family:"Archivo",system-ui,sans-serif;
+    font-variation-settings:"wdth" 100;
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+  }
+  #map{position:fixed;inset:0;background:#0B1016}
+  .leaflet-container{font-family:"IBM Plex Mono",monospace;background:#0B1016}
+  .leaflet-control-attribution{
+    background:rgba(11,16,22,.72)!important;color:var(--nebbia)!important;
+    font-size:9px!important;backdrop-filter:blur(6px);
+  }
+  .leaflet-control-attribution a{color:var(--glacier-dim)!important}
+  .leaflet-control-zoom{border:none!important;box-shadow:var(--ombra)!important}
+  .leaflet-control-zoom a{
+    background:var(--vetro)!important;color:var(--ghiaccio)!important;
+    border:none!important;border-bottom:1px solid var(--linea)!important;
+    backdrop-filter:blur(10px);width:34px!important;line-height:34px!important;
+  }
+  .leaflet-control-zoom a:hover{background:#16212B!important;color:var(--glacier)!important}
+
+  /* ---- targhetta ---- */
+  .marchio{
+    position:fixed;top:0;left:0;z-index:600;
+    padding:14px 16px calc(14px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-left));
+    pointer-events:none;
+  }
+  .marchio h1{
+    margin:0;font-size:15px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+    font-variation-settings:"wdth" 118;
+    text-shadow:0 2px 14px rgba(0,0,0,.85);
+  }
+  .marchio p{
+    margin:2px 0 0;font-family:"IBM Plex Mono",monospace;font-size:10.5px;
+    color:var(--nebbia);letter-spacing:.06em;text-shadow:0 2px 10px rgba(0,0,0,.9);
+  }
+
+  /* ---- pannello ---- */
+  .pannello{
+    position:fixed;z-index:700;
+    left:16px;bottom:16px;width:352px;max-width:calc(100vw - 32px);
+    background:var(--vetro);backdrop-filter:blur(16px);
+    border:1px solid var(--linea);border-radius:14px;
+    box-shadow:var(--ombra);
+    padding:16px 18px 14px;
+  }
+  .lettura{display:flex;align-items:baseline;gap:8px;margin-bottom:2px}
+  .lettura .valore{
+    font-family:"IBM Plex Mono",monospace;font-weight:600;
+    font-size:44px;line-height:1;letter-spacing:-.02em;
+    color:var(--glacier);font-variant-numeric:tabular-nums;
+  }
+  .lettura .unita{font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--glacier-dim)}
+  .didascalia{
+    font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--nebbia);
+    letter-spacing:.05em;margin:0 0 16px;
+  }
+
+  /* ---- rotaia altimetrica ---- */
+  .rotaia{position:relative;padding-bottom:26px}
+  .rotaia input[type=range]{
+    -webkit-appearance:none;appearance:none;width:100%;height:26px;
+    background:transparent;margin:0;display:block;cursor:grab;
+  }
+  .rotaia input[type=range]:active{cursor:grabbing}
+  .rotaia input[type=range]::-webkit-slider-runnable-track{
+    height:6px;border-radius:3px;
+    background:linear-gradient(90deg,#1B2732 0%,#2B4A55 55%,#5FA9BC 100%);
+    border:1px solid rgba(159,231,245,.14);
+  }
+  .rotaia input[type=range]::-moz-range-track{
+    height:6px;border-radius:3px;
+    background:linear-gradient(90deg,#1B2732 0%,#2B4A55 55%,#5FA9BC 100%);
+    border:1px solid rgba(159,231,245,.14);
+  }
+  .rotaia input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:12px;height:24px;border-radius:3px;margin-top:-10px;
+    background:var(--glacier);border:1px solid #06343E;
+    box-shadow:0 0 0 1px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.6);
+  }
+  .rotaia input[type=range]::-moz-range-thumb{
+    width:12px;height:24px;border-radius:3px;border:1px solid #06343E;
+    background:var(--glacier);box-shadow:0 4px 12px rgba(0,0,0,.6);
+  }
+  .rotaia input[type=range]:focus-visible{outline:none}
+  .rotaia input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(159,231,245,.45)}
+  .tacche{position:absolute;left:0;right:0;bottom:0;height:24px;pointer-events:none}
+  .tacca{position:absolute;transform:translateX(-50%);text-align:center}
+  .tacca i{display:block;width:1px;height:5px;background:rgba(159,231,245,.28);margin:0 auto 3px}
+  .tacca span{
+    font-family:"IBM Plex Mono",monospace;font-size:9px;color:var(--nebbia);
+    letter-spacing:.04em;white-space:nowrap;
+  }
+  .tacca.casa i{background:var(--glacier);height:7px}
+  .tacca.casa span{color:var(--glacier-dim)}
+
+  /* ---- scorciatoie ---- */
+  .scorciatoie{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 0}
+  .scorciatoie button{
+    font-family:"IBM Plex Mono",monospace;font-size:11px;
+    background:transparent;color:var(--nebbia);
+    border:1px solid var(--linea);border-radius:999px;
+    padding:5px 11px;cursor:pointer;transition:.15s;
+  }
+  .scorciatoie button:hover{border-color:rgba(159,231,245,.4);color:var(--ghiaccio)}
+  .scorciatoie button[aria-pressed=true]{
+    background:rgba(159,231,245,.14);border-color:var(--glacier);color:var(--glacier);
+  }
+  .scorciatoie button:focus-visible{outline:2px solid var(--glacier);outline-offset:2px}
+
+  .righello{height:1px;background:var(--linea);margin:14px 0 12px}
+  .opzioni{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .interruttore{
+    display:flex;align-items:center;gap:8px;cursor:pointer;
+    font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--nebbia);
+  }
+  .interruttore input{
+    appearance:none;-webkit-appearance:none;margin:0;
+    width:30px;height:17px;border-radius:999px;
+    background:#1B2732;border:1px solid var(--linea);position:relative;cursor:pointer;transition:.18s;
+  }
+  .interruttore input::after{
+    content:"";position:absolute;top:2px;left:2px;width:11px;height:11px;border-radius:50%;
+    background:var(--nebbia);transition:.18s;
+  }
+  .interruttore input:checked{background:rgba(159,231,245,.2);border-color:var(--glacier)}
+  .interruttore input:checked::after{left:15px;background:var(--glacier)}
+  .interruttore input:focus-visible{outline:2px solid var(--glacier);outline-offset:2px}
+  .posizione{
+    font-family:"IBM Plex Mono",monospace;font-size:11px;
+    background:transparent;color:var(--glacier);border:1px solid var(--linea);
+    border-radius:999px;padding:5px 11px;cursor:pointer;transition:.15s;white-space:nowrap;
+  }
+  .posizione:hover{border-color:var(--glacier)}
+  .posizione:focus-visible{outline:2px solid var(--glacier);outline-offset:2px}
+
+  /* ---- sonda ---- */
+  .sonda{
+    margin-top:12px;padding-top:12px;border-top:1px solid var(--linea);
+    font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--nebbia);
+    line-height:1.55;
+  }
+  .sonda b{color:var(--ghiaccio);font-weight:500;font-size:13px}
+  .sonda .su{color:var(--glacier)}
+  .sonda a{color:var(--glacier-dim);text-decoration:none;border-bottom:1px solid var(--linea)}
+  .sonda a:hover{color:var(--glacier)}
+
+  .avviso{
+    position:fixed;z-index:800;left:50%;top:16px;transform:translateX(-50%);
+    background:#3A1D1D;border:1px solid #7A3B3B;color:#F3D9D9;
+    font-family:"IBM Plex Mono",monospace;font-size:11px;
+    padding:9px 14px;border-radius:10px;max-width:88vw;display:none;
+  }
+
+  .pin-io{
+    width:14px;height:14px;border-radius:50%;
+    background:var(--glacier);border:2px solid #06343E;
+    box-shadow:0 0 0 4px rgba(159,231,245,.22);
+  }
+  .pin-sonda{
+    width:12px;height:12px;border-radius:2px;transform:rotate(45deg);
+    background:transparent;border:2px solid var(--ghiaccio);
+    box-shadow:0 0 0 2px rgba(0,0,0,.5);
+  }
+
+  @media (max-width:640px){
+    .pannello{
+      left:0;right:0;bottom:0;width:100%;max-width:none;
+      border-radius:16px 16px 0 0;border-bottom:none;
+      padding:14px 16px calc(12px + env(safe-area-inset-bottom));
+    }
+    .lettura .valore{font-size:38px}
+    .didascalia{margin-bottom:14px}
+    .leaflet-control-zoom{display:none}
+    .marchio p{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<div class="marchio">
+  <h1>Quota</h1>
+  <p>dove inizia il fresco</p>
+</div>
+
+<div class="avviso" id="avviso"></div>
+
+<section class="pannello">
+  <div class="lettura">
+    <span class="valore" id="valore">1000</span>
+    <span class="unita">m s.l.m.</span>
+  </div>
+  <p class="didascalia">resta acceso solo ciò che sta più in alto</p>
+
+  <div class="rotaia">
+    <input type="range" id="soglia" min="0" max="2600" step="50" value="1000"
+           aria-label="Soglia di quota in metri">
+    <div class="tacche" id="tacche"></div>
+  </div>
+
+  <div class="scorciatoie" id="scorciatoie"></div>
+
+  <div class="righello"></div>
+
+  <div class="opzioni">
+    <label class="interruttore">
+      <input type="checkbox" id="fasce">
+      <span>fasce sopra soglia</span>
+    </label>
+    <button class="posizione" id="btnPos">dove sono</button>
+  </div>
+
+  <div class="sonda" id="sonda">Tocca un punto sulla mappa per leggerne la quota.</div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var LATO = 256;
+  var ZOOM_DEM = 12;          // zoom massimo dei dati di quota
+  var soglia = 1000;
+  var fasce = false;
+  var mioPunto = null;
+  var deposito = new Map();   // chiave tile -> {ctx, quote}
+  var avvisato = false;
+
+  /* ---------------- mappa ---------------- */
+
+  var map = L.map('map', {
+    center:[45.85, 9.60], zoom:8, minZoom:5, maxZoom:15,
+    zoomControl:false, attributionControl:true
+  });
+  L.control.zoom({position:'bottomright'}).addTo(map);
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
+    subdomains:'abcd', maxZoom:19,
+    attribution:'&copy; OpenStreetMap, &copy; CARTO · quote: Terrain Tiles (AWS Open Data)'
+  }).addTo(map);
+
+  /* ---------------- maschera di quota ---------------- */
+
+  function dipingi(rec){
+    if(!rec.quote) return;
+    var out = rec.ctx.createImageData(LATO, LATO);
+    var d = out.data, q = rec.quote, t = soglia;
+    for(var i=0, p=0; i<q.length; i++, p+=4){
+      var h = q[i];
+      if(h < t){
+        var giu = (t - h) / 500; if(giu > 1) giu = 1;
+        d[p]=13; d[p+1]=19; d[p+2]=26;
+        d[p+3]= 128 + 92*giu;
+      } else if(fasce){
+        var su = (h - t) / 900; if(su > 1) su = 1;
+        d[p]=159; d[p+1]=231; d[p+2]=245;
+        d[p+3]= 14 + 62*su;
+      }
+    }
+    rec.ctx.putImageData(out, 0, 0);
+  }
+
+  function urlDem(z,x,y){
+    return 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/'+z+'/'+x+'/'+y+'.png';
+  }
+
+  function decodifica(img){
+    var off = document.createElement('canvas');
+    off.width = off.height = LATO;
+    var octx = off.getContext('2d', {willReadFrequently:true});
+    octx.drawImage(img, 0, 0, LATO, LATO);
+    var d = octx.getImageData(0, 0, LATO, LATO).data;
+    var q = new Float32Array(LATO*LATO);
+    for(var i=0, p=0; i<q.length; i++, p+=4){
+      q[i] = (d[p]*256 + d[p+1] + d[p+2]/256) - 32768;
+    }
+    return q;
+  }
+
+  function segnala(testo){
+    if(avvisato) return;
+    avvisato = true;
+    var el = document.getElementById('avviso');
+    el.textContent = testo;
+    el.style.display = 'block';
+  }
+
+  var Maschera = L.GridLayer.extend({
+    createTile: function(coords, done){
+      var chiave = coords.z+'/'+coords.x+'/'+coords.y;
+      var el = document.createElement('canvas');
+      el.width = el.height = LATO;
+      var rec = { ctx: el.getContext('2d', {willReadFrequently:true}), quote:null };
+      deposito.set(chiave, rec);
+
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function(){
+        try{ rec.quote = decodifica(img); }
+        catch(e){
+          segnala('Dati di quota non leggibili: il servizio ha rifiutato la richiesta. Riprova più tardi.');
+          done(null, el); return;
+        }
+        dipingi(rec);
+        done(null, el);
+      };
+      img.onerror = function(){
+        segnala('Tile di quota non raggiungibili. Controlla la connessione.');
+        done(null, el);
+      };
+      img.src = urlDem(coords.z, coords.x, coords.y);
+      return el;
+    }
+  });
+
+  var maschera = new Maschera({
+    tileSize: LATO, maxNativeZoom: ZOOM_DEM, minZoom: 5, maxZoom: 15,
+    keepBuffer: 2, updateWhenZooming: false, className: 'strato-quota'
+  }).addTo(map);
+
+  maschera.on('tileunload', function(e){
+    deposito.delete(e.coords.z+'/'+e.coords.x+'/'+e.coords.y);
+  });
+
+  var inCoda = false;
+  function ridipingi(){
+    if(inCoda) return;
+    inCoda = true;
+    requestAnimationFrame(function(){
+      inCoda = false;
+      deposito.forEach(dipingi);
+    });
+  }
+
+  /* ---------------- lettura puntuale ---------------- */
+
+  function quotaDi(latlng, callback){
+    var z = Math.min(Math.round(map.getZoom()), ZOOM_DEM);
+    var p = map.project(latlng, z);
+    var tx = Math.floor(p.x/LATO), ty = Math.floor(p.y/LATO);
+    var px = Math.floor(p.x) - tx*LATO, py = Math.floor(p.y) - ty*LATO;
+    var rec = deposito.get(z+'/'+tx+'/'+ty);
+    if(rec && rec.quote){ callback(rec.quote[py*LATO + px]); return; }
+
+    var img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function(){
+      try{ callback(decodifica(img)[py*LATO + px]); }
+      catch(e){ callback(null); }
+    };
+    img.onerror = function(){ callback(null); };
+    img.src = urlDem(z, tx, ty);
+  }
+
+  var pinSonda = null;
+  var sonda = document.getElementById('sonda');
+
+  map.on('click', function(e){
+    sonda.textContent = 'lettura…';
+    if(pinSonda) map.removeLayer(pinSonda);
+    pinSonda = L.marker(e.latlng, {
+      icon: L.divIcon({className:'', html:'<div class="pin-sonda"></div>', iconSize:[12,12], iconAnchor:[6,6]}),
+      keyboard:false
+    }).addTo(map);
+
+    quotaDi(e.latlng, function(h){
+      if(h === null || !isFinite(h)){ sonda.textContent = 'Quota non disponibile qui.'; return; }
+      var m = Math.round(h);
+      var sopra = m >= soglia;
+      var righe = '<b class="'+(sopra?'su':'')+'">'+m+' m</b> · '+(sopra
+        ? (m - soglia) + ' m sopra soglia'
+        : 'sotto soglia di ' + (soglia - m) + ' m');
+      if(mioPunto){
+        var km = map.distance(mioPunto, e.latlng)/1000;
+        righe += '<br>' + (km < 10 ? km.toFixed(1) : Math.round(km)) + ' km da te in linea d\'aria';
+      }
+      righe += '<br><a href="https://www.google.com/maps?q='+e.latlng.lat.toFixed(5)+','+e.latlng.lng.toFixed(5)+
+               '" target="_blank" rel="noopener">apri in Maps</a>';
+      sonda.innerHTML = righe;
+    });
+  });
+
+  /* ---------------- controlli ---------------- */
+
+  var campo = document.getElementById('soglia');
+  var valore = document.getElementById('valore');
+  var bottoni = [];
+
+  function aggiorna(v, daBottone){
+    soglia = v;
+    valore.textContent = v;
+    campo.value = v;
+    bottoni.forEach(function(b){
+      b.setAttribute('aria-pressed', String(Number(b.dataset.q) === v));
+    });
+    ridipingi();
+    if(daBottone) campo.dispatchEvent(new Event('sync'));
+  }
+
+  campo.addEventListener('input', function(){ aggiorna(Number(campo.value), false); });
+
+  [600, 800, 1000, 1200, 1500, 2000].forEach(function(q){
+    var b = document.createElement('button');
+    b.textContent = q + ' m';
+    b.dataset.q = q;
+    b.setAttribute('aria-pressed', String(q === soglia));
+    b.addEventListener('click', function(){ aggiorna(q, true); });
+    bottoni.push(b);
+    document.getElementById('scorciatoie').appendChild(b);
+  });
+
+  // tacche di riferimento sulla rotaia
+  var riferimenti = [
+    {q:0,    testo:'0'},
+    {q:122,  testo:'Milano', casa:true},
+    {q:500,  testo:'500'},
+    {q:1000, testo:'1000'},
+    {q:1500, testo:'1500'},
+    {q:2000, testo:'2000'},
+    {q:2600, testo:'2600'}
+  ];
+  var tacche = document.getElementById('tacche');
+  riferimenti.forEach(function(r){
+    var d = document.createElement('div');
+    d.className = 'tacca' + (r.casa ? ' casa' : '');
+    var pc = (r.q / 2600) * 100;
+    d.style.left = 'calc(6px + ' + pc + '% - ' + (pc * 0.12) + 'px)';
+    d.innerHTML = '<i></i><span>' + r.testo + '</span>';
+    tacche.appendChild(d);
+  });
+
+  document.getElementById('fasce').addEventListener('change', function(e){
+    fasce = e.target.checked;
+    ridipingi();
+  });
+
+  document.getElementById('btnPos').addEventListener('click', function(){
+    var b = this;
+    b.textContent = 'cerco…';
+    map.locate({setView:true, maxZoom:11, enableHighAccuracy:false});
+    map.once('locationfound', function(e){
+      mioPunto = e.latlng;
+      b.textContent = 'dove sono';
+      L.marker(e.latlng, {
+        icon: L.divIcon({className:'', html:'<div class="pin-io"></div>', iconSize:[14,14], iconAnchor:[7,7]})
+      }).addTo(map);
+      quotaDi(e.latlng, function(h){
+        if(h !== null && isFinite(h)){
+          sonda.innerHTML = 'Sei a <b>' + Math.round(h) + ' m</b>. Le distanze dai punti che tocchi partono da qui.';
+        }
+      });
+    });
+    map.once('locationerror', function(){
+      b.textContent = 'dove sono';
+      sonda.textContent = 'Posizione non disponibile. Puoi comunque toccare la mappa.';
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
