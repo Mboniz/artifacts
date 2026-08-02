@@ -97,6 +97,16 @@ const HSR=[
 ];
 const ISO={id:"iso",name:"Isometrico — spinta sulle punte",tgt:"Fase reattiva",load:'5 × 45" · recupero 2\' · 1–2 volte al giorno',
  desc:"Sali sulle punte bilaterale zavorrato con la KB e mantieni la posizione alta per 45 secondi, spingendo con intensità elevata ma sostenibile. Effetto analgesico documentato, mantiene tensione senza il carico eccentrico che irrita in fase reattiva. Usalo 1–2 settimane, poi passa alla progressione normale."};
+const ROUTINE=[
+ {id:"r1",name:"Sveglia caviglia",tgt:"2' — non saltarlo",load:"20 pompaggi + 10 circonduzioni per lato, poi 1' camminando",sec:60,sets:1,rest:0,
+  desc:"Seduto sul bordo del letto: 20 pompaggi di caviglia per lato (punta su e giù, ampiezza piena ma senza forzare), poi 10 circonduzioni per lato. Poi alzati e cammina per casa un minuto. Serve a portare sangue e sinovia al tendine prima di caricarlo. NIENTE stretching del polpaccio: in fase reattiva la messa in tensione passiva irrita, e se il dolore è inserzionale comprime il tendine contro il calcagno."},
+ {id:"r2",name:"Isometrico — spinta sulle punte",tgt:"Il cuore della routine",load:'5 × 45" · recupero 60" · KB 16 kg in mano',sec:45,sets:5,rest:60,
+  desc:"Sali sulle punte bilaterale con la KB in mano e mantieni la posizione alta 45 secondi SPINGENDO, circa il 70% dello sforzo massimo. Devi sentire il polpaccio in tensione, non stare semplicemente in equilibrio. Se a 45\" non ti trema niente, il carico è troppo basso: aggiungi lo zaino. Effetto analgesico documentato entro 24–48 ore, e mantiene tensione sul tendine senza il carico eccentrico che in fase reattiva lo irrita."},
+ {id:"r3",name:"Monopodalica SX su cuscino — occhi chiusi",tgt:"Propriocezione",load:'3 × 20" · muro vicino',sec:20,sets:3,rest:20,
+  desc:"Cuscino ripiegato sotto il piede sx, muro a fianco per sicurezza, occhi chiusi. Ingrediente fisso e permanente, non solo di questa fase: agisce sulla pre-attivazione dei peronei, l'unica leva utile contro la distorsione, che si consuma in ~40 ms mentre i peronei reagiscono in 50–80 ms."},
+ {id:"r4",name:"Ponte glutei monopodalico SX",tgt:"Catena posteriore",load:"2 × 10 · piede sx su cuscino",
+  desc:"Supino, piede sx su cuscino instabile, gamba dx sollevata. Spingi attraverso il piede sx fino a portare il bacino in linea retta spalle-ginocchio. Scendi lento. Carica il gluteo senza toccare il tendine."}
+];
 const FORZA=[
  {id:"f1",name:"KB Goblet squat",presc:"4 × 12",tint:"#0d9488",desc:"KB per il campanello vicina al petto, schiena verticale, scendi sotto il parallelo. Ginocchio sx mai bloccato in iperestensione in cima."},
  {id:"f2",name:"Bulgarian split squat — SX davanti",presc:"3 × 10",tint:"#ea580c",desc:"Piede dx sulla sedia dietro, gamba sx davanti che lavora. KB in goblet. Scendi finché il ginocchio dx quasi tocca terra."},
@@ -118,7 +128,7 @@ const RULES=[
 
 /* ===================== STATO ===================== */
 const KEY="achille-hsr-v1";
-const DEF={start:"",site:"",reactive:false,mode:"full",phase:null,stiff:{},loads:{},tests:[],window:30};
+const DEF={start:"",site:"",reactive:false,mode:"routine",phase:null,stiff:{},loads:{},tests:[],rout:{},window:30};
 let S=Object.assign({},DEF);
 let checks={}, open={};
 
@@ -152,6 +162,38 @@ function beep(){
   o.connect(g);g.connect(c.destination);o.frequency.value=880;o.type="sine";
   g.gain.setValueAtTime(1e-4,c.currentTime);g.gain.exponentialRampToValueAtTime(.3,c.currentTime+.02);
   g.gain.exponentialRampToValueAtTime(1e-4,c.currentTime+.5);o.start();o.stop(c.currentTime+.5);}catch(e){}
+}
+/* timer sequenziale lavoro/recupero per gli esercizi a tempo */
+let exT=null,exInt=null;
+function exLabel(){
+  if(!exT) return "";
+  return (exT.phase==="rest"?"recupero ":"")+exT.left+'" · '+exT.set+"/"+exT.sets;
+}
+function stopEx(){clearInterval(exInt);exInt=null;exT=null;}
+function startEx(it){
+  if(exT&&exT.id===it.id){stopEx();return render();}
+  clearInterval(exInt);
+  exT={id:it.id,phase:"work",left:it.sec,set:1,sets:it.sets,work:it.sec,rest:it.rest||0};
+  exInt=setInterval(exTick,1000);
+  render();
+}
+function exTick(){
+  if(!exT){clearInterval(exInt);exInt=null;return;}
+  exT.left--;
+  if(exT.left<=0){
+    beep();
+    if(exT.phase==="work"){
+      if(exT.set>=exT.sets){const id=exT.id;stopEx();checks[id]=true;markRoutine();return render();}
+      if(exT.rest>0){exT.phase="rest";exT.left=exT.rest;}
+      else{exT.set++;exT.left=exT.work;}
+    }else{exT.phase="work";exT.set++;exT.left=exT.work;}
+    return render();
+  }
+  const el=document.getElementById("ext-"+exT.id);
+  if(el) el.textContent=exLabel(); else render();
+}
+function markRoutine(){
+  if(ROUTINE.every(i=>checks[i.id])){S.rout[TODAY]=true;save();}
 }
 let timerId=null,timerLeft=0,timerTotal=150;
 function tickTimer(){
@@ -212,6 +254,9 @@ function buildExport(){
     if(t.prev!==null) o+=" · 7 gg precedenti: "+t.prev.toFixed(1)+" → "+(t.rec<t.prev?"in calo":t.rec>t.prev?"IN SALITA":"stabile");
     o+="\n";
   }
+  const rd=lastDays(14).filter(x=>S.rout[x.k]);
+  o+="Routine 14': "+rd.length+"/14 giorni completati\n";
+
   o+="\n### Carichi HSR\n";
   let any=false;
   HSR.forEach(e=>{
@@ -255,6 +300,9 @@ function exCard(e,presc,tint,logging){
       <button class="pill" data-open="${e.id}"
         style="background:${op?tint:tint+"12"};color:${op?"#fff":tint}">${op?"▲ Nascondi":"ℹ Come si esegue"}</button>
       ${op?`<div class="desc" style="background:${tint}0a;border-left:3px solid ${tint}">${h(e.desc)}</div>`:""}
+      ${e.sec?`<div><button class="btn ${exT&&exT.id===e.id?"btnP":"btnG"}" id="ext-${e.id}" data-ex="${e.id}"
+        style="margin-top:8px;${exT&&exT.id===e.id&&exT.phase==="rest"?"background:#57534e;color:#fff":""}">${
+        exT&&exT.id===e.id?exLabel():"▶ Avvia "+e.sets+"×"+e.sec+'"'}</button></div>`:""}
       ${logging?`
         <div class="row">
           <label for="kg-${e.id}">kg</label><input type="number" id="kg-${e.id}" inputmode="decimal" step="0.5" value="${last?last.kg:16}">
@@ -270,18 +318,21 @@ function exCard(e,presc,tint,logging){
 function render(){
   const P=PHASES[curPhase()],W=weekNum();
   const hsrItems=S.reactive?[ISO]:HSR;
-  const items=S.mode==="full"?[...hsrItems,...FORZA]:hsrItems;
+  const items=S.mode==="routine"?ROUTINE:S.mode==="full"?[...hsrItems,...FORZA]:hsrItems;
   const done=items.filter(i=>checks[i.id]).length,pct=Math.round(done/items.length*100);
   const win=S.window,days=lastDays(win),t=trend();
 
   let html=`
   <div class="hdr">
     <div class="eyebrow">Achille sx · Heavy Slow Resistance</div>
-    <h1>${S.mode==="hsr"?"Solo tendine · ~15'":"Tendine + forza · ~40'"}</h1>
-    <div class="sub" style="color:#bae6fd;margin-top:6px">HSR 3×/sett a giorni alterni. Forza generale su 2 delle 3 sessioni.${W?" Sei alla settimana "+W+" del protocollo.":""}</div>
+    <h1>${S.mode==="routine"?"Routine mattutina · 14'":S.mode==="hsr"?"Solo tendine · ~15'":"Tendine + forza · ~40'"}</h1>
+    <div class="sub" style="color:#bae6fd;margin-top:6px">${S.mode==="routine"
+      ?"Tutti i giorni appena alzato, dopo aver segnato la rigidità. Se oggi sei ≥4, ripeti solo gli isometrici la sera."
+      :"HSR 3×/sett a giorni alterni. Forza generale su 2 delle 3 sessioni."}${W?" Settimana "+W+" del protocollo.":""}</div>
     <div class="seg">
+      <button data-mode="routine" class="${S.mode==="routine"?"on":""}">Routine 14'</button>
       <button data-mode="hsr" class="${S.mode==="hsr"?"on":""}">Solo HSR</button>
-      <button data-mode="full" class="${S.mode==="full"?"on":""}">HSR + forza</button>
+      <button data-mode="full" class="${S.mode==="full"?"on":""}">+ Forza</button>
     </div>
     <div style="margin-top:16px">
       <div style="display:flex;justify-content:space-between;align-items:baseline">
@@ -332,7 +383,7 @@ function render(){
   </div>`;
 
   /* FASE */
-  if(!S.reactive){
+  if(!S.reactive&&S.mode!=="routine"){
     html+=`<div class="card">
       <h2>Fase della progressione</h2>
       <div class="grid4" style="margin-top:10px">${PHASES.map((p,i)=>
@@ -344,9 +395,28 @@ function render(){
     </div>`;
   }
 
+  /* ROUTINE */
+  if(S.mode==="routine"){
+    const rd=lastDays(14).map(d=>({k:d.k,v:!!S.rout[d.k]}));
+    const nd=rd.filter(x=>x.v).length;
+    html+=`<div class="sectitle">Routine quotidiana — 14 minuti</div>`;
+    html+=ROUTINE.map(e=>exCard(e,e.sets?e.sets+" × "+e.sec+'"':"2 × 10","#0891b2",false)).join("");
+    html+=`<div class="card" style="margin-top:14px">
+      <h2>Costanza — ultimi 14 giorni</h2>
+      <div class="sub">${nd}/14 giorni completati. La costanza vale più della perfezione del singolo protocollo.</div>
+      <div class="chart" style="height:26px">${rd.map(d=>`<div title="${short(d.k)}" style="height:${d.v?24:7}px;background:${d.v?"#0891b2":"#e7e5e4"}"></div>`).join("")}</div>
+    </div>
+    <div class="warncard" style="margin-top:14px">
+      <div style="font-size:14px;font-weight:700">Da NON fare in questa fase</div>
+      <div style="font-size:13.5px;margin-top:6px">Niente stretching del polpaccio. Niente calf raise eccentrici: tornano quando la rigidità mattutina è stabile sotto 2. In bici sempre seduto, cadenza ≥85, percorsi piatti.</div>
+    </div>`;
+  }
+
   /* HSR */
-  html+=`<div class="sectitle">${S.reactive?"Fase reattiva — isometrici":"Blocco tendine — ogni sessione"}</div>`;
-  html+=hsrItems.map(e=>exCard(e,S.reactive?'5 × 45"':P.sets+" × "+P.reps,"#2563eb",!S.reactive)).join("");
+  if(S.mode!=="routine"){
+    html+=`<div class="sectitle">${S.reactive?"Fase reattiva — isometrici":"Blocco tendine — ogni sessione"}</div>`;
+    html+=hsrItems.map(e=>exCard(e,S.reactive?'5 × 45"':P.sets+" × "+P.reps,"#2563eb",!S.reactive)).join("");
+  }
 
   /* FORZA */
   if(S.mode==="full"){
@@ -396,7 +466,8 @@ function render(){
 document.addEventListener("click",e=>{
   const b=e.target.closest("button"); if(!b) return;
   const d=b.dataset;
-  if(d.check){checks[d.check]=!checks[d.check];return render();}
+  if(d.ex){const it=ROUTINE.find(x=>x.id===d.ex);if(it)startEx(it);return;}
+  if(d.check){checks[d.check]=!checks[d.check];markRoutine();return render();}
   if(d.open){open[d.open]=!open[d.open];return render();}
   if(d.mode){S.mode=d.mode;save();return render();}
   if(d.win){S.window=+d.win;save();return render();}
