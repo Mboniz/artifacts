@@ -213,6 +213,31 @@
     font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--nebbia);letter-spacing:.05em;
   }
 
+  .sblocco{
+    display:flex;align-items:center;gap:8px;margin-top:12px;cursor:pointer;
+    font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--nebbia);
+  }
+  .sblocco input{
+    appearance:none;-webkit-appearance:none;margin:0;flex:none;
+    width:30px;height:17px;border-radius:999px;
+    background:#231A12;border:1px solid var(--linea);position:relative;cursor:pointer;transition:.18s;
+  }
+  .sblocco input::after{
+    content:"";position:absolute;top:2px;left:2px;width:11px;height:11px;border-radius:50%;
+    background:var(--nebbia);transition:.18s;
+  }
+  .sblocco input:checked{background:rgba(242,166,90,.2);border-color:var(--ambra)}
+  .sblocco input:checked::after{left:15px;background:var(--ambra)}
+  .sblocco input:focus-visible{outline:2px solid var(--ambra);outline-offset:2px}
+  .sblocco input:checked ~ span{color:var(--ambra)}
+  .nota{
+    display:none;margin-top:9px;padding-left:10px;
+    border-left:1px solid var(--ambra-dim);
+    font-family:"IBM Plex Mono",monospace;font-size:10px;line-height:1.65;color:var(--nebbia);
+  }
+  .nota.visibile{display:block}
+  .nota b{color:var(--ambra);font-weight:500}
+
   .cta{
     width:100%;margin-top:13px;
     font-family:"IBM Plex Mono",monospace;font-size:12px;
@@ -326,9 +351,22 @@
     <span class="etichetta" id="minutiNota">minuti</span>
   </div>
   <div class="rotaia stretta calda">
-    <input type="range" id="tempo" min="10" max="120" step="5" value="45"
+    <input type="range" id="tempo" min="10" max="60" step="5" value="45"
            aria-label="Minuti di viaggio">
   </div>
+
+  <label class="sblocco">
+    <input type="checkbox" id="oltre">
+    <span>vai oltre i 60 minuti</span>
+  </label>
+  <p class="nota" id="nota">
+    Il servizio di isocrone si ferma a <b>60 minuti</b>. Oltre, la stima è mia:
+    calcolo l'area a 60 min, prendo <b>8 punti</b> sul suo bordo e da ognuno lancio
+    un'altra isocrona per i minuti che restano.<br>
+    Costa <b>9 chiamate</b> invece di una (qualche secondo di attesa, ~100 crediti sui 3000
+    giornalieri) e il contorno è <b>approssimato per difetto</b>: campiono otto direzioni,
+    non tutto il perimetro. Buono per farsi un'idea, non per contare i minuti.
+  </p>
 
   <button class="cta" id="cta" disabled>imposta prima la partenza</button>
 
@@ -898,6 +936,23 @@
     etMinuti.textContent = minuti;
     etNota.textContent = minuti > TETTO_ISO ? 'minuti · stima a due tappe' : 'minuti';
     scadeArea();
+  });
+
+  var toggleOltre = document.getElementById('oltre');
+  var nota = document.getElementById('nota');
+
+  toggleOltre.addEventListener('change', function(){
+    var esteso = toggleOltre.checked;
+    nota.classList.toggle('visibile', esteso);
+    campoTempo.max = esteso ? 120 : TETTO_ISO;
+    if(!esteso && minuti > TETTO_ISO){
+      minuti = TETTO_ISO;
+      campoTempo.value = TETTO_ISO;
+      etMinuti.textContent = TETTO_ISO;
+      etNota.textContent = 'minuti';
+      scadeArea();
+    }
+    aggiornaCta();
   });
 
   var pulsantiMezzo = Array.prototype.slice.call(document.querySelectorAll('#modi button'));
