@@ -213,8 +213,31 @@
     font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--nebbia);letter-spacing:.05em;
   }
 
+  .testa{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
+    background:transparent;border:none;padding:0 0 12px;margin:0;cursor:pointer;
+    color:var(--ghiaccio);text-align:left;
+  }
+  .testa:focus-visible{outline:2px solid var(--glacier);outline-offset:3px;border-radius:6px}
+  .riassunto{
+    font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--nebbia);
+    letter-spacing:.03em;line-height:1.3;
+  }
+  .riassunto b{color:var(--glacier);font-weight:500}
+  .riassunto i{color:var(--ambra);font-style:normal}
+  .testa svg{width:15px;height:15px;flex:none;stroke:var(--nebbia);fill:none;stroke-width:1.9;transition:.2s}
+  .pannello.compatto .testa svg{transform:rotate(180deg)}
+  .pannello.compatto .testa{padding-bottom:0}
+  .pannello.compatto .corpo{display:none}
+  .pannello.compatto .legenda{display:none}
+  .pannello.compatto .sonda{margin-top:12px}
+  .corpo{border-top:1px solid var(--linea);padding-top:13px}
+
   .sblocco{
-    display:flex;align-items:center;gap:8px;margin-top:12px;cursor:pointer;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;
+  }
+  .sblocco label{
+    display:flex;align-items:center;gap:8px;cursor:pointer;
     font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--nebbia);
   }
   .sblocco input{
@@ -230,6 +253,14 @@
   .sblocco input:checked::after{left:15px;background:var(--ambra)}
   .sblocco input:focus-visible{outline:2px solid var(--ambra);outline-offset:2px}
   .sblocco input:checked ~ span{color:var(--ambra)}
+  .dettagli{
+    flex:none;width:22px;height:22px;border-radius:50%;
+    background:transparent;border:1px solid var(--linea);color:var(--nebbia);
+    font-family:"IBM Plex Mono",monospace;font-size:11px;line-height:1;cursor:pointer;transition:.15s;
+  }
+  .dettagli:hover{border-color:var(--ambra);color:var(--ambra)}
+  .dettagli[aria-expanded=true]{border-color:var(--ambra);color:var(--ambra)}
+  .dettagli:focus-visible{outline:2px solid var(--ambra);outline-offset:2px}
   .nota{
     display:none;margin-top:9px;padding-left:10px;
     border-left:1px solid var(--ambra-dim);
@@ -265,6 +296,7 @@
   .legenda i{width:9px;height:9px;border-radius:2px;flex:none}
   .legenda .fredda{background:#3D4E60}
   .legenda .calda{background:#6E4A2A}
+  .legenda .buona{background:#8BF0C4;box-shadow:0 0 6px rgba(139,240,196,.5)}
 
   .pin-io{
     width:15px;height:15px;border-radius:50%;
@@ -317,11 +349,17 @@
   <div class="suggerimento" id="suggerimento">tocca la mappa per fissare la partenza · tocca di nuovo l'icona per annullare</div>
 </div>
 
-<section class="pannello">
-  <div class="partenza" id="partenza">
-    <span class="pallino"></span>
-    <span id="partenzaTesto">nessuna partenza impostata</span>
-  </div>
+<section class="pannello" id="pannello">
+  <button class="testa" id="testa" aria-expanded="true" aria-controls="corpo">
+    <span class="riassunto" id="riassunto">sopra <b>1000 m</b> · entro <i>45 min in auto</i></span>
+    <svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg>
+  </button>
+
+  <div class="corpo" id="corpo">
+    <div class="partenza" id="partenza">
+      <span class="pallino"></span>
+      <span id="partenzaTesto">nessuna partenza impostata</span>
+    </div>
 
   <div class="lettura">
     <span class="valore" id="valore">1000</span>
@@ -355,10 +393,14 @@
            aria-label="Minuti di viaggio">
   </div>
 
-  <label class="sblocco">
-    <input type="checkbox" id="oltre">
-    <span>vai oltre i 60 minuti</span>
-  </label>
+  <div class="sblocco">
+    <label>
+      <input type="checkbox" id="oltre">
+      <span>vai oltre i 60 minuti</span>
+    </label>
+    <button class="dettagli" id="btnNota" aria-expanded="false"
+            aria-controls="nota" title="Cosa comporta">?</button>
+  </div>
   <p class="nota" id="nota">
     Il servizio di isocrone si ferma a <b>60 minuti</b>. Oltre, la stima è mia:
     calcolo l'area a 60 min, prendo <b>8 punti</b> sul suo bordo e da ognuno lancio
@@ -367,12 +409,14 @@
     giornalieri) e il contorno è <b>approssimato per difetto</b>: campiono otto direzioni,
     non tutto il perimetro. Buono per farsi un'idea, non per contare i minuti.
   </p>
+  </div><!-- /corpo -->
 
   <button class="cta" id="cta" disabled>imposta prima la partenza</button>
 
   <div class="sonda" id="sonda">Tocca un punto sulla mappa per leggerne la quota.</div>
 
   <div class="legenda">
+    <span><i class="buona"></i>fresco raggiungibile</span>
     <span><i class="fredda"></i>sotto quota</span>
     <span><i class="calda"></i>fuori portata</span>
   </div>
@@ -436,16 +480,20 @@
   function dipingi(rec){
     if(!rec.quote) return;
     var out = rec.ctx.createImageData(LATO, LATO);
-    var d = out.data, q = rec.quote, t = soglia;
+    var msk = rec.mctx.createImageData(LATO, LATO);
+    var d = out.data, s = msk.data, q = rec.quote, t = soglia;
     for(var i=0, p=0; i<q.length; i++, p+=4){
       var h = q[i];
       if(h < t){
         var giu = (t - h) / 900; if(giu > 1) giu = 1;
         d[p]=42; d[p+1]=54; d[p+2]=68;
         d[p+3]= 38 + 26*giu;
+      } else {
+        s[p]=255; s[p+1]=255; s[p+2]=255; s[p+3]=255;
       }
     }
     rec.ctx.putImageData(out, 0, 0);
+    rec.mctx.putImageData(msk, 0, 0);
   }
 
   var Maschera = L.GridLayer.extend({
@@ -454,13 +502,18 @@
       var el = document.createElement('canvas');
       el.width = el.height = LATO;
       var rec = { ctx: el.getContext('2d', {willReadFrequently:true}), quote:null };
+      var mk = document.createElement('canvas');
+      mk.width = mk.height = LATO;
+      rec.mask = mk;
+      rec.mctx = mk.getContext('2d', {willReadFrequently:true});
+      rec.coords = {z:coords.z, x:coords.x, y:coords.y};
       deposito.set(chiave, rec);
       var img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = function(){
         try{ rec.quote = decodifica(img); }
         catch(e){ segnala('Dati di quota non leggibili in questo momento.'); done(null, el); return; }
-        dipingi(rec); done(null, el);
+        dipingi(rec); evidenzia(); done(null, el);
       };
       img.onerror = function(){ done(null, el); };
       img.src = urlDem(coords.z, coords.x, coords.y);
@@ -481,8 +534,105 @@
   function ridipingi(){
     if(inCoda) return;
     inCoda = true;
-    requestAnimationFrame(function(){ inCoda = false; deposito.forEach(dipingi); });
+    requestAnimationFrame(function(){
+      inCoda = false;
+      deposito.forEach(dipingi);
+      evidenzia();
+    });
   }
+
+  /* ---------------- evidenza: sopra quota E dentro il viaggio ---------------- */
+
+  var Evidenza = L.Layer.extend({
+    onAdd: function(m){
+      this._tela = L.DomUtil.create('canvas', 'evidenza');
+      this._tela.style.position = 'absolute';
+      this._tela.style.pointerEvents = 'none';
+      this._buf = document.createElement('canvas');
+      this._buf2 = document.createElement('canvas');
+      m.getPanes().overlayPane.appendChild(this._tela);
+      m.on('moveend zoomend resize viewreset', this._render, this);
+      m.on('zoomstart', this._sfuma, this);
+      this._render();
+    },
+    onRemove: function(m){
+      m.off('moveend zoomend resize viewreset', this._render, this);
+      m.off('zoomstart', this._sfuma, this);
+      L.DomUtil.remove(this._tela);
+    },
+    setAree: function(g){ this._gruppi = g; this._render(); },
+    _sfuma: function(){ if(this._tela) this._tela.style.opacity = '0'; },
+    _render: function(){
+      if(!this._map || !this._tela) return;
+      var m = this._map, dim = m.getSize(), dpr = window.devicePixelRatio || 1;
+      var tela = this._tela, buf = this._buf;
+      var mx = Math.round(dim.x * 0.3), my = Math.round(dim.y * 0.3);
+      var lx = dim.x + mx*2, ly = dim.y + my*2;
+
+      if(tela.width !== lx*dpr || tela.height !== ly*dpr){
+        tela.width = lx*dpr; tela.height = ly*dpr;
+        tela.style.width = lx+'px'; tela.style.height = ly+'px';
+        buf.width = lx*dpr; buf.height = ly*dpr;
+        this._buf2.width = lx*dpr; this._buf2.height = ly*dpr;
+      }
+      L.DomUtil.setPosition(tela, m.containerPointToLayerPoint([-mx, -my]));
+      tela.style.opacity = '1';
+
+      var ctx = tela.getContext('2d');
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.clearRect(0,0,lx,ly);
+      if(!this._gruppi || !this._gruppi.length) return;
+
+      // 1. maschera del terreno sopra soglia, assemblata dalle tile
+      var bctx = buf.getContext('2d');
+      bctx.setTransform(dpr,0,0,dpr,0,0);
+      bctx.globalCompositeOperation = 'source-over';
+      bctx.clearRect(0,0,lx,ly);
+      bctx.imageSmoothingEnabled = false;
+      var zc = m.getZoom(), qualcosa = false;
+      deposito.forEach(function(rec){
+        if(!rec.quote || !rec.coords) return;
+        var c = rec.coords;
+        var scala = Math.pow(2, zc - c.z);
+        var lato = LATO * scala;
+        var ang = m.latLngToContainerPoint(m.unproject(L.point(c.x*LATO, c.y*LATO), c.z));
+        if(ang.x + lato < -mx || ang.y + lato < -my || ang.x > dim.x + mx || ang.y > dim.y + my) return;
+        bctx.drawImage(rec.mask, ang.x + mx, ang.y + my, lato, lato);
+        qualcosa = true;
+      });
+      if(!qualcosa) return;
+
+      // 2. unione delle aree raggiungibili in un secondo buffer
+      var buf2 = this._buf2;
+      var b2 = buf2.getContext('2d');
+      b2.setTransform(dpr,0,0,dpr,0,0);
+      b2.globalCompositeOperation = 'source-over';
+      b2.clearRect(0,0,lx,ly);
+      b2.fillStyle = '#fff';
+      this._gruppi.forEach(function(g){
+        b2.beginPath();
+        g.forEach(function(anello){
+          anello.forEach(function(p, i){
+            var pt = m.latLngToContainerPoint(p);
+            if(i === 0) b2.moveTo(pt.x + mx, pt.y + my); else b2.lineTo(pt.x + mx, pt.y + my);
+          });
+          b2.closePath();
+        });
+        b2.fill('evenodd');
+      });
+
+      // 3. tinta piena, ritagliata prima sul terreno alto e poi sull'area
+      ctx.fillStyle = 'rgba(139,240,196,.32)';
+      ctx.fillRect(0,0,lx,ly);
+      ctx.setTransform(1,0,0,1,0,0);
+      ctx.globalCompositeOperation = 'destination-in';
+      ctx.drawImage(buf, 0, 0);
+      ctx.drawImage(buf2, 0, 0);
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      ctx.globalCompositeOperation = 'source-over';
+    }
+  });
 
   /* ---------------- velo "fuori portata" su canvas ---------------- */
 
@@ -548,6 +698,9 @@
   });
 
   var velo = new VeloArea().addTo(map);
+  var luce = new Evidenza().addTo(map);
+
+  function evidenzia(){ if(luce && luce._map) luce._render(); }
 
   /* ---------------- Geoapify ---------------- */
 
@@ -773,6 +926,7 @@
   function nascondiAree(){
     areeVisibili = false;
     velo.setAree(null);
+    luce.setAree(null);
     pulisciMeta();
     aggiornaCta();
   }
@@ -911,6 +1065,8 @@
   campo.addEventListener('input', function(){
     soglia = Number(campo.value);
     valore.textContent = soglia;
+    aggiornaRiassunto();
+    aggiornaCta();
     pulisciMeta();
     ridipingi();
   });
@@ -935,21 +1091,34 @@
     minuti = Number(campoTempo.value);
     etMinuti.textContent = minuti;
     etNota.textContent = minuti > TETTO_ISO ? 'minuti · stima a due tappe' : 'minuti';
+    aggiornaRiassunto();
     scadeArea();
   });
 
   var toggleOltre = document.getElementById('oltre');
   var nota = document.getElementById('nota');
+  var btnNota = document.getElementById('btnNota');
+
+  function mostraNota(v){
+    nota.classList.toggle('visibile', v);
+    btnNota.setAttribute('aria-expanded', String(v));
+    btnNota.textContent = v ? '−' : '?';
+  }
+
+  btnNota.addEventListener('click', function(){
+    mostraNota(!nota.classList.contains('visibile'));
+  });
 
   toggleOltre.addEventListener('change', function(){
     var esteso = toggleOltre.checked;
-    nota.classList.toggle('visibile', esteso);
+    mostraNota(esteso);
     campoTempo.max = esteso ? 120 : TETTO_ISO;
     if(!esteso && minuti > TETTO_ISO){
       minuti = TETTO_ISO;
       campoTempo.value = TETTO_ISO;
       etMinuti.textContent = TETTO_ISO;
       etNota.textContent = 'minuti';
+      aggiornaRiassunto();
       scadeArea();
     }
     aggiornaCta();
@@ -960,6 +1129,7 @@
     b.addEventListener('click', function(){
       mezzo = b.dataset.m;
       pulsantiMezzo.forEach(function(o){ o.setAttribute('aria-pressed', String(o === b)); });
+      aggiornaRiassunto();
       scadeArea();
     });
   });
@@ -969,6 +1139,7 @@
   function mostraAree(){
     areeVisibili = true;
     velo.setAree(aree);
+    luce.setAree(aree);
     var b = L.latLngBounds([]);
     aree.forEach(function(g){ g.forEach(function(r){ r.forEach(function(p){ b.extend(p); }); }); });
     map.fitBounds(b.pad(0.05));
@@ -1026,6 +1197,23 @@
     });
   });
 
+  /* ---- pannello compatto ---- */
+
+  var pannello = document.getElementById('pannello');
+  var testa = document.getElementById('testa');
+  var riassunto = document.getElementById('riassunto');
+
+  function aggiornaRiassunto(){
+    riassunto.innerHTML = 'sopra <b>' + soglia + ' m</b> · entro <i>' +
+      minuti + ' min ' + NOME[mezzo] + '</i>';
+  }
+
+  testa.addEventListener('click', function(){
+    var compatto = pannello.classList.toggle('compatto');
+    testa.setAttribute('aria-expanded', String(!compatto));
+  });
+
+  aggiornaRiassunto();
   aggiornaCta();
 })();
 </script>
