@@ -58,6 +58,17 @@
   .pp-k{color:#8a94a3}.pp-v{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
   .pp-foot{padding:7px 13px 10px;display:flex;gap:6px;flex-wrap:wrap}
   .pp-chip{font-size:10.5px;font-weight:700;border-radius:20px;padding:3px 9px}
+  .pp-strava{font-size:10.5px;font-weight:700;border-radius:20px;padding:3px 9px;background:#fc4c02;color:#fff!important;text-decoration:none;line-height:1.5}
+  .pp-strava:hover{background:#e04402}
+  td.tlink{text-align:center}
+  td.vcol{background:#fafaff}
+  .vna{color:#c3c9d4}
+  .bias{font-weight:800;font-variant-numeric:tabular-nums;border-radius:6px;padding:1px 6px}
+  .bias.lo{color:#5b6474;background:#f1f3f5}
+  .bias.mid{color:#a16207;background:#fef6dd}
+  .bias.hi{color:#b42318;background:#fee4e2}
+  .tstrava{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#fc4c0214;color:#fc4c02;text-decoration:none;font-weight:800;font-size:12px}
+  .tstrava:hover{background:#fc4c02;color:#fff}
   .tview{position:absolute;inset:0;overflow:auto;background:#fafbfc;padding:14px}
   .filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
   .fl{font-size:11px;color:#8a94a3;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-right:2px}
@@ -122,12 +133,16 @@ function popupHTML(r){
   rows.push(cell(isRun?"passo medio":"vel. media",isRun?(r._pace?r._pace+"/km":null):(r._kmh!=null?r._kmh+" km/h":null)));
   if(r._maxkmh!=null&&!isRun) rows.push(cell("vel. max",r._maxkmh+" km/h"));
   rows.push(cell("Discesa",r.descent!=null?"−"+r.descent+" m":null));
+  if(r.vvert!=null) rows.push(cell("D+ verificato","+"+r.vvert+" m"));
+  if(r.vdesc!=null) rows.push(cell("Discesa verif.","−"+r.vdesc+" m"));
   if(r._vam!=null&&!isRun) rows.push(cell("VAM salita",r._vam+" m/h"));
   if(r._cad!=null) rows.push(cell("cadenza",r._cad+(isRide?" rpm":" spm")));
   const chips=[];
   if(r.relative_effort!=null) chips.push(`<span class="pp-chip" style="background:${K.color}18;color:${K.color}">⚡ effort ${r.relative_effort}</span>`);
   if(r.total_calories!=null) chips.push(`<span class="pp-chip" style="background:#f1f3f5;color:#555">🔥 ${r.total_calories} kcal</span>`);
   if(r.pr_count) chips.push(`<span class="pp-chip" style="background:#fff4d6;color:#a67c00">🏆 ${r.pr_count} PR</span>`);
+  if(r.vbias!=null&&r.vbias>=60) chips.push(`<span class="pp-chip" style="background:#eef2ff;color:#4338ca">📐 altimetro +${r.vbias} m</span>`);
+  if(r.id) chips.push(`<a class="pp-strava" href="https://www.strava.com/activities/${r.id}" target="_blank" rel="noopener">Apri su Strava ↗</a>`);
   return `<div class="pp"><div class="pp-h"><span class="pp-emoji">${K.emoji}</span>
     <div><div class="pp-title">${r.name}</div><div class="pp-date">${r.day} ${r.year}</div></div></div>
     <div class="pp-hero"><div><div class="pp-hv">${r.km.toFixed(1)}</div><div class="pp-hl">km</div></div>
@@ -148,12 +163,16 @@ const COLS=[
  {id:"km",label:"Km",get:r=>r.km,num:true,render:r=>r.km.toFixed(1)},
  {id:"asc",label:"Ascesa",get:r=>r.vert,num:true,render:r=>"+"+r.vert},
  {id:"desc",label:"Discesa",get:r=>r.descent??0,num:true,render:r=>r.descent!=null?"−"+r.descent:""},
+ {id:"vasc",label:"D+ verif.",get:r=>r.vvert??-1,num:true,cls:"vcol",render:r=>r.vvert!=null?"+"+r.vvert:"<span class='vna'>—</span>"},
+ {id:"vdesc",label:"Disc. verif.",get:r=>r.vdesc??-1,num:true,cls:"vcol",render:r=>r.vdesc!=null?"−"+r.vdesc:"<span class='vna'>—</span>"},
+ {id:"vbias",label:"Scarto",get:r=>r.vbias??-9999,num:true,cls:"vcol",render:r=>r.vbias==null?"<span class='vna'>—</span>":`<span class="bias ${r.vbias>=120?'hi':(r.vbias>=60?'mid':'lo')}">${r.vbias>0?"+":""}${r.vbias}</span>`},
  {id:"net",label:"Disliv. netto",get:r=>r.net??0,num:true,render:r=>r.net===0?"0":(r.net>0?"+":"")+r.net},
  {id:"grad",label:"Pendenza",get:r=>r.vert/(r.km*10),num:true,render:r=>(r.vert/(r.km*10)).toFixed(1)+"%"},
  {id:"kmh",label:"Vel. media",get:r=>r._kmh??0,num:true,render:r=>r._kmh!=null?r._kmh+" km/h":""},
  {id:"pace",label:"Passo",get:r=>r._pace_s??1e9,num:true,render:r=>r._pace?r._pace+"/km":""},
  {id:"vam",label:"VAM",get:r=>r._vam??0,num:true,render:r=>r._vam!=null?r._vam+" m/h":""},
  {id:"kcal",label:"Kcal",get:r=>r.total_calories??0,num:true,render:r=>r.total_calories??""},
+ {id:"strava",label:"Strava",get:r=>+r.id||0,num:true,cls:"tlink",render:r=>r.id?`<a class="tstrava" href="https://www.strava.com/activities/${r.id}" target="_blank" rel="noopener" title="Apri su Strava">↗</a>`:""},
 ];
 
 function buildMapView(key){
@@ -246,7 +265,8 @@ function buildTableView(key){
     tb.innerHTML=rows.map(r=>`<tr data-id="${r.id}" title="Vedi sulla mappa">`+COLS.map(c=>{
       let v=c.render?c.render(r):c.get(r); if(c.id==="date")v=fmtDate(r._date);
       return `<td class="${c.cls||''}">${v??""}</td>`;}).join("")+"</tr>").join("");
-    tb.querySelectorAll("tr").forEach(tr=>tr.addEventListener("click",()=>{
+    tb.querySelectorAll("tr").forEach(tr=>tr.addEventListener("click",(e)=>{
+      if(e.target.closest("a"))return;
       activate(key,"map"); API[key].map.showOnMap(tr.dataset.id);}));
     const km=rows.reduce((s,r)=>s+r.km,0),up=rows.reduce((s,r)=>s+r.vert,0),dn=rows.reduce((s,r)=>s+(r.descent||0),0);
     foot.textContent=`${rows.length} attività · ${km.toFixed(0)} km · +${up} m ascesa · −${dn} m discesa`;
