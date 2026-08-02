@@ -281,6 +281,35 @@
   .cta[disabled]{opacity:.42;cursor:default}
   .cta.spenta{background:transparent;color:var(--nebbia);border-color:var(--linea)}
 
+  .cta.mare{
+    background:rgba(90,169,230,.11);color:#7FC0F0;
+    border-color:rgba(90,169,230,.4);margin-top:7px;
+  }
+  .cta.mare:hover{border-color:#7FC0F0}
+  .cta.mare:focus-visible{outline-color:#7FC0F0}
+  .cta.mare.spenta{background:transparent;color:var(--nebbia);border-color:var(--linea)}
+
+  .costa{position:relative}
+  .costa .punto{
+    position:absolute;left:0;top:0;width:11px;height:11px;border-radius:50%;
+    background:#5AA9E6;border:2px solid #06263D;box-shadow:0 0 0 4px rgba(90,169,230,.22);
+  }
+  .costa .nome{
+    position:absolute;left:16px;top:-4px;white-space:nowrap;
+    background:rgba(11,16,22,.9);border:1px solid rgba(90,169,230,.45);
+    color:#7FC0F0;font-family:"IBM Plex Mono",monospace;font-size:10px;
+    padding:3px 7px;border-radius:6px;
+  }
+  .costa.minore .punto{background:transparent;border-color:#5AA9E6;box-shadow:none}
+  .costa.minore .nome{color:var(--nebbia);border-color:var(--linea)}
+
+  .sonda .elenco{margin:7px 0 0;padding:0;list-style:none}
+  .sonda .elenco li{
+    display:flex;justify-content:space-between;gap:10px;
+    padding:4px 0;border-top:1px solid var(--linea);
+  }
+  .sonda .elenco li span:first-child{color:var(--ghiaccio)}
+
   .sonda{
     margin-top:13px;padding-top:12px;border-top:1px solid var(--linea);
     font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--nebbia);line-height:1.55;
@@ -412,6 +441,7 @@
   </div><!-- /corpo -->
 
   <button class="cta" id="cta" disabled>imposta prima la partenza</button>
+  <button class="cta mare" id="ctaMare" disabled>il mare più vicino</button>
 
   <div class="sonda" id="sonda">Tocca un punto sulla mappa per leggerne la quota.</div>
 
@@ -902,6 +932,7 @@
   var NOME = { drive:'in auto', bicycle:'in bici', walk:'a piedi' };
 
   function aggiornaCta(){
+    if(typeof ctaMare !== 'undefined' && ctaMare) ctaMare.disabled = !origine || !!mareInCorso;
     if(!origine){
       cta.disabled = true;
       cta.classList.remove('spenta');
@@ -1196,6 +1227,301 @@
       mostraAree();
     });
   });
+
+  /* ---------------- il mare più vicino ---------------- */
+
+  var Z_MARE = 7;            // ~0,9 km per pixel: serve a capire la direzione
+  var Z_COSTA = 10;          // ~110 m per pixel: serve ad agganciare la riga di costa
+  var ctaMare = document.getElementById('ctaMare');
+  var pinMare = [], mareAttivo = false, mareInCorso = false;
+
+  function pulisciMare(){
+    pinMare.forEach(function(p){ map.removeLayer(p); });
+    pinMare = [];
+    mareAttivo = false;
+    ctaMare.classList.remove('spenta');
+    ctaMare.textContent = 'il mare più vicino';
+  }
+
+  function quotaA(latlng, z, cb){
+    var p = map.project(latlng, z);
+    var tx = Math.floor(p.x/LATO), ty = Math.floor(p.y/LATO);
+    var px = Math.floor(p.x) - tx*LATO, py = Math.floor(p.y) - ty*LATO;
+    quoteTile(z, tx, ty, function(q){ cb(q ? q[py*LATO + px] : null); });
+  }
+
+  function spostati(ll, metri, angolo){
+    var dlat = (metri * Math.cos(angolo)) / 111320;
+    var dlng = (metri * Math.sin(angolo)) / (111320 * Math.cos(ll.lat * Math.PI/180));
+    return L.latLng(ll.lat + dlat, ll.lng + dlng);
+  }
+
+  // il mare è grande: a 40 km di distanza deve esserci ancora acqua tutt'intorno.
+  // una depressione bonificata non supera questa prova.
+  function eVeroMare(ll, cb){
+    var n = 18, fatti = 0, acqua = 0;
+    for(var i=0; i<n; i++){
+      (function(ang){
+        quotaA(spostati(ll, 40000, ang), Z_MARE, function(h){
+          if(h !== null && h <= 0) acqua++;
+          if(++fatti === n) cb(acqua / n >= 0.3);
+        });
+      })(2 * Math.PI * i / n);
+    }
+  }
+
+  // fase 1: dove sta l'acqua, per settori angolari
+  function direzioniDelMare(da, fatto){
+    var z = Z_MARE, RT = 6;
+    var o = map.project(da, z);
+    var mpp = 156543.03392 * Math.cos(da.lat * Math.PI/180) / Math.pow(2, z);
+    var tx0 = Math.floor(o.x/LATO), ty0 = Math.floor(o.y/LATO);
+
+    var coda = [];
+    for(var dx=-RT; dx<=RT; dx++){
+      for(var dy=-RT; dy<=RT; dy++){
+        var tx = tx0+dx, ty = ty0+dy;
+        var x0 = tx*LATO, x1 = x0+LATO-1, y0 = ty*LATO, y1 = y0+LATO-1;
+        var ax = o.x < x0 ? x0-o.x : (o.x > x1 ? o.x-x1 : 0);
+        var ay = o.y < y0 ? y0-o.y : (o.y > y1 ? o.y-y1 : 0);
+        coda.push({tx:tx, ty:ty, min:Math.sqrt(ax*ax + ay*ay)});
+      }
+    }
+    coda.sort(function(a,b){ return a.min - b.min; });
+
+    var SETT = 12, settori = new Array(SETT), migliore = Infinity, i = 0;
+
+    function passo(){
+      if(i >= coda.length || coda[i].min > migliore * 1.8){
+        var lista = [];
+        for(var s=0; s<SETT; s++) if(settori[s]) lista.push(settori[s]);
+        lista.sort(function(a,b){ return a.d - b.d; });
+        fatto(lista.map(function(v){
+          return { ll: map.unproject(L.point(v.x + 0.5, v.y + 0.5), z), km: v.d * mpp / 1000 };
+        }));
+        return;
+      }
+      var t = coda[i++];
+      quoteTile(z, t.tx, t.ty, function(q){
+        if(q){
+          for(var y=0; y<LATO; y++){
+            var gy = t.ty*LATO + y, ay = gy - o.y;
+            for(var x=0; x<LATO; x++){
+              if(q[y*LATO + x] <= 0){
+                var gx = t.tx*LATO + x, ax = gx - o.x;
+                var d = Math.sqrt(ax*ax + ay*ay);
+                if(d < 1) continue;
+                if(d < migliore) migliore = d;
+                var s = Math.floor(((Math.atan2(ay, ax) + Math.PI) / (2*Math.PI)) * SETT) % SETT;
+                if(!settori[s] || d < settori[s].d) settori[s] = {d:d, x:gx, y:gy};
+              }
+            }
+          }
+        }
+        setTimeout(passo, 0);
+      });
+    }
+    passo();
+  }
+
+  // fase 2: dal punto grezzo trovo il pixel di terra affacciato sull'acqua
+  function agganciaCosta(grezzo, da, fatto){
+    var z = Z_COSTA;
+    var g = map.project(grezzo, z), o = map.project(da, z);
+    var tx0 = Math.floor(g.x/LATO), ty0 = Math.floor(g.y/LATO);
+    var verso = { x: o.x > g.x ? 1 : -1, y: o.y > g.y ? 1 : -1 };
+    var caselle = [
+      {x:tx0, y:ty0},
+      {x:tx0 + verso.x, y:ty0},
+      {x:tx0, y:ty0 + verso.y},
+      {x:tx0 + verso.x, y:ty0 + verso.y}
+    ];
+
+    var mgl = null, mglD = Infinity, fatti = 0;
+
+    caselle.forEach(function(c){
+      quoteTile(z, c.x, c.y, function(q){
+        if(q){
+          for(var y=3; y<LATO-3; y++){
+            for(var x=3; x<LATO-3; x++){
+              var h = q[y*LATO + x];
+              if(h <= 0 || h > 400) continue;
+              // terra con acqua a meno di tre pixel: è un affaccio
+              if(q[y*LATO + x-3] > 0 && q[y*LATO + x+3] > 0 &&
+                 q[(y-3)*LATO + x] > 0 && q[(y+3)*LATO + x] > 0) continue;
+              var ax = (c.x*LATO + x) - o.x, ay = (c.y*LATO + y) - o.y;
+              var d = Math.sqrt(ax*ax + ay*ay);
+              if(d < mglD){ mglD = d; mgl = {x:c.x*LATO + x, y:c.y*LATO + y}; }
+            }
+          }
+        }
+        if(++fatti === caselle.length){
+          fatto(mgl ? map.unproject(L.point(mgl.x + 0.5, mgl.y + 0.5), z) : grezzo);
+        }
+      });
+    });
+  }
+
+  // fase 3: tempi reali su strada, tutti in una richiesta sola
+  function tempiInAuto(da, mete, cb){
+    var corpo = {
+      mode: mezzo,
+      sources: [{ location: [da.lng, da.lat] }],
+      targets: mete.map(function(m){ return { location: [m.ll.lng, m.ll.lat] }; })
+    };
+    fetch('https://api.geoapify.com/v1/routematrix?apiKey=' + CHIAVE, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(corpo)
+    }).then(function(r){
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    }).then(function(g){
+      var righe = (g.sources_to_targets || [])[0];
+      if(!righe) throw new Error('risposta vuota');
+      righe.forEach(function(v){
+        var m = mete[v.target_index];
+        if(m && v.time != null){
+          m.minuti = Math.round(v.time / 60);
+          m.strada = v.distance != null ? Math.round(v.distance / 1000) : null;
+        }
+      });
+      cb(null);
+    }).catch(function(e){ cb(e.message || 'errore'); });
+  }
+
+  ctaMare.addEventListener('click', function(){
+    if(!origine || mareInCorso) return;
+    if(mareAttivo){ pulisciMare(); sonda.textContent = 'Pin di costa rimossi.'; return; }
+
+    nascondiAree();
+    mareInCorso = true;
+    ctaMare.disabled = true;
+    ctaMare.textContent = 'cerco l\'acqua…';
+    sonda.textContent = 'Cerco dove finisce la terra, in tutte le direzioni…';
+
+    direzioniDelMare(origine, function(grezzi){
+      if(!grezzi.length){
+        mareInCorso = false; ctaMare.disabled = false;
+        ctaMare.textContent = 'il mare più vicino';
+        sonda.textContent = 'Nessuna acqua a livello del mare entro il raggio esplorato.';
+        return;
+      }
+
+      sonda.textContent = 'Verifico quali sono mare e non depressioni…';
+      var validi = [], j = 0;
+      var daProvare = grezzi.slice(0, 6);
+
+      (function prova(){
+        if(j >= daProvare.length || validi.length >= 4){ raffina(validi); return; }
+        var c = daProvare[j++];
+        eVeroMare(c.ll, function(ok){
+          if(ok){
+            var vicino = validi.some(function(v){ return map.distance(v.ll, c.ll) < 30000; });
+            if(!vicino) validi.push(c);
+          }
+          prova();
+        });
+      })();
+
+      function raffina(lista){
+        if(!lista.length){
+          mareInCorso = false; ctaMare.disabled = false;
+          ctaMare.textContent = 'il mare più vicino';
+          sonda.innerHTML = 'Ho trovato acqua a quota zero ma nessuna abbastanza estesa da essere mare.' +
+            '<br>Probabilmente erano zone depresse dell\'entroterra.';
+          return;
+        }
+
+        sonda.textContent = 'Aggancio la riga di costa…';
+        var mete = [], k = 0;
+        (function affina(){
+          if(k >= lista.length){ nomina(mete); return; }
+          var c = lista[k++];
+          agganciaCosta(c.ll, origine, function(ll){
+            mete.push({ ll: ll, aria: map.distance(origine, ll)/1000 });
+            affina();
+          });
+        })();
+      }
+
+      function nomina(mete){
+        sonda.textContent = 'Cerco i nomi delle località…';
+        var k = 0;
+        (function passo(){
+          if(k >= mete.length){ tempi(mete); return; }
+          var m = mete[k++];
+          nominaPunto(m.ll, function(n){ m.nome = n || 'costa'; passo(); });
+        })();
+      }
+
+      function tempi(mete){
+        sonda.textContent = 'Calcolo i tempi reali su strada…';
+        tempiInAuto(origine, mete, function(err){ mostra(mete, err); });
+      }
+
+      function mostra(mete, err){
+        mareInCorso = false;
+        ctaMare.disabled = false;
+        mareAttivo = true;
+        ctaMare.classList.add('spenta');
+        ctaMare.textContent = 'togli i pin di costa';
+
+        var conTempo = mete.filter(function(m){ return m.minuti != null; });
+        if(conTempo.length) mete.sort(function(a,b){ return (a.minuti||1e9) - (b.minuti||1e9); });
+        else mete.sort(function(a,b){ return a.aria - b.aria; });
+
+        pulisciMare();
+        mareAttivo = true;
+        ctaMare.classList.add('spenta');
+        ctaMare.textContent = 'togli i pin di costa';
+
+        var conf = L.latLngBounds([origine]);
+        mete.forEach(function(m, i){
+          conf.extend(m.ll);
+          var etichetta = m.nome + (m.minuti != null ? ' · ' + ore(m.minuti) : '');
+          pinMare.push(L.marker(m.ll, {
+            icon: L.divIcon({
+              className: '',
+              html: '<div class="costa' + (i ? ' minore' : '') + '"><div class="punto"></div>' +
+                    '<div class="nome">' + etichetta + '</div></div>',
+              iconSize:[11,11], iconAnchor:[5.5,5.5]
+            })
+          }).addTo(map));
+        });
+        map.fitBounds(conf.pad(0.12));
+
+        var p = mete[0];
+        var testa = '<b class="su">' + p.nome + '</b> · ' +
+          (p.minuti != null ? ore(p.minuti) + ' ' + NOME[mezzo] +
+            (p.strada != null ? ' · ' + p.strada + ' km' : '')
+           : Math.round(p.aria) + ' km in linea d\'aria');
+        testa += '<br><a href="https://www.google.com/maps/dir/?api=1&origin=' +
+          origine.lat.toFixed(5) + ',' + origine.lng.toFixed(5) +
+          '&destination=' + p.ll.lat.toFixed(5) + ',' + p.ll.lng.toFixed(5) +
+          '&travelmode=' + (mezzo === 'drive' ? 'driving' : (mezzo === 'bicycle' ? 'bicycling' : 'walking')) +
+          '" target="_blank" rel="noopener">portami qui</a>';
+
+        if(mete.length > 1){
+          testa += '<ul class="elenco">';
+          mete.slice(1).forEach(function(m){
+            testa += '<li><span>' + m.nome + '</span><span>' +
+              (m.minuti != null ? ore(m.minuti) : Math.round(m.aria) + ' km aria') + '</span></li>';
+          });
+          testa += '</ul>';
+        }
+        if(err) testa += '<br><span style="color:#C98A5A">tempi su strada non disponibili (' +
+          err + '): ordino per distanza in linea d\'aria</span>';
+        sonda.innerHTML = testa;
+      }
+    });
+  });
+
+  function ore(min){
+    if(min < 60) return min + ' min';
+    var h = Math.floor(min/60), m = min % 60;
+    return h + 'h' + (m < 10 ? '0' : '') + m;
+  }
 
   /* ---- pannello compatto ---- */
 
