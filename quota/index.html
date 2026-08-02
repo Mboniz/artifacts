@@ -126,6 +126,28 @@
   .tacca.casa i{background:var(--glacier);height:7px}
   .tacca.casa span{color:var(--glacier-dim)}
 
+  .rotaia.stretta{padding-bottom:2px}
+  .riga-tempo{display:flex;align-items:baseline;gap:7px;margin:0 0 9px}
+  .riga-tempo .mini{
+    font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:22px;line-height:1;
+    color:var(--ghiaccio);font-variant-numeric:tabular-nums;
+  }
+  .riga-tempo .etichetta{
+    font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--nebbia);letter-spacing:.05em;
+  }
+  .modi{display:flex;gap:6px;margin:11px 0 0}
+  .modi button{
+    flex:1;font-family:"IBM Plex Mono",monospace;font-size:11px;
+    background:transparent;color:var(--nebbia);
+    border:1px solid var(--linea);border-radius:7px;
+    padding:6px 6px;cursor:pointer;transition:.15s;
+  }
+  .modi button:hover{border-color:rgba(159,231,245,.4);color:var(--ghiaccio)}
+  .modi button[aria-pressed=true]{
+    background:rgba(159,231,245,.14);border-color:var(--glacier);color:var(--glacier);
+  }
+  .modi button:focus-visible{outline:2px solid var(--glacier);outline-offset:2px}
+
   .righello{height:1px;background:var(--linea);margin:16px 0 12px}
   .azioni{display:flex;gap:7px}
   .azioni button{
@@ -216,9 +238,25 @@
 
   <div class="righello"></div>
 
+  <div class="riga-tempo">
+    <span class="mini" id="minuti">45</span>
+    <span class="etichetta">minuti di viaggio</span>
+  </div>
+  <div class="rotaia stretta">
+    <input type="range" id="tempo" min="10" max="60" step="5" value="45"
+           aria-label="Minuti di viaggio">
+  </div>
+  <div class="modi" id="modi" role="group" aria-label="Mezzo di trasporto">
+    <button data-m="drive" aria-pressed="true">auto</button>
+    <button data-m="bicycle">bici</button>
+    <button data-m="walk">a piedi</button>
+  </div>
+
+  <div class="righello"></div>
+
   <div class="azioni">
     <button id="btnPos">dove sono</button>
-    <button id="btnCerca" class="primaria">il fresco più vicino</button>
+    <button id="btnCerca" class="primaria">il fresco raggiungibile</button>
   </div>
 
   <div class="sonda" id="sonda">Tocca un punto sulla mappa per leggerne la quota.</div>
@@ -394,6 +432,7 @@
   campo.addEventListener('input', function(){
     soglia = Number(campo.value);
     valore.textContent = soglia;
+    pulisciMeta();
     ridipingi();
   });
 
@@ -439,7 +478,74 @@
     });
   });
 
-  /* ---------------- il fresco più vicino ---------------- */
+  /* ---------------- area raggiungibile (Geoapify) ---------------- */
+
+  var CHIAVE = '0cd1041148c7421abeb95b2bd4668d8b';
+  var minuti = 45, mezzo = 'drive';
+  var memoIso = new Map();
+  var veloFuori = null, bordo = null;
+  var MONDO = [[-85,-179.9],[-85,179.9],[85,179.9],[85,-179.9]];
+
+  function scaricaIsocrona(origine, cb){
+    var k = origine.lat.toFixed(4)+','+origine.lng.toFixed(4)+':'+minuti+':'+mezzo;
+    if(memoIso.has(k)){ cb(memoIso.get(k), null); return; }
+    var url = 'https://api.geoapify.com/v1/isoline?lat=' + origine.lat + '&lon=' + origine.lng +
+              '&type=time&mode=' + mezzo + '&range=' + (minuti*60) + '&apiKey=' + CHIAVE;
+    fetch(url).then(function(r){
+      if(!r.ok) throw new Error(r.status === 401 ? 'chiave' : (r.status === 429 ? 'quota' : 'servizio'));
+      return r.json();
+    }).then(function(g){
+      var anelli = [];
+      (g.features || []).forEach(function(f){
+        if(!f.geometry) return;
+        var poli = f.geometry.type === 'MultiPolygon' ? f.geometry.coordinates : [f.geometry.coordinates];
+        poli.forEach(function(p){
+          p.forEach(function(anello){
+            anelli.push(anello.map(function(pt){ return [pt[1], pt[0]]; }));
+          });
+        });
+      });
+      if(!anelli.length) throw new Error('vuoto');
+      memoIso.set(k, anelli);
+      cb(anelli, null);
+    }).catch(function(e){ cb(null, e.message); });
+  }
+
+  function dentro(lat, lng, anelli){
+    var d = false;
+    for(var a=0; a<anelli.length; a++){
+      var r = anelli[a];
+      for(var i=0, j=r.length-1; i<r.length; j=i++){
+        var yi=r[i][0], xi=r[i][1], yj=r[j][0], xj=r[j][1];
+        if(((yi>lat) !== (yj>lat)) && (lng < (xj-xi)*(lat-yi)/(yj-yi) + xi)) d = !d;
+      }
+    }
+    return d;
+  }
+
+  function disegnaArea(anelli){
+    if(veloFuori) map.removeLayer(veloFuori);
+    if(bordo) map.removeLayer(bordo);
+    veloFuori = L.polygon([MONDO].concat(anelli), {
+      stroke:false, fillColor:'#2A3644', fillOpacity:.34, fillRule:'evenodd', interactive:false
+    }).addTo(map);
+    bordo = L.polyline(anelli, {
+      color:'#9FE7F5', weight:1.3, opacity:.6, interactive:false
+    }).addTo(map);
+  }
+
+  function pulisciArea(){
+    if(veloFuori){ map.removeLayer(veloFuori); veloFuori = null; }
+    if(bordo){ map.removeLayer(bordo); bordo = null; }
+    pulisciMeta();
+  }
+
+  function pulisciMeta(){
+    if(pinMeta){ map.removeLayer(pinMeta); pinMeta = null; }
+    if(rotta){ map.removeLayer(rotta); rotta = null; }
+  }
+
+  /* ---------------- il punto più vicino sopra soglia ---------------- */
 
   var Z_CERCA = 10;          // ~110 m per pixel a 45° di latitudine
   var RAGGIO_TILE = 8;       // ~220 km di raggio massimo
@@ -461,16 +567,27 @@
     img.src = urlDem(z, x, y);
   }
 
-  function cercaFresco(origine, fatto){
+  function cercaFresco(origine, anelli, fatto){
     var z = Z_CERCA;
     var o = map.project(origine, z);
     var mpp = 156543.03392 * Math.cos(origine.lat * Math.PI/180) / Math.pow(2, z);
     var tx0 = Math.floor(o.x/LATO), ty0 = Math.floor(o.y/LATO);
 
+    // limito la scansione al rettangolo dell'area raggiungibile
+    var lim = null;
+    if(anelli){
+      var b = L.latLngBounds([]);
+      anelli.forEach(function(r){ r.forEach(function(p){ b.extend(p); }); });
+      var a1 = map.project(b.getNorthWest(), z), a2 = map.project(b.getSouthEast(), z);
+      lim = {x0:Math.floor(a1.x/LATO), x1:Math.floor(a2.x/LATO),
+             y0:Math.floor(a1.y/LATO), y1:Math.floor(a2.y/LATO)};
+    }
+
     var coda = [];
     for(var dx=-RAGGIO_TILE; dx<=RAGGIO_TILE; dx++){
       for(var dy=-RAGGIO_TILE; dy<=RAGGIO_TILE; dy++){
         var tx = tx0+dx, ty = ty0+dy;
+        if(lim && (tx < lim.x0 || tx > lim.x1 || ty < lim.y0 || ty > lim.y1)) continue;
         var x0 = tx*LATO, x1 = x0+LATO-1, y0 = ty*LATO, y1 = y0+LATO-1;
         var ax = o.x < x0 ? x0-o.x : (o.x > x1 ? o.x-x1 : 0);
         var ay = o.y < y0 ? y0-o.y : (o.y > y1 ? o.y-y1 : 0);
@@ -483,11 +600,7 @@
 
     function passo(){
       if(i >= coda.length || coda[i].min > mglD){
-        fatto(mgl ? {
-          latlng: map.unproject(L.point(mgl.x + 0.5, mgl.y + 0.5), z),
-          metri: mglD * mpp,
-          quota: mglH
-        } : null);
+        fatto(mgl ? { latlng: mgl.ll, metri: mglD * mpp, quota: mglH } : null);
         return;
       }
       var t = coda[i++];
@@ -500,7 +613,12 @@
               if(h >= soglia){
                 var ax = (t.tx*LATO + x) - o.x;
                 var d = Math.sqrt(ax*ax + ay*ay);
-                if(d < mglD){ mglD = d; mgl = {x:t.tx*LATO + x, y:gy}; mglH = h; }
+                if(d < mglD){
+                  var ll = map.unproject(L.point(t.tx*LATO + x + 0.5, gy + 0.5), z);
+                  if(!anelli || dentro(ll.lat, ll.lng, anelli)){
+                    mglD = d; mgl = {ll:ll}; mglH = h;
+                  }
+                }
               }
             }
           }
@@ -511,47 +629,86 @@
     passo();
   }
 
+  /* ---------------- comandi tempo e mezzo ---------------- */
+
+  var campoTempo = document.getElementById('tempo');
+  var etichettaMin = document.getElementById('minuti');
+
+  campoTempo.addEventListener('input', function(){
+    minuti = Number(campoTempo.value);
+    etichettaMin.textContent = minuti;
+    pulisciArea();
+  });
+
+  var pulsantiMezzo = Array.prototype.slice.call(document.querySelectorAll('#modi button'));
+  pulsantiMezzo.forEach(function(b){
+    b.addEventListener('click', function(){
+      mezzo = b.dataset.m;
+      pulsantiMezzo.forEach(function(o){ o.setAttribute('aria-pressed', String(o === b)); });
+      pulisciArea();
+    });
+  });
+
   var btnCerca = document.getElementById('btnCerca');
+  var NOME_MEZZO = { drive:'in auto', bicycle:'in bici', walk:'a piedi' };
 
   btnCerca.addEventListener('click', function(){
     var origine = mioPunto || map.getCenter();
     var daCentro = !mioPunto;
 
     btnCerca.disabled = true;
-    btnCerca.textContent = 'cerco…';
-    sonda.textContent = daCentro
-      ? 'Cerco dal centro della mappa (posizione non attiva)…'
-      : 'Cerco il punto più vicino sopra i ' + soglia + ' m…';
+    btnCerca.textContent = 'calcolo…';
+    pulisciMeta();
+    sonda.textContent = 'Calcolo dove arrivi in ' + minuti + ' minuti ' + NOME_MEZZO[mezzo] +
+      (daCentro ? ' dal centro mappa…' : '…');
 
-    cercaFresco(origine, function(res){
-      btnCerca.disabled = false;
-      btnCerca.textContent = 'il fresco più vicino';
-
-      if(!res){
-        sonda.textContent = 'Niente sopra i ' + soglia + ' m entro 220 km. Abbassa la soglia.';
+    scaricaIsocrona(origine, function(anelli, err){
+      if(err){
+        btnCerca.disabled = false;
+        btnCerca.textContent = 'il fresco raggiungibile';
+        sonda.textContent =
+          err === 'chiave' ? 'Chiave del servizio rifiutata.' :
+          err === 'quota'  ? 'Quota giornaliera esaurita, riprova domani.' :
+          err === 'vuoto'  ? 'Nessuna area calcolabile da questo punto.' :
+                             'Servizio non raggiungibile in questo momento.';
         return;
       }
 
-      if(pinMeta) map.removeLayer(pinMeta);
-      if(rotta) map.removeLayer(rotta);
-      pinMeta = L.marker(res.latlng, {
-        icon: L.divIcon({className:'', html:'<div class="pin-meta"></div>', iconSize:[16,16], iconAnchor:[8,8]})
-      }).addTo(map);
-      rotta = L.polyline([origine, res.latlng], {
-        color:'#9FE7F5', weight:1.5, opacity:.75, dashArray:'5 5'
-      }).addTo(map);
-      map.fitBounds(L.latLngBounds([origine, res.latlng]).pad(0.28));
+      disegnaArea(anelli);
+      var b = L.latLngBounds([]);
+      anelli.forEach(function(r){ r.forEach(function(p){ b.extend(p); }); });
+      map.fitBounds(b.pad(0.06));
 
-      var km = res.metri/1000;
-      var lat = res.latlng.lat.toFixed(5), lon = res.latlng.lng.toFixed(5);
-      sonda.innerHTML =
-        '<b class="su">' + Math.round(res.quota) + ' m</b> · ' +
-        (km < 10 ? km.toFixed(1) : Math.round(km)) + ' km in linea d\'aria' +
-        (daCentro ? ' dal centro mappa' : ' da te') +
-        '<br><a href="https://www.google.com/maps/dir/?api=1&origin=' +
-        origine.lat.toFixed(5) + ',' + origine.lng.toFixed(5) +
-        '&destination=' + lat + ',' + lon + '&travelmode=driving" target="_blank" rel="noopener">' +
-        'strada e tempo in auto</a>';
+      sonda.textContent = 'Cerco il punto più vicino sopra i ' + soglia + ' m…';
+
+      cercaFresco(origine, anelli, function(res){
+        btnCerca.disabled = false;
+        btnCerca.textContent = 'il fresco raggiungibile';
+
+        if(!res){
+          sonda.textContent = 'In ' + minuti + ' min ' + NOME_MEZZO[mezzo] +
+            ' non arrivi sopra i ' + soglia + ' m. Alza i minuti o abbassa la quota.';
+          return;
+        }
+
+        pinMeta = L.marker(res.latlng, {
+          icon: L.divIcon({className:'', html:'<div class="pin-meta"></div>', iconSize:[16,16], iconAnchor:[8,8]})
+        }).addTo(map);
+        rotta = L.polyline([origine, res.latlng], {
+          color:'#9FE7F5', weight:1.5, opacity:.75, dashArray:'5 5', interactive:false
+        }).addTo(map);
+
+        var km = res.metri/1000;
+        sonda.innerHTML =
+          '<b class="su">' + Math.round(res.quota) + ' m</b> · ' +
+          (km < 10 ? km.toFixed(1) : Math.round(km)) + ' km in linea d\'aria' +
+          (daCentro ? ' dal centro mappa' : ' da te') +
+          '<br><a href="https://www.google.com/maps/dir/?api=1&origin=' +
+          origine.lat.toFixed(5) + ',' + origine.lng.toFixed(5) +
+          '&destination=' + res.latlng.lat.toFixed(5) + ',' + res.latlng.lng.toFixed(5) +
+          '&travelmode=' + (mezzo === 'drive' ? 'driving' : (mezzo === 'bicycle' ? 'bicycling' : 'walking')) +
+          '" target="_blank" rel="noopener">strada e tempo reale</a>';
+      });
     });
   });
 
