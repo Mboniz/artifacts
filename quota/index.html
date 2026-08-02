@@ -10,7 +10,7 @@
 <meta name="AdsBot-Google" content="noindex, nofollow">
 <meta name="GPTBot" content="noindex, nofollow">
 <meta name="CCBot" content="noindex, nofollow">
-<meta name="description" content="Mappa con soglia di quota regolabile: sotto la soglia si spegne, sopra resta accesa.">
+<meta name="description" content="Mappa con soglia di quota regolabile e area raggiungibile in un dato tempo di viaggio.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,25 +18,25 @@
 <style>
   :root{
     --ink:#0B1016;
-    --vetro:rgba(11,16,22,.88);
+    --vetro:rgba(11,16,22,.9);
     --ghiaccio:#E7F1F5;
     --nebbia:#8A98A6;
     --glacier:#9FE7F5;
     --glacier-dim:#3E6C79;
+    --ambra:#F2A65A;
+    --ambra-dim:#7A5330;
     --linea:rgba(159,231,245,.16);
     --ombra:0 18px 44px rgba(0,0,0,.5);
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
   body{
-    background:var(--ink);
-    color:var(--ghiaccio);
+    background:var(--ink);color:var(--ghiaccio);
     font-family:"Archivo",system-ui,sans-serif;
-    font-variation-settings:"wdth" 100;
-    -webkit-font-smoothing:antialiased;
-    overflow:hidden;
+    -webkit-font-smoothing:antialiased;overflow:hidden;
   }
   #map{position:fixed;inset:0;background:#0B1016}
+  #map.puntamento{cursor:crosshair}
   .leaflet-container{font-family:"IBM Plex Mono",monospace;background:#0B1016}
   .leaflet-control-attribution{
     background:rgba(11,16,22,.72)!important;color:var(--nebbia)!important;
@@ -49,38 +49,93 @@
     border:none!important;border-bottom:1px solid var(--linea)!important;
     backdrop-filter:blur(10px);width:34px!important;line-height:34px!important;
   }
-  .leaflet-control-zoom a:hover{background:#16212B!important;color:var(--glacier)!important}
 
-  /* ---- targhetta ---- */
-  .marchio{
-    position:fixed;top:0;left:0;z-index:600;
-    padding:14px 16px calc(14px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-left));
+  /* ---------- barra di partenza ---------- */
+  .cima{
+    position:fixed;z-index:900;top:0;left:0;right:0;
+    padding:calc(12px + env(safe-area-inset-top)) 14px 0;
     pointer-events:none;
   }
-  .marchio h1{
-    margin:0;font-size:15px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
-    font-variation-settings:"wdth" 118;
-    text-shadow:0 2px 14px rgba(0,0,0,.85);
+  .cima .marchio{
+    font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--nebbia);margin:0 0 7px 3px;
+    text-shadow:0 2px 10px rgba(0,0,0,.9);
   }
-  .marchio p{
-    margin:2px 0 0;font-family:"IBM Plex Mono",monospace;font-size:10.5px;
-    color:var(--nebbia);letter-spacing:.06em;text-shadow:0 2px 10px rgba(0,0,0,.9);
+  .barra{
+    display:flex;gap:7px;align-items:stretch;pointer-events:auto;
+    max-width:560px;margin:0 auto;
   }
-
-  /* ---- pannello ---- */
-  .pannello{
-    position:fixed;z-index:700;
-    left:16px;bottom:16px;width:352px;max-width:calc(100vw - 32px);
+  .campo-cerca{
+    flex:1;position:relative;
     background:var(--vetro);backdrop-filter:blur(16px);
-    border:1px solid var(--linea);border-radius:14px;
-    box-shadow:var(--ombra);
-    padding:16px 18px 14px;
+    border:1px solid var(--linea);border-radius:11px;box-shadow:var(--ombra);
   }
+  .campo-cerca input{
+    width:100%;background:transparent;border:none;outline:none;
+    font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ghiaccio);
+    padding:12px 13px;
+  }
+  .campo-cerca input::placeholder{color:var(--nebbia)}
+  .campo-cerca input:focus{outline:none}
+  .campo-cerca:focus-within{border-color:rgba(159,231,245,.45)}
+  .icona{
+    width:44px;flex:none;display:grid;place-items:center;
+    background:var(--vetro);backdrop-filter:blur(16px);
+    border:1px solid var(--linea);border-radius:11px;box-shadow:var(--ombra);
+    color:var(--ghiaccio);cursor:pointer;transition:.15s;
+  }
+  .icona:hover{border-color:rgba(159,231,245,.45);color:var(--glacier)}
+  .icona[aria-pressed=true]{background:rgba(159,231,245,.18);border-color:var(--glacier);color:var(--glacier)}
+  .icona:focus-visible{outline:2px solid var(--glacier);outline-offset:2px}
+  .icona svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7}
+  .esiti{
+    position:absolute;top:calc(100% + 6px);left:0;right:0;
+    background:var(--vetro);backdrop-filter:blur(16px);
+    border:1px solid var(--linea);border-radius:11px;box-shadow:var(--ombra);
+    overflow:hidden;display:none;
+  }
+  .esiti.aperto{display:block}
+  .esiti button{
+    display:block;width:100%;text-align:left;background:transparent;border:none;
+    border-bottom:1px solid var(--linea);color:var(--ghiaccio);
+    font-family:"IBM Plex Mono",monospace;font-size:12px;
+    padding:10px 13px;cursor:pointer;line-height:1.35;
+  }
+  .esiti button:last-child{border-bottom:none}
+  .esiti button:hover,.esiti button:focus-visible{background:rgba(159,231,245,.12);outline:none}
+  .esiti button small{display:block;color:var(--nebbia);font-size:10.5px;margin-top:2px}
+  .suggerimento{
+    pointer-events:auto;max-width:560px;margin:8px auto 0;
+    background:rgba(159,231,245,.14);border:1px solid var(--glacier);
+    border-radius:9px;padding:8px 12px;
+    font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--glacier);
+    display:none;text-align:center;
+  }
+  .suggerimento.visibile{display:block}
+
+  /* ---------- pannello ---------- */
+  .pannello{
+    position:fixed;z-index:700;left:16px;bottom:16px;
+    width:352px;max-width:calc(100vw - 32px);max-height:calc(100vh - 150px);
+    overflow-y:auto;overscroll-behavior:contain;
+    background:var(--vetro);backdrop-filter:blur(16px);
+    border:1px solid var(--linea);border-radius:14px;box-shadow:var(--ombra);
+    padding:14px 18px 14px;
+  }
+  .partenza{
+    display:flex;align-items:center;gap:7px;
+    font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--nebbia);
+    padding-bottom:12px;border-bottom:1px solid var(--linea);margin-bottom:14px;
+    line-height:1.4;
+  }
+  .partenza .pallino{width:7px;height:7px;border-radius:50%;background:var(--nebbia);flex:none}
+  .partenza.pronta .pallino{background:var(--glacier)}
+  .partenza.pronta b{color:var(--ghiaccio);font-weight:500}
+
   .lettura{display:flex;align-items:baseline;gap:8px;margin-bottom:2px}
   .lettura .valore{
-    font-family:"IBM Plex Mono",monospace;font-weight:600;
-    font-size:44px;line-height:1;letter-spacing:-.02em;
-    color:var(--glacier);font-variant-numeric:tabular-nums;
+    font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:42px;line-height:1;
+    letter-spacing:-.02em;color:var(--glacier);font-variant-numeric:tabular-nums;
   }
   .lettura .unita{font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--glacier-dim)}
   .didascalia{
@@ -88,22 +143,19 @@
     letter-spacing:.05em;margin:0 0 16px;
   }
 
-  /* ---- rotaia altimetrica ---- */
   .rotaia{position:relative;padding-bottom:26px}
+  .rotaia.stretta{padding-bottom:2px}
   .rotaia input[type=range]{
     -webkit-appearance:none;appearance:none;width:100%;height:26px;
     background:transparent;margin:0;display:block;cursor:grab;
   }
-  .rotaia input[type=range]:active{cursor:grabbing}
   .rotaia input[type=range]::-webkit-slider-runnable-track{
-    height:6px;border-radius:3px;
+    height:6px;border-radius:3px;border:1px solid rgba(159,231,245,.14);
     background:linear-gradient(90deg,#1B2732 0%,#2B4A55 55%,#5FA9BC 100%);
-    border:1px solid rgba(159,231,245,.14);
   }
   .rotaia input[type=range]::-moz-range-track{
-    height:6px;border-radius:3px;
+    height:6px;border-radius:3px;border:1px solid rgba(159,231,245,.14);
     background:linear-gradient(90deg,#1B2732 0%,#2B4A55 55%,#5FA9BC 100%);
-    border:1px solid rgba(159,231,245,.14);
   }
   .rotaia input[type=range]::-webkit-slider-thumb{
     -webkit-appearance:none;width:12px;height:24px;border-radius:3px;margin-top:-10px;
@@ -114,83 +166,90 @@
     width:12px;height:24px;border-radius:3px;border:1px solid #06343E;
     background:var(--glacier);box-shadow:0 4px 12px rgba(0,0,0,.6);
   }
-  .rotaia input[type=range]:focus-visible{outline:none}
+  .rotaia.calda input[type=range]::-webkit-slider-runnable-track{
+    background:linear-gradient(90deg,#241C15 0%,#4A3520 55%,#B4763C 100%);
+    border-color:rgba(242,166,90,.16);
+  }
+  .rotaia.calda input[type=range]::-moz-range-track{
+    background:linear-gradient(90deg,#241C15 0%,#4A3520 55%,#B4763C 100%);
+    border-color:rgba(242,166,90,.16);
+  }
+  .rotaia.calda input[type=range]::-webkit-slider-thumb{background:var(--ambra);border-color:#3A2410}
+  .rotaia.calda input[type=range]::-moz-range-thumb{background:var(--ambra);border-color:#3A2410}
   .rotaia input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(159,231,245,.45)}
   .tacche{position:absolute;left:0;right:0;bottom:0;height:24px;pointer-events:none}
   .tacca{position:absolute;transform:translateX(-50%);text-align:center}
   .tacca i{display:block;width:1px;height:5px;background:rgba(159,231,245,.28);margin:0 auto 3px}
-  .tacca span{
-    font-family:"IBM Plex Mono",monospace;font-size:9px;color:var(--nebbia);
-    letter-spacing:.04em;white-space:nowrap;
-  }
+  .tacca span{font-family:"IBM Plex Mono",monospace;font-size:9px;color:var(--nebbia);white-space:nowrap}
   .tacca.casa i{background:var(--glacier);height:7px}
   .tacca.casa span{color:var(--glacier-dim)}
 
-  .rotaia.stretta{padding-bottom:2px}
-  .riga-tempo{display:flex;align-items:baseline;gap:7px;margin:0 0 9px}
+  .righello{height:1px;background:var(--linea);margin:16px 0 13px}
+  .capo{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:11px;
+  }
+  .capo .titolo{
+    font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--nebbia);
+  }
+  .modi{display:flex;gap:5px}
+  .modi button{
+    font-family:"IBM Plex Mono",monospace;font-size:10.5px;
+    background:transparent;color:var(--nebbia);
+    border:1px solid var(--linea);border-radius:7px;
+    padding:4px 9px;cursor:pointer;transition:.15s;
+  }
+  .modi button:hover{border-color:rgba(242,166,90,.45);color:var(--ghiaccio)}
+  .modi button[aria-pressed=true]{
+    background:rgba(242,166,90,.15);border-color:var(--ambra);color:var(--ambra);
+  }
+  .modi button:focus-visible{outline:2px solid var(--ambra);outline-offset:2px}
+  .riga-tempo{display:flex;align-items:baseline;gap:7px;margin:0 0 8px}
   .riga-tempo .mini{
-    font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:22px;line-height:1;
-    color:var(--ghiaccio);font-variant-numeric:tabular-nums;
+    font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:24px;line-height:1;
+    color:var(--ambra);font-variant-numeric:tabular-nums;
   }
   .riga-tempo .etichetta{
     font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--nebbia);letter-spacing:.05em;
   }
-  .modi{display:flex;gap:6px;margin:11px 0 0}
-  .modi button{
-    flex:1;font-family:"IBM Plex Mono",monospace;font-size:11px;
-    background:transparent;color:var(--nebbia);
-    border:1px solid var(--linea);border-radius:7px;
-    padding:6px 6px;cursor:pointer;transition:.15s;
-  }
-  .modi button:hover{border-color:rgba(159,231,245,.4);color:var(--ghiaccio)}
-  .modi button[aria-pressed=true]{
-    background:rgba(159,231,245,.14);border-color:var(--glacier);color:var(--glacier);
-  }
-  .modi button:focus-visible{outline:2px solid var(--glacier);outline-offset:2px}
 
-  .righello{height:1px;background:var(--linea);margin:16px 0 12px}
-  .azioni{display:flex;gap:7px}
-  .azioni button{
-    flex:1;font-family:"IBM Plex Mono",monospace;font-size:11.5px;
-    background:transparent;color:var(--ghiaccio);
-    border:1px solid var(--linea);border-radius:8px;
-    padding:9px 8px;cursor:pointer;transition:.15s;line-height:1.2;
+  .cta{
+    width:100%;margin-top:13px;
+    font-family:"IBM Plex Mono",monospace;font-size:12px;
+    background:rgba(242,166,90,.14);color:var(--ambra);
+    border:1px solid rgba(242,166,90,.45);border-radius:9px;
+    padding:11px 10px;cursor:pointer;transition:.15s;
   }
-  .azioni button:hover{border-color:rgba(159,231,245,.45)}
-  .azioni button:focus-visible{outline:2px solid var(--glacier);outline-offset:2px}
-  .azioni button.primaria{
-    background:rgba(159,231,245,.13);border-color:rgba(159,231,245,.42);color:var(--glacier);
-  }
-  .azioni button.primaria:hover{border-color:var(--glacier)}
-  .azioni button[disabled]{opacity:.5;cursor:default}
+  .cta:hover{border-color:var(--ambra)}
+  .cta:focus-visible{outline:2px solid var(--ambra);outline-offset:2px}
+  .cta[disabled]{opacity:.42;cursor:default}
+  .cta.spenta{background:transparent;color:var(--nebbia);border-color:var(--linea)}
 
-  /* ---- sonda ---- */
   .sonda{
-    margin-top:12px;padding-top:12px;border-top:1px solid var(--linea);
-    font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--nebbia);
-    line-height:1.55;
+    margin-top:13px;padding-top:12px;border-top:1px solid var(--linea);
+    font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--nebbia);line-height:1.55;
   }
   .sonda b{color:var(--ghiaccio);font-weight:500;font-size:13px}
   .sonda .su{color:var(--glacier)}
-  .sonda a{color:var(--glacier-dim);text-decoration:none;border-bottom:1px solid var(--linea)}
-  .sonda a:hover{color:var(--glacier)}
-
-  .avviso{
-    position:fixed;z-index:800;left:50%;top:16px;transform:translateX(-50%);
-    background:#3A1D1D;border:1px solid #7A3B3B;color:#F3D9D9;
-    font-family:"IBM Plex Mono",monospace;font-size:11px;
-    padding:9px 14px;border-radius:10px;max-width:88vw;display:none;
+  .sonda a{color:var(--ambra);text-decoration:none;border-bottom:1px solid rgba(242,166,90,.35)}
+  .legenda{
+    display:flex;gap:13px;flex-wrap:wrap;margin-top:11px;
+    font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--nebbia);
   }
+  .legenda span{display:flex;align-items:center;gap:5px}
+  .legenda i{width:9px;height:9px;border-radius:2px;flex:none}
+  .legenda .fredda{background:#3D4E60}
+  .legenda .calda{background:#6E4A2A}
 
   .pin-io{
-    width:14px;height:14px;border-radius:50%;
+    width:15px;height:15px;border-radius:50%;
     background:var(--glacier);border:2px solid #06343E;
-    box-shadow:0 0 0 4px rgba(159,231,245,.22);
+    box-shadow:0 0 0 4px rgba(159,231,245,.22);cursor:grab;
   }
   .pin-meta{
     width:16px;height:16px;border-radius:50%;
-    background:rgba(159,231,245,.28);border:2px solid var(--glacier);
-    box-shadow:0 0 0 5px rgba(159,231,245,.14),0 2px 10px rgba(0,0,0,.6);
+    background:rgba(242,166,90,.3);border:2px solid var(--ambra);
+    box-shadow:0 0 0 5px rgba(242,166,90,.14),0 2px 10px rgba(0,0,0,.6);
   }
   .pin-sonda{
     width:12px;height:12px;border-radius:2px;transform:rotate(45deg);
@@ -200,14 +259,13 @@
 
   @media (max-width:640px){
     .pannello{
-      left:0;right:0;bottom:0;width:100%;max-width:none;
+      left:0;right:0;bottom:0;width:100%;max-width:none;max-height:62vh;
       border-radius:16px 16px 0 0;border-bottom:none;
-      padding:14px 16px calc(12px + env(safe-area-inset-bottom));
+      padding:13px 16px calc(12px + env(safe-area-inset-bottom));
     }
-    .lettura .valore{font-size:38px}
-    .didascalia{margin-bottom:14px}
+    .lettura .valore{font-size:36px}
+    .didascalia{margin-bottom:13px}
     .leaflet-control-zoom{display:none}
-    .marchio p{display:none}
   }
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -216,14 +274,30 @@
 
 <div id="map"></div>
 
-<div class="marchio">
-  <h1>Quota</h1>
-  <p>dove inizia il fresco</p>
+<div class="cima">
+  <p class="marchio">Quota</p>
+  <div class="barra">
+    <div class="campo-cerca">
+      <input id="cerca" type="text" placeholder="da dove parti?" autocomplete="off"
+             aria-label="Cerca il punto di partenza">
+      <div class="esiti" id="esiti"></div>
+    </div>
+    <button class="icona" id="btnGps" title="Usa la mia posizione" aria-label="Usa la mia posizione">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="9"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg>
+    </button>
+    <button class="icona" id="btnPin" title="Scegli sulla mappa" aria-label="Scegli sulla mappa" aria-pressed="false">
+      <svg viewBox="0 0 24 24"><path d="M12 22s7-6.3 7-12a7 7 0 1 0-14 0c0 5.7 7 12 7 12z"/><circle cx="12" cy="10" r="2.4"/></svg>
+    </button>
+  </div>
+  <div class="suggerimento" id="suggerimento">tocca la mappa per fissare la partenza · tocca di nuovo l'icona per annullare</div>
 </div>
 
-<div class="avviso" id="avviso"></div>
-
 <section class="pannello">
+  <div class="partenza" id="partenza">
+    <span class="pallino"></span>
+    <span id="partenzaTesto">nessuna partenza impostata</span>
+  </div>
+
   <div class="lettura">
     <span class="valore" id="valore">1000</span>
     <span class="unita">m s.l.m.</span>
@@ -238,28 +312,32 @@
 
   <div class="righello"></div>
 
+  <div class="capo">
+    <span class="titolo">viaggio</span>
+    <div class="modi" id="modi" role="group" aria-label="Mezzo di trasporto">
+      <button data-m="drive" aria-pressed="true">auto</button>
+      <button data-m="bicycle">bici</button>
+      <button data-m="walk">a piedi</button>
+    </div>
+  </div>
+
   <div class="riga-tempo">
     <span class="mini" id="minuti">45</span>
-    <span class="etichetta">minuti di viaggio</span>
+    <span class="etichetta" id="minutiNota">minuti</span>
   </div>
-  <div class="rotaia stretta">
-    <input type="range" id="tempo" min="10" max="60" step="5" value="45"
+  <div class="rotaia stretta calda">
+    <input type="range" id="tempo" min="10" max="120" step="5" value="45"
            aria-label="Minuti di viaggio">
   </div>
-  <div class="modi" id="modi" role="group" aria-label="Mezzo di trasporto">
-    <button data-m="drive" aria-pressed="true">auto</button>
-    <button data-m="bicycle">bici</button>
-    <button data-m="walk">a piedi</button>
-  </div>
 
-  <div class="righello"></div>
-
-  <div class="azioni">
-    <button id="btnPos">dove sono</button>
-    <button id="btnCerca" class="primaria">il fresco raggiungibile</button>
-  </div>
+  <button class="cta" id="cta" disabled>imposta prima la partenza</button>
 
   <div class="sonda" id="sonda">Tocca un punto sulla mappa per leggerne la quota.</div>
+
+  <div class="legenda">
+    <span><i class="fredda"></i>sotto quota</span>
+    <span><i class="calda"></i>fuori portata</span>
+  </div>
 </section>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -267,12 +345,17 @@
 (function(){
   "use strict";
 
+  var CHIAVE = '0cd1041148c7421abeb95b2bd4668d8b';
   var LATO = 256;
-  var ZOOM_DEM = 12;          // zoom massimo dei dati di quota
-  var soglia = 1000;
-  var mioPunto = null;
-  var deposito = new Map();   // chiave tile -> {ctx, quote}
-  var avvisato = false;
+  var Z_CERCA = 10;
+  var RAGGIO_TILE = 10;
+  var TETTO_ISO = 60;        // minuti massimi per singola chiamata
+
+  var soglia = 1000, minuti = 45, mezzo = 'drive';
+  var origine = null, nomeOrigine = '';
+  var aree = null, areeVisibili = false;
+  var deposito = new Map(), memoDem = new Map(), memoIso = new Map();
+  var avvisato = false, puntamento = false;
 
   /* ---------------- mappa ---------------- */
 
@@ -284,25 +367,10 @@
 
   L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
     subdomains:'abcd', maxZoom:19,
-    attribution:'&copy; OpenStreetMap, &copy; CARTO · quote: Terrain Tiles (AWS Open Data)'
+    attribution:'&copy; OpenStreetMap, &copy; CARTO · quote: Terrain Tiles · isocrone: Geoapify'
   }).addTo(map);
 
-  /* ---------------- maschera di quota ---------------- */
-
-  function dipingi(rec){
-    if(!rec.quote) return;
-    var out = rec.ctx.createImageData(LATO, LATO);
-    var d = out.data, q = rec.quote, t = soglia;
-    for(var i=0, p=0; i<q.length; i++, p+=4){
-      var h = q[i];
-      if(h < t){
-        var giu = (t - h) / 900; if(giu > 1) giu = 1;
-        d[p]=42; d[p+1]=54; d[p+2]=68;
-        d[p+3]= 38 + 26*giu;
-      }
-    }
-    rec.ctx.putImageData(out, 0, 0);
-  }
+  /* ---------------- velo di quota ---------------- */
 
   function urlDem(z,x,y){
     return 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/'+z+'/'+x+'/'+y+'.png';
@@ -321,12 +389,25 @@
     return q;
   }
 
-  function segnala(testo){
+  function segnala(t){
     if(avvisato) return;
     avvisato = true;
-    var el = document.getElementById('avviso');
-    el.textContent = testo;
-    el.style.display = 'block';
+    document.getElementById('sonda').textContent = t;
+  }
+
+  function dipingi(rec){
+    if(!rec.quote) return;
+    var out = rec.ctx.createImageData(LATO, LATO);
+    var d = out.data, q = rec.quote, t = soglia;
+    for(var i=0, p=0; i<q.length; i++, p+=4){
+      var h = q[i];
+      if(h < t){
+        var giu = (t - h) / 900; if(giu > 1) giu = 1;
+        d[p]=42; d[p+1]=54; d[p+2]=68;
+        d[p+3]= 38 + 26*giu;
+      }
+    }
+    rec.ctx.putImageData(out, 0, 0);
   }
 
   var Maschera = L.GridLayer.extend({
@@ -336,30 +417,22 @@
       el.width = el.height = LATO;
       var rec = { ctx: el.getContext('2d', {willReadFrequently:true}), quote:null };
       deposito.set(chiave, rec);
-
       var img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = function(){
         try{ rec.quote = decodifica(img); }
-        catch(e){
-          segnala('Dati di quota non leggibili: il servizio ha rifiutato la richiesta. Riprova più tardi.');
-          done(null, el); return;
-        }
-        dipingi(rec);
-        done(null, el);
+        catch(e){ segnala('Dati di quota non leggibili in questo momento.'); done(null, el); return; }
+        dipingi(rec); done(null, el);
       };
-      img.onerror = function(){
-        segnala('Tile di quota non raggiungibili. Controlla la connessione.');
-        done(null, el);
-      };
+      img.onerror = function(){ done(null, el); };
       img.src = urlDem(coords.z, coords.x, coords.y);
       return el;
     }
   });
 
   var maschera = new Maschera({
-    tileSize: LATO, maxNativeZoom: ZOOM_DEM, minZoom: 5, maxZoom: 15,
-    keepBuffer: 2, updateWhenZooming: false, className: 'strato-quota'
+    tileSize: LATO, maxNativeZoom: 12, minZoom: 5, maxZoom: 15,
+    keepBuffer: 2, updateWhenZooming: false
   }).addTo(map);
 
   maschera.on('tileunload', function(e){
@@ -370,214 +443,208 @@
   function ridipingi(){
     if(inCoda) return;
     inCoda = true;
-    requestAnimationFrame(function(){
-      inCoda = false;
-      deposito.forEach(dipingi);
-    });
+    requestAnimationFrame(function(){ inCoda = false; deposito.forEach(dipingi); });
   }
 
-  /* ---------------- lettura puntuale ---------------- */
+  /* ---------------- velo "fuori portata" su canvas ---------------- */
 
-  function quotaDi(latlng, callback){
-    var z = Math.min(Math.round(map.getZoom()), ZOOM_DEM);
-    var p = map.project(latlng, z);
-    var tx = Math.floor(p.x/LATO), ty = Math.floor(p.y/LATO);
-    var px = Math.floor(p.x) - tx*LATO, py = Math.floor(p.y) - ty*LATO;
-    var rec = deposito.get(z+'/'+tx+'/'+ty);
-    if(rec && rec.quote){ callback(rec.quote[py*LATO + px]); return; }
+  var VeloArea = L.Layer.extend({
+    onAdd: function(m){
+      this._tela = L.DomUtil.create('canvas', 'velo-area');
+      this._tela.style.position = 'absolute';
+      this._tela.style.pointerEvents = 'none';
+      m.getPanes().overlayPane.appendChild(this._tela);
+      m.on('moveend zoomend resize viewreset', this._render, this);
+      m.on('zoomstart', this._sfuma, this);
+      this._render();
+    },
+    onRemove: function(m){
+      m.off('moveend zoomend resize viewreset', this._render, this);
+      m.off('zoomstart', this._sfuma, this);
+      L.DomUtil.remove(this._tela);
+    },
+    setAree: function(g){ this._gruppi = g; this._render(); },
+    _sfuma: function(){ if(this._tela) this._tela.style.opacity = '0'; },
+    _render: function(){
+      if(!this._map || !this._tela) return;
+      var m = this._map, dim = m.getSize(), dpr = window.devicePixelRatio || 1;
+      var tela = this._tela;
+      // margine attorno al viewport, così una panoramica breve resta coperta
+      var mx = Math.round(dim.x * 0.3), my = Math.round(dim.y * 0.3);
+      var lx = dim.x + mx*2, ly = dim.y + my*2;
 
-    var img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = function(){
-      try{ callback(decodifica(img)[py*LATO + px]); }
-      catch(e){ callback(null); }
-    };
-    img.onerror = function(){ callback(null); };
-    img.src = urlDem(z, tx, ty);
-  }
-
-  var pinSonda = null;
-  var sonda = document.getElementById('sonda');
-
-  map.on('click', function(e){
-    sonda.textContent = 'lettura…';
-    if(pinSonda) map.removeLayer(pinSonda);
-    pinSonda = L.marker(e.latlng, {
-      icon: L.divIcon({className:'', html:'<div class="pin-sonda"></div>', iconSize:[12,12], iconAnchor:[6,6]}),
-      keyboard:false
-    }).addTo(map);
-
-    quotaDi(e.latlng, function(h){
-      if(h === null || !isFinite(h)){ sonda.textContent = 'Quota non disponibile qui.'; return; }
-      var m = Math.round(h);
-      var sopra = m >= soglia;
-      var righe = '<b class="'+(sopra?'su':'')+'">'+m+' m</b> · '+(sopra
-        ? (m - soglia) + ' m sopra soglia'
-        : 'sotto soglia di ' + (soglia - m) + ' m');
-      if(mioPunto){
-        var km = map.distance(mioPunto, e.latlng)/1000;
-        righe += '<br>' + (km < 10 ? km.toFixed(1) : Math.round(km)) + ' km da te in linea d\'aria';
+      if(tela.width !== lx*dpr || tela.height !== ly*dpr){
+        tela.width = lx*dpr; tela.height = ly*dpr;
+        tela.style.width = lx+'px'; tela.style.height = ly+'px';
       }
-      righe += '<br><a href="https://www.google.com/maps?q='+e.latlng.lat.toFixed(5)+','+e.latlng.lng.toFixed(5)+
-               '" target="_blank" rel="noopener">apri in Maps</a>';
-      sonda.innerHTML = righe;
-    });
+      L.DomUtil.setPosition(tela, m.containerPointToLayerPoint([-mx, -my]));
+      tela.style.opacity = '1';
+
+      var ctx = tela.getContext('2d');
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      ctx.clearRect(0,0,lx,ly);
+      if(!this._gruppi || !this._gruppi.length) return;
+
+      ctx.fillStyle = 'rgba(74,46,24,.42)';
+      ctx.fillRect(0,0,lx,ly);
+
+      function traccia(gruppo){
+        ctx.beginPath();
+        gruppo.forEach(function(anello){
+          anello.forEach(function(p, i){
+            var pt = m.latLngToContainerPoint(p);
+            if(i === 0) ctx.moveTo(pt.x + mx, pt.y + my); else ctx.lineTo(pt.x + mx, pt.y + my);
+          });
+          ctx.closePath();
+        });
+      }
+
+      ctx.globalCompositeOperation = 'destination-out';
+      this._gruppi.forEach(function(g){ traccia(g); ctx.fill('evenodd'); });
+
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = 'rgba(242,166,90,.75)';
+      ctx.lineWidth = 1.3;
+      this._gruppi.forEach(function(g){ traccia(g); ctx.stroke(); });
+    }
   });
 
-  /* ---------------- controlli ---------------- */
+  var velo = new VeloArea().addTo(map);
 
-  var campo = document.getElementById('soglia');
-  var valore = document.getElementById('valore');
+  /* ---------------- Geoapify ---------------- */
 
-  campo.addEventListener('input', function(){
-    soglia = Number(campo.value);
-    valore.textContent = soglia;
-    pulisciMeta();
-    ridipingi();
-  });
-
-  // tacche di riferimento sulla rotaia
-  var riferimenti = [
-    {q:0,    testo:'0'},
-    {q:122,  testo:'Milano', casa:true},
-    {q:500,  testo:'500'},
-    {q:1000, testo:'1000'},
-    {q:1500, testo:'1500'},
-    {q:2000, testo:'2000'},
-    {q:2600, testo:'2600'}
-  ];
-  var tacche = document.getElementById('tacche');
-  riferimenti.forEach(function(r){
-    var d = document.createElement('div');
-    d.className = 'tacca' + (r.casa ? ' casa' : '');
-    var pc = (r.q / 2600) * 100;
-    d.style.left = 'calc(6px + ' + pc + '% - ' + (pc * 0.12) + 'px)';
-    d.innerHTML = '<i></i><span>' + r.testo + '</span>';
-    tacche.appendChild(d);
-  });
-
-  document.getElementById('btnPos').addEventListener('click', function(){
-    var b = this;
-    b.textContent = 'cerco…';
-    map.locate({setView:true, maxZoom:11, enableHighAccuracy:false});
-    map.once('locationfound', function(e){
-      mioPunto = e.latlng;
-      b.textContent = 'dove sono';
-      L.marker(e.latlng, {
-        icon: L.divIcon({className:'', html:'<div class="pin-io"></div>', iconSize:[14,14], iconAnchor:[7,7]})
-      }).addTo(map);
-      quotaDi(e.latlng, function(h){
-        if(h !== null && isFinite(h)){
-          sonda.innerHTML = 'Sei a <b>' + Math.round(h) + ' m</b>. Le distanze dai punti che tocchi partono da qui.';
-        }
-      });
-    });
-    map.once('locationerror', function(){
-      b.textContent = 'dove sono';
-      sonda.textContent = 'Posizione non disponibile. Puoi comunque toccare la mappa.';
-    });
-  });
-
-  /* ---------------- area raggiungibile (Geoapify) ---------------- */
-
-  var CHIAVE = '0cd1041148c7421abeb95b2bd4668d8b';
-  var minuti = 45, mezzo = 'drive';
-  var memoIso = new Map();
-  var veloFuori = null, bordo = null;
-  var MONDO = [[-85,-179.9],[-85,179.9],[85,179.9],[85,-179.9]];
-
-  function scaricaIsocrona(origine, cb){
-    var k = origine.lat.toFixed(4)+','+origine.lng.toFixed(4)+':'+minuti+':'+mezzo;
+  function isocrona(punto, min, cb){
+    var k = punto.lat.toFixed(4)+','+punto.lng.toFixed(4)+':'+min+':'+mezzo;
     if(memoIso.has(k)){ cb(memoIso.get(k), null); return; }
-    var url = 'https://api.geoapify.com/v1/isoline?lat=' + origine.lat + '&lon=' + origine.lng +
-              '&type=time&mode=' + mezzo + '&range=' + (minuti*60) + '&apiKey=' + CHIAVE;
+    var url = 'https://api.geoapify.com/v1/isoline?lat=' + punto.lat + '&lon=' + punto.lng +
+              '&type=time&mode=' + mezzo + '&range=' + (min*60) + '&apiKey=' + CHIAVE;
     fetch(url).then(function(r){
       if(!r.ok) throw new Error(r.status === 401 ? 'chiave' : (r.status === 429 ? 'quota' : 'servizio'));
       return r.json();
     }).then(function(g){
-      var anelli = [];
+      var gruppi = [];
       (g.features || []).forEach(function(f){
         if(!f.geometry) return;
         var poli = f.geometry.type === 'MultiPolygon' ? f.geometry.coordinates : [f.geometry.coordinates];
         poli.forEach(function(p){
-          p.forEach(function(anello){
-            anelli.push(anello.map(function(pt){ return [pt[1], pt[0]]; }));
-          });
+          gruppi.push(p.map(function(anello){
+            return anello.map(function(pt){ return [pt[1], pt[0]]; });
+          }));
         });
       });
-      if(!anelli.length) throw new Error('vuoto');
-      memoIso.set(k, anelli);
-      cb(anelli, null);
-    }).catch(function(e){ cb(null, e.message); });
+      if(!gruppi.length) throw new Error('vuoto');
+      memoIso.set(k, gruppi);
+      cb(gruppi, null);
+    }).catch(function(e){ cb(null, e.message || 'servizio'); });
   }
 
-  function dentro(lat, lng, anelli){
-    var d = false;
-    for(var a=0; a<anelli.length; a++){
-      var r = anelli[a];
-      for(var i=0, j=r.length-1; i<r.length; j=i++){
-        var yi=r[i][0], xi=r[i][1], yj=r[j][0], xj=r[j][1];
-        if(((yi>lat) !== (yj>lat)) && (lng < (xj-xi)*(lat-yi)/(yj-yi) + xi)) d = !d;
+  // oltre i 60 minuti concateno: isocrona base + isocrone dai punti del suo bordo
+  function areaRaggiungibile(punto, min, cb){
+    if(min <= TETTO_ISO){ isocrona(punto, min, cb); return; }
+
+    isocrona(punto, TETTO_ISO, function(base, err){
+      if(err){ cb(null, err); return; }
+
+      var esterno = null;
+      base.forEach(function(g){ if(!esterno || g[0].length > esterno.length) esterno = g[0]; });
+      var K = 8, semi = [];
+      for(var i=0; i<K; i++){
+        var p = esterno[Math.floor(i * esterno.length / K)];
+        semi.push(L.latLng(p[0], p[1]));
       }
+
+      var resto = min - TETTO_ISO;
+      var tutti = base.slice(), fatti = 0, j = 0;
+
+      function prossimo(){
+        if(j >= semi.length) return;
+        var s = semi[j++];
+        isocrona(s, resto, function(g){
+          if(g) tutti = tutti.concat(g);
+          if(++fatti === semi.length) cb(tutti, null);
+          else setTimeout(prossimo, 220);
+        });
+      }
+      // tre in parallelo, poi a catena: resto sotto il limite di richieste al secondo
+      prossimo(); setTimeout(prossimo, 220); setTimeout(prossimo, 440);
+    });
+  }
+
+  function dentro(lat, lng, gruppi){
+    for(var a=0; a<gruppi.length; a++){
+      var d = false, g = gruppi[a];
+      for(var r=0; r<g.length; r++){
+        var anello = g[r];
+        for(var i=0, j=anello.length-1; i<anello.length; j=i++){
+          var yi=anello[i][0], xi=anello[i][1], yj=anello[j][0], xj=anello[j][1];
+          if(((yi>lat) !== (yj>lat)) && (lng < (xj-xi)*(lat-yi)/(yj-yi) + xi)) d = !d;
+        }
+      }
+      if(d) return true;
     }
-    return d;
+    return false;
   }
 
-  function disegnaArea(anelli){
-    if(veloFuori) map.removeLayer(veloFuori);
-    if(bordo) map.removeLayer(bordo);
-    veloFuori = L.polygon([MONDO].concat(anelli), {
-      stroke:false, fillColor:'#2A3644', fillOpacity:.34, fillRule:'evenodd', interactive:false
-    }).addTo(map);
-    bordo = L.polyline(anelli, {
-      color:'#9FE7F5', weight:1.3, opacity:.6, interactive:false
-    }).addTo(map);
+  function geocodifica(testo, cb){
+    var c = map.getCenter();
+    var url = 'https://api.geoapify.com/v1/geocode/autocomplete?text=' + encodeURIComponent(testo) +
+              '&limit=5&lang=it&filter=countrycode:it,ch,at,fr,si&bias=proximity:' +
+              c.lng.toFixed(3) + ',' + c.lat.toFixed(3) + '&apiKey=' + CHIAVE;
+    fetch(url).then(function(r){ return r.json(); })
+      .then(function(g){ cb(g.features || []); })
+      .catch(function(){ cb([]); });
   }
 
-  function pulisciArea(){
-    if(veloFuori){ map.removeLayer(veloFuori); veloFuori = null; }
-    if(bordo){ map.removeLayer(bordo); bordo = null; }
-    pulisciMeta();
+  function nominaPunto(p, cb){
+    var url = 'https://api.geoapify.com/v1/geocode/reverse?lat=' + p.lat + '&lon=' + p.lng +
+              '&limit=1&lang=it&apiKey=' + CHIAVE;
+    fetch(url).then(function(r){ return r.json(); })
+      .then(function(g){
+        var f = (g.features || [])[0];
+        cb(f ? (f.properties.city || f.properties.name || f.properties.formatted) : null);
+      })
+      .catch(function(){ cb(null); });
   }
 
-  function pulisciMeta(){
-    if(pinMeta){ map.removeLayer(pinMeta); pinMeta = null; }
-    if(rotta){ map.removeLayer(rotta); rotta = null; }
-  }
-
-  /* ---------------- il punto più vicino sopra soglia ---------------- */
-
-  var Z_CERCA = 10;          // ~110 m per pixel a 45° di latitudine
-  var RAGGIO_TILE = 8;       // ~220 km di raggio massimo
-  var memo = new Map();
-  var pinMeta = null, rotta = null;
+  /* ---------------- quote puntuali ---------------- */
 
   function quoteTile(z, x, y, cb){
     var k = z+':'+x+':'+y;
-    if(memo.has(k)){ cb(memo.get(k)); return; }
+    if(memoDem.has(k)){ cb(memoDem.get(k)); return; }
     var img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = function(){
       var q = null;
       try{ q = decodifica(img); }catch(e){}
-      if(memo.size > 90) memo.clear();
-      memo.set(k, q); cb(q);
+      if(memoDem.size > 90) memoDem.clear();
+      memoDem.set(k, q); cb(q);
     };
-    img.onerror = function(){ memo.set(k, null); cb(null); };
+    img.onerror = function(){ memoDem.set(k, null); cb(null); };
     img.src = urlDem(z, x, y);
   }
 
-  function cercaFresco(origine, anelli, fatto){
+  function quotaDi(latlng, cb){
+    var z = Math.min(Math.round(map.getZoom()), 12);
+    var p = map.project(latlng, z);
+    var tx = Math.floor(p.x/LATO), ty = Math.floor(p.y/LATO);
+    var px = Math.floor(p.x) - tx*LATO, py = Math.floor(p.y) - ty*LATO;
+    var rec = deposito.get(z+'/'+tx+'/'+ty);
+    if(rec && rec.quote){ cb(rec.quote[py*LATO + px]); return; }
+    quoteTile(z, tx, ty, function(q){ cb(q ? q[py*LATO + px] : null); });
+  }
+
+  /* ---------------- ricerca del punto più vicino ---------------- */
+
+  function cercaFresco(da, gruppi, fatto){
     var z = Z_CERCA;
-    var o = map.project(origine, z);
-    var mpp = 156543.03392 * Math.cos(origine.lat * Math.PI/180) / Math.pow(2, z);
+    var o = map.project(da, z);
+    var mpp = 156543.03392 * Math.cos(da.lat * Math.PI/180) / Math.pow(2, z);
     var tx0 = Math.floor(o.x/LATO), ty0 = Math.floor(o.y/LATO);
 
-    // limito la scansione al rettangolo dell'area raggiungibile
     var lim = null;
-    if(anelli){
+    if(gruppi){
       var b = L.latLngBounds([]);
-      anelli.forEach(function(r){ r.forEach(function(p){ b.extend(p); }); });
+      gruppi.forEach(function(g){ g.forEach(function(r){ r.forEach(function(p){ b.extend(p); }); }); });
       var a1 = map.project(b.getNorthWest(), z), a2 = map.project(b.getSouthEast(), z);
       lim = {x0:Math.floor(a1.x/LATO), x1:Math.floor(a2.x/LATO),
              y0:Math.floor(a1.y/LATO), y1:Math.floor(a2.y/LATO)};
@@ -600,7 +667,7 @@
 
     function passo(){
       if(i >= coda.length || coda[i].min > mglD){
-        fatto(mgl ? { latlng: mgl.ll, metri: mglD * mpp, quota: mglH } : null);
+        fatto(mgl ? { latlng: mgl, metri: mglD * mpp, quota: mglH } : null);
         return;
       }
       var t = coda[i++];
@@ -609,14 +676,13 @@
           for(var y=0; y<LATO; y++){
             var gy = t.ty*LATO + y, ay = gy - o.y;
             for(var x=0; x<LATO; x++){
-              var h = q[y*LATO + x];
-              if(h >= soglia){
+              if(q[y*LATO + x] >= soglia){
                 var ax = (t.tx*LATO + x) - o.x;
                 var d = Math.sqrt(ax*ax + ay*ay);
                 if(d < mglD){
                   var ll = map.unproject(L.point(t.tx*LATO + x + 0.5, gy + 0.5), z);
-                  if(!anelli || dentro(ll.lat, ll.lng, anelli)){
-                    mglD = d; mgl = {ll:ll}; mglH = h;
+                  if(!gruppi || dentro(ll.lat, ll.lng, gruppi)){
+                    mglD = d; mgl = ll; mglH = q[y*LATO + x];
                   }
                 }
               }
@@ -629,15 +695,209 @@
     passo();
   }
 
-  /* ---------------- comandi tempo e mezzo ---------------- */
+  /* ---------------- stato e interfaccia ---------------- */
 
+  var sonda = document.getElementById('sonda');
+  var cta = document.getElementById('cta');
+  var campo = document.getElementById('soglia');
+  var valore = document.getElementById('valore');
   var campoTempo = document.getElementById('tempo');
-  var etichettaMin = document.getElementById('minuti');
+  var etMinuti = document.getElementById('minuti');
+  var etNota = document.getElementById('minutiNota');
+  var rigaPartenza = document.getElementById('partenza');
+  var testoPartenza = document.getElementById('partenzaTesto');
+  var pinOrigine = null, pinMeta = null, rotta = null, pinSonda = null;
+
+  var NOME = { drive:'in auto', bicycle:'in bici', walk:'a piedi' };
+
+  function aggiornaCta(){
+    if(!origine){
+      cta.disabled = true;
+      cta.classList.remove('spenta');
+      cta.textContent = 'imposta prima la partenza';
+      return;
+    }
+    cta.disabled = false;
+    if(areeVisibili){
+      cta.classList.add('spenta');
+      cta.textContent = 'nascondi l\'area di viaggio';
+    } else {
+      cta.classList.remove('spenta');
+      cta.textContent = 'mostra dove arrivo in ' + minuti + ' min ' + NOME[mezzo];
+    }
+  }
+
+  function pulisciMeta(){
+    if(pinMeta){ map.removeLayer(pinMeta); pinMeta = null; }
+    if(rotta){ map.removeLayer(rotta); rotta = null; }
+  }
+
+  function nascondiAree(){
+    areeVisibili = false;
+    velo.setAree(null);
+    pulisciMeta();
+    aggiornaCta();
+  }
+
+  function scadeArea(){
+    aree = null;
+    nascondiAree();
+  }
+
+  function impostaOrigine(latlng, nome){
+    origine = latlng;
+    nomeOrigine = nome || '';
+    if(pinOrigine) map.removeLayer(pinOrigine);
+    pinOrigine = L.marker(latlng, {
+      draggable:true,
+      icon: L.divIcon({className:'', html:'<div class="pin-io"></div>', iconSize:[15,15], iconAnchor:[7.5,7.5]})
+    }).addTo(map);
+    pinOrigine.on('dragend', function(e){
+      var p = e.target.getLatLng();
+      nominaPunto(p, function(n){ impostaOrigine(p, n); });
+    });
+
+    scadeArea();
+    quotaDi(latlng, function(h){
+      var etichetta = nomeOrigine || (latlng.lat.toFixed(3) + ', ' + latlng.lng.toFixed(3));
+      rigaPartenza.classList.add('pronta');
+      testoPartenza.innerHTML = 'parti da <b>' + etichetta + '</b>' +
+        (h !== null && isFinite(h) ? ' · ' + Math.round(h) + ' m' : '');
+      aggiornaCta();
+    });
+    aggiornaCta();
+  }
+
+  /* ---- barra di ricerca ---- */
+
+  var input = document.getElementById('cerca');
+  var esiti = document.getElementById('esiti');
+  var attesa = null;
+
+  input.addEventListener('input', function(){
+    var q = input.value.trim();
+    clearTimeout(attesa);
+    if(q.length < 3){ esiti.classList.remove('aperto'); return; }
+    attesa = setTimeout(function(){
+      geocodifica(q, function(lista){
+        esiti.innerHTML = '';
+        if(!lista.length){ esiti.classList.remove('aperto'); return; }
+        lista.forEach(function(f){
+          var pr = f.properties;
+          var b = document.createElement('button');
+          b.innerHTML = (pr.name || pr.city || pr.formatted) +
+            '<small>' + (pr.formatted || '') + '</small>';
+          b.addEventListener('click', function(){
+            esiti.classList.remove('aperto');
+            input.value = pr.name || pr.city || '';
+            var ll = L.latLng(pr.lat, pr.lon);
+            map.setView(ll, 11);
+            impostaOrigine(ll, pr.name || pr.city || pr.formatted);
+          });
+          esiti.appendChild(b);
+        });
+        esiti.classList.add('aperto');
+      });
+    }, 330);
+  });
+
+  document.addEventListener('click', function(e){
+    if(!esiti.contains(e.target) && e.target !== input) esiti.classList.remove('aperto');
+  });
+
+  /* ---- geolocalizzazione ---- */
+
+  document.getElementById('btnGps').addEventListener('click', function(){
+    sonda.textContent = 'Cerco la tua posizione…';
+    map.locate({setView:true, maxZoom:11, enableHighAccuracy:false});
+    map.once('locationfound', function(e){
+      nominaPunto(e.latlng, function(n){
+        impostaOrigine(e.latlng, n);
+        input.value = n || '';
+        sonda.textContent = 'Partenza impostata sulla tua posizione.';
+      });
+    });
+    map.once('locationerror', function(){
+      sonda.textContent = 'Posizione non disponibile. Cerca un luogo o scegli sulla mappa.';
+    });
+  });
+
+  /* ---- scelta sulla mappa ---- */
+
+  var btnPin = document.getElementById('btnPin');
+  var suggerimento = document.getElementById('suggerimento');
+
+  btnPin.addEventListener('click', function(){
+    puntamento = !puntamento;
+    btnPin.setAttribute('aria-pressed', String(puntamento));
+    suggerimento.classList.toggle('visibile', puntamento);
+    document.getElementById('map').classList.toggle('puntamento', puntamento);
+  });
+
+  map.on('click', function(e){
+    if(puntamento){
+      puntamento = false;
+      btnPin.setAttribute('aria-pressed', 'false');
+      suggerimento.classList.remove('visibile');
+      document.getElementById('map').classList.remove('puntamento');
+      nominaPunto(e.latlng, function(n){
+        impostaOrigine(e.latlng, n);
+        input.value = n || '';
+        sonda.textContent = 'Partenza fissata sul punto scelto.';
+      });
+      return;
+    }
+
+    sonda.textContent = 'lettura…';
+    if(pinSonda) map.removeLayer(pinSonda);
+    pinSonda = L.marker(e.latlng, {
+      icon: L.divIcon({className:'', html:'<div class="pin-sonda"></div>', iconSize:[12,12], iconAnchor:[6,6]}),
+      keyboard:false
+    }).addTo(map);
+
+    quotaDi(e.latlng, function(h){
+      if(h === null || !isFinite(h)){ sonda.textContent = 'Quota non disponibile qui.'; return; }
+      var m = Math.round(h), sopra = m >= soglia;
+      var testo = '<b class="' + (sopra ? 'su' : '') + '">' + m + ' m</b> · ' +
+        (sopra ? (m - soglia) + ' m sopra soglia' : 'sotto soglia di ' + (soglia - m) + ' m');
+      if(origine){
+        var km = map.distance(origine, e.latlng)/1000;
+        testo += '<br>' + (km < 10 ? km.toFixed(1) : Math.round(km)) + ' km dalla partenza';
+      }
+      sonda.innerHTML = testo;
+    });
+  });
+
+  /* ---- soglia ---- */
+
+  campo.addEventListener('input', function(){
+    soglia = Number(campo.value);
+    valore.textContent = soglia;
+    pulisciMeta();
+    ridipingi();
+  });
+
+  var riferimenti = [
+    {q:0, testo:'0'}, {q:122, testo:'Milano', casa:true}, {q:500, testo:'500'},
+    {q:1000, testo:'1000'}, {q:1500, testo:'1500'}, {q:2000, testo:'2000'}, {q:2600, testo:'2600'}
+  ];
+  var tacche = document.getElementById('tacche');
+  riferimenti.forEach(function(r){
+    var d = document.createElement('div');
+    d.className = 'tacca' + (r.casa ? ' casa' : '');
+    var pc = (r.q / 2600) * 100;
+    d.style.left = 'calc(6px + ' + pc + '% - ' + (pc * 0.12) + 'px)';
+    d.innerHTML = '<i></i><span>' + r.testo + '</span>';
+    tacche.appendChild(d);
+  });
+
+  /* ---- tempo e mezzo ---- */
 
   campoTempo.addEventListener('input', function(){
     minuti = Number(campoTempo.value);
-    etichettaMin.textContent = minuti;
-    pulisciArea();
+    etMinuti.textContent = minuti;
+    etNota.textContent = minuti > TETTO_ISO ? 'minuti · stima a due tappe' : 'minuti';
+    scadeArea();
   });
 
   var pulsantiMezzo = Array.prototype.slice.call(document.querySelectorAll('#modi button'));
@@ -645,73 +905,73 @@
     b.addEventListener('click', function(){
       mezzo = b.dataset.m;
       pulsantiMezzo.forEach(function(o){ o.setAttribute('aria-pressed', String(o === b)); });
-      pulisciArea();
+      scadeArea();
     });
   });
 
-  var btnCerca = document.getElementById('btnCerca');
-  var NOME_MEZZO = { drive:'in auto', bicycle:'in bici', walk:'a piedi' };
+  /* ---- azione principale ---- */
 
-  btnCerca.addEventListener('click', function(){
-    var origine = mioPunto || map.getCenter();
-    var daCentro = !mioPunto;
+  function mostraAree(){
+    areeVisibili = true;
+    velo.setAree(aree);
+    var b = L.latLngBounds([]);
+    aree.forEach(function(g){ g.forEach(function(r){ r.forEach(function(p){ b.extend(p); }); }); });
+    map.fitBounds(b.pad(0.05));
+    aggiornaCta();
 
-    btnCerca.disabled = true;
-    btnCerca.textContent = 'calcolo…';
-    pulisciMeta();
-    sonda.textContent = 'Calcolo dove arrivi in ' + minuti + ' minuti ' + NOME_MEZZO[mezzo] +
-      (daCentro ? ' dal centro mappa…' : '…');
+    sonda.textContent = 'Cerco il punto più vicino sopra i ' + soglia + ' m…';
+    cercaFresco(origine, aree, function(res){
+      if(!res){
+        sonda.textContent = 'In ' + minuti + ' min ' + NOME[mezzo] + ' non arrivi sopra i ' +
+          soglia + ' m. Alza i minuti o abbassa la quota.';
+        return;
+      }
+      pulisciMeta();
+      pinMeta = L.marker(res.latlng, {
+        icon: L.divIcon({className:'', html:'<div class="pin-meta"></div>', iconSize:[16,16], iconAnchor:[8,8]})
+      }).addTo(map);
+      rotta = L.polyline([origine, res.latlng], {
+        color:'#F2A65A', weight:1.5, opacity:.7, dashArray:'5 5', interactive:false
+      }).addTo(map);
 
-    scaricaIsocrona(origine, function(anelli, err){
+      var km = res.metri/1000;
+      sonda.innerHTML = '<b class="su">' + Math.round(res.quota) + ' m</b> · ' +
+        (km < 10 ? km.toFixed(1) : Math.round(km)) + ' km in linea d\'aria dalla partenza' +
+        '<br><a href="https://www.google.com/maps/dir/?api=1&origin=' +
+        origine.lat.toFixed(5) + ',' + origine.lng.toFixed(5) +
+        '&destination=' + res.latlng.lat.toFixed(5) + ',' + res.latlng.lng.toFixed(5) +
+        '&travelmode=' + (mezzo === 'drive' ? 'driving' : (mezzo === 'bicycle' ? 'bicycling' : 'walking')) +
+        '" target="_blank" rel="noopener">strada e tempo reale</a>';
+    });
+  }
+
+  cta.addEventListener('click', function(){
+    if(!origine) return;
+    if(areeVisibili){ nascondiAree(); return; }
+    if(aree){ mostraAree(); return; }
+
+    cta.disabled = true;
+    cta.textContent = 'calcolo…';
+    sonda.textContent = 'Calcolo dove arrivi in ' + minuti + ' minuti ' + NOME[mezzo] +
+      (minuti > TETTO_ISO ? ' (due tappe, ci vuole qualche secondo)…' : '…');
+
+    areaRaggiungibile(origine, minuti, function(g, err){
+      cta.disabled = false;
       if(err){
-        btnCerca.disabled = false;
-        btnCerca.textContent = 'il fresco raggiungibile';
+        aggiornaCta();
         sonda.textContent =
-          err === 'chiave' ? 'Chiave del servizio rifiutata.' :
+          err === 'chiave' ? 'Chiave del servizio rifiutata (controlla le origini consentite).' :
           err === 'quota'  ? 'Quota giornaliera esaurita, riprova domani.' :
           err === 'vuoto'  ? 'Nessuna area calcolabile da questo punto.' :
                              'Servizio non raggiungibile in questo momento.';
         return;
       }
-
-      disegnaArea(anelli);
-      var b = L.latLngBounds([]);
-      anelli.forEach(function(r){ r.forEach(function(p){ b.extend(p); }); });
-      map.fitBounds(b.pad(0.06));
-
-      sonda.textContent = 'Cerco il punto più vicino sopra i ' + soglia + ' m…';
-
-      cercaFresco(origine, anelli, function(res){
-        btnCerca.disabled = false;
-        btnCerca.textContent = 'il fresco raggiungibile';
-
-        if(!res){
-          sonda.textContent = 'In ' + minuti + ' min ' + NOME_MEZZO[mezzo] +
-            ' non arrivi sopra i ' + soglia + ' m. Alza i minuti o abbassa la quota.';
-          return;
-        }
-
-        pinMeta = L.marker(res.latlng, {
-          icon: L.divIcon({className:'', html:'<div class="pin-meta"></div>', iconSize:[16,16], iconAnchor:[8,8]})
-        }).addTo(map);
-        rotta = L.polyline([origine, res.latlng], {
-          color:'#9FE7F5', weight:1.5, opacity:.75, dashArray:'5 5', interactive:false
-        }).addTo(map);
-
-        var km = res.metri/1000;
-        sonda.innerHTML =
-          '<b class="su">' + Math.round(res.quota) + ' m</b> · ' +
-          (km < 10 ? km.toFixed(1) : Math.round(km)) + ' km in linea d\'aria' +
-          (daCentro ? ' dal centro mappa' : ' da te') +
-          '<br><a href="https://www.google.com/maps/dir/?api=1&origin=' +
-          origine.lat.toFixed(5) + ',' + origine.lng.toFixed(5) +
-          '&destination=' + res.latlng.lat.toFixed(5) + ',' + res.latlng.lng.toFixed(5) +
-          '&travelmode=' + (mezzo === 'drive' ? 'driving' : (mezzo === 'bicycle' ? 'bicycling' : 'walking')) +
-          '" target="_blank" rel="noopener">strada e tempo reale</a>';
-      });
+      aree = g;
+      mostraAree();
     });
   });
 
+  aggiornaCta();
 })();
 </script>
 </body>
