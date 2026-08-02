@@ -281,6 +281,34 @@
   .cta[disabled]{opacity:.42;cursor:default}
   .cta.spenta{background:transparent;color:var(--nebbia);border-color:var(--linea)}
 
+  .cta.secondaria{
+    background:rgba(139,240,196,.1);color:#8BF0C4;
+    border-color:rgba(139,240,196,.4);margin-top:7px;
+  }
+  .cta.secondaria:hover{border-color:#8BF0C4}
+  .cta.secondaria:focus-visible{outline-color:#8BF0C4}
+
+  .luogo{position:relative}
+  .luogo .punto{
+    position:absolute;left:0;top:0;width:11px;height:11px;border-radius:50%;
+    background:#8BF0C4;border:2px solid #073A28;box-shadow:0 0 0 4px rgba(139,240,196,.2);
+  }
+  .luogo .nome{
+    position:absolute;left:16px;top:-4px;white-space:nowrap;
+    background:rgba(11,16,22,.9);border:1px solid rgba(139,240,196,.45);
+    color:#8BF0C4;font-family:"IBM Plex Mono",monospace;font-size:10px;
+    padding:3px 7px;border-radius:6px;
+  }
+  .luogo.secondo .punto{background:transparent;border-color:#8BF0C4;box-shadow:none}
+  .luogo.secondo .nome{color:var(--nebbia);border-color:var(--linea)}
+
+  .sonda .elenco{margin:7px 0 0;padding:0;list-style:none}
+  .sonda .elenco li{
+    display:flex;justify-content:space-between;gap:10px;
+    padding:4px 0;border-top:1px solid var(--linea);
+  }
+  .sonda .elenco li span:first-child{color:var(--ghiaccio)}
+
   .sonda{
     margin-top:13px;padding-top:12px;border-top:1px solid var(--linea);
     font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--nebbia);line-height:1.55;
@@ -412,6 +440,7 @@
   </div><!-- /corpo -->
 
   <button class="cta" id="cta" disabled>imposta prima la partenza</button>
+  <button class="cta secondaria" id="ctaLuoghi" disabled>aggancia a un luogo reale</button>
 
   <div class="sonda" id="sonda">Tocca un punto sulla mappa per leggerne la quota.</div>
 
@@ -902,6 +931,11 @@
   var NOME = { drive:'in auto', bicycle:'in bici', walk:'a piedi' };
 
   function aggiornaCta(){
+    if(typeof ctaLuoghi !== 'undefined'){
+      var pronto = !!(aree && areeVisibili);
+      ctaLuoghi.disabled = !pronto;
+      if(!pronto && typeof pulisciLuoghi === 'function') pulisciLuoghi();
+    }
     if(!origine){
       cta.disabled = true;
       cta.classList.remove('spenta');
@@ -928,6 +962,7 @@
     velo.setAree(null);
     luce.setAree(null);
     pulisciMeta();
+    if(typeof pulisciLuoghi === 'function') pulisciLuoghi();
     aggiornaCta();
   }
 
@@ -1194,6 +1229,140 @@
       }
       aree = g;
       mostraAree();
+    });
+  });
+
+  /* ---------------- luoghi reali sopra soglia ---------------- */
+
+  var ctaLuoghi = document.getElementById('ctaLuoghi');
+  var pinLuoghi = [];
+
+  function pulisciLuoghi(){
+    pinLuoghi.forEach(function(p){ map.removeLayer(p); });
+    pinLuoghi = [];
+  }
+
+  function chiediLuoghi(rect, categorie, cb){
+    var url = 'https://api.geoapify.com/v2/places?categories=' + categorie +
+              '&filter=rect:' + rect + '&bias=proximity:' +
+              origine.lng.toFixed(5) + ',' + origine.lat.toFixed(5) +
+              '&limit=60&apiKey=' + CHIAVE;
+    fetch(url).then(function(r){
+      if(!r.ok) throw new Error(r.status === 400 ? 'categorie' : 'servizio');
+      return r.json();
+    }).then(function(g){ cb(g.features || [], null); })
+      .catch(function(e){ cb(null, e.message || 'servizio'); });
+  }
+
+  function quotaGrezza(latlng, cb){
+    var z = Z_CERCA;
+    var p = map.project(latlng, z);
+    var tx = Math.floor(p.x/LATO), ty = Math.floor(p.y/LATO);
+    var px = Math.floor(p.x) - tx*LATO, py = Math.floor(p.y) - ty*LATO;
+    quoteTile(z, tx, ty, function(q){ cb(q ? q[py*LATO + px] : null); });
+  }
+
+  ctaLuoghi.addEventListener('click', function(){
+    if(!aree || !origine) return;
+
+    ctaLuoghi.disabled = true;
+    ctaLuoghi.textContent = 'cerco…';
+    pulisciLuoghi();
+    sonda.textContent = 'Cerco paesi e vette sopra i ' + soglia + ' m dentro l\'area…';
+
+    var b = L.latLngBounds([]);
+    aree.forEach(function(g){ g.forEach(function(r){ r.forEach(function(p){ b.extend(p); }); }); });
+    var rect = b.getWest().toFixed(5) + ',' + b.getSouth().toFixed(5) + ',' +
+               b.getEast().toFixed(5) + ',' + b.getNorth().toFixed(5);
+
+    function elabora(lista){
+      var candidati = lista.filter(function(f){
+        var pr = f.properties;
+        return pr.name && dentro(pr.lat, pr.lon, aree);
+      });
+      if(!candidati.length){ nessuno(); return; }
+
+      var buoni = [], i = 0;
+      (function prossimo(){
+        if(i >= candidati.length){ mostra(buoni); return; }
+        var pr = candidati[i++].properties;
+        var ll = L.latLng(pr.lat, pr.lon);
+        quotaGrezza(ll, function(h){
+          if(h !== null && isFinite(h) && h >= soglia){
+            buoni.push({ nome: pr.name, ll: ll, quota: Math.round(h),
+                         km: map.distance(origine, ll)/1000 });
+          }
+          prossimo();
+        });
+      })();
+    }
+
+    function nessuno(){
+      ctaLuoghi.disabled = false;
+      ctaLuoghi.textContent = 'aggancia a un luogo reale';
+      sonda.innerHTML = 'Dentro l\'area non c\'è nessun paese o vetta con un nome sopra i ' +
+        soglia + ' m.<br>Lassù ci si arriva solo a piedi: allarga i minuti o abbassa la quota.';
+    }
+
+    function mostra(buoni){
+      ctaLuoghi.disabled = false;
+      ctaLuoghi.textContent = 'aggancia a un luogo reale';
+      if(!buoni.length){ nessuno(); return; }
+
+      buoni.sort(function(a,b){ return a.km - b.km; });
+      buoni = buoni.slice(0, 5);
+
+      buoni.forEach(function(v, k){
+        var m = L.marker(v.ll, {
+          icon: L.divIcon({
+            className: '',
+            html: '<div class="luogo' + (k ? ' secondo' : '') + '">' +
+                  '<div class="punto"></div><div class="nome">' + v.nome +
+                  ' · ' + v.quota + ' m</div></div>',
+            iconSize: [11,11], iconAnchor: [5.5,5.5]
+          })
+        }).addTo(map);
+        pinLuoghi.push(m);
+      });
+
+      var primo = buoni[0];
+      var righe = '<b class="su">' + primo.nome + '</b> · ' + primo.quota + ' m · ' +
+        (primo.km < 10 ? primo.km.toFixed(1) : Math.round(primo.km)) + ' km' +
+        '<br><a href="https://www.google.com/maps/dir/?api=1&origin=' +
+        origine.lat.toFixed(5) + ',' + origine.lng.toFixed(5) +
+        '&destination=' + encodeURIComponent(primo.nome) +
+        '&travelmode=' + (mezzo === 'drive' ? 'driving' : (mezzo === 'bicycle' ? 'bicycling' : 'walking')) +
+        '" target="_blank" rel="noopener">portami qui</a>';
+
+      if(buoni.length > 1){
+        righe += '<ul class="elenco">';
+        buoni.slice(1).forEach(function(v){
+          righe += '<li><span>' + v.nome + '</span><span>' + v.quota + ' m · ' +
+                   Math.round(v.km) + ' km</span></li>';
+        });
+        righe += '</ul>';
+      }
+      sonda.innerHTML = righe;
+    }
+
+    chiediLuoghi(rect, 'populated_place,natural.mountain.peak', function(lista, err){
+      if(!err){ elabora(lista); return; }
+      if(err === 'categorie'){
+        // qualche categoria non è riconosciuta: riprovo solo con i centri abitati
+        chiediLuoghi(rect, 'populated_place', function(l2, e2){
+          if(e2){
+            ctaLuoghi.disabled = false;
+            ctaLuoghi.textContent = 'aggancia a un luogo reale';
+            sonda.textContent = 'Il servizio dei luoghi non risponde in questo momento.';
+            return;
+          }
+          elabora(l2);
+        });
+        return;
+      }
+      ctaLuoghi.disabled = false;
+      ctaLuoghi.textContent = 'aggancia a un luogo reale';
+      sonda.textContent = 'Il servizio dei luoghi non risponde in questo momento.';
     });
   });
 
