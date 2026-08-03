@@ -97,16 +97,6 @@ const HSR=[
 ];
 const ISO={id:"iso",name:"Isometrico — spinta sulle punte",tgt:"Fase reattiva",load:'5 × 45" · recupero 2\' · 1–2 volte al giorno',
  desc:"Sali sulle punte bilaterale zavorrato con la KB e mantieni la posizione alta per 45 secondi, spingendo con intensità elevata ma sostenibile. Effetto analgesico documentato, mantiene tensione senza il carico eccentrico che irrita in fase reattiva. Usalo 1–2 settimane, poi passa alla progressione normale."};
-const ROUTINE=[
- {id:"r1",name:"Sveglia caviglia",tgt:"2' — non saltarlo",load:"20 pompaggi + 10 circonduzioni per lato, poi 1' camminando",sec:60,sets:1,rest:0,
-  desc:"Seduto sul bordo del letto: 20 pompaggi di caviglia per lato (punta su e giù, ampiezza piena ma senza forzare), poi 10 circonduzioni per lato. Poi alzati e cammina per casa un minuto. Serve a portare sangue e sinovia al tendine prima di caricarlo. NIENTE stretching del polpaccio: in fase reattiva la messa in tensione passiva irrita, e se il dolore è inserzionale comprime il tendine contro il calcagno."},
- {id:"r2",name:"Isometrico — spinta sulle punte",tgt:"Il cuore della routine",load:'5 × 45" · recupero 60" · KB 16 kg in mano',sec:45,sets:5,rest:60,
-  desc:"Sali sulle punte bilaterale con la KB in mano e mantieni la posizione alta 45 secondi SPINGENDO, circa il 70% dello sforzo massimo. Devi sentire il polpaccio in tensione, non stare semplicemente in equilibrio. Se a 45\" non ti trema niente, il carico è troppo basso: aggiungi lo zaino. Effetto analgesico documentato entro 24–48 ore, e mantiene tensione sul tendine senza il carico eccentrico che in fase reattiva lo irrita."},
- {id:"r3",name:"Monopodalica SX su cuscino — occhi chiusi",tgt:"Propriocezione",load:'3 × 20" · muro vicino',sec:20,sets:3,rest:20,
-  desc:"Cuscino ripiegato sotto il piede sx, muro a fianco per sicurezza, occhi chiusi. Ingrediente fisso e permanente, non solo di questa fase: agisce sulla pre-attivazione dei peronei, l'unica leva utile contro la distorsione, che si consuma in ~40 ms mentre i peronei reagiscono in 50–80 ms."},
- {id:"r4",name:"Ponte glutei monopodalico SX",tgt:"Catena posteriore",load:"2 × 10 · piede sx su cuscino",
-  desc:"Supino, piede sx su cuscino instabile, gamba dx sollevata. Spingi attraverso il piede sx fino a portare il bacino in linea retta spalle-ginocchio. Scendi lento. Carica il gluteo senza toccare il tendine."}
-];
 const FORZA=[
  {id:"f1",name:"KB Goblet squat",presc:"4 × 12",tint:"#0d9488",desc:"KB per il campanello vicina al petto, schiena verticale, scendi sotto il parallelo. Ginocchio sx mai bloccato in iperestensione in cima."},
  {id:"f2",name:"Bulgarian split squat — SX davanti",presc:"3 × 10",tint:"#ea580c",desc:"Piede dx sulla sedia dietro, gamba sx davanti che lavora. KB in goblet. Scendi finché il ginocchio dx quasi tocca terra."},
@@ -116,6 +106,16 @@ const FORZA=[
  {id:"f6",name:"Ponte glutei monopodalico SX su cuscino",presc:"3 × 10",tint:"#db2777",desc:"Supino, piede sx su cuscino instabile, gamba dx sollevata. Spingi attraverso il piede sx fino a linea retta spalle-ginocchio."},
  {id:"f7",name:"Monopodalica SX su cuscino — occhi chiusi",presc:'3 × 15"',tint:"#7c3aed",desc:"Cuscino sotto il piede sx, muro vicino, occhi chiusi. Senza riferimento visivo il sistema propriocettivo lavora da solo."},
  {id:"f8",name:"RDL monopodalico SX — dinamico",presc:"3 × 8",tint:"#7c3aed",desc:"In piedi sul piede sx, hip hinge in avanti mentre la gamba dx si solleva dietro a controbilanciare. Senza peso finché non è stabile, poi KB."}
+];
+const ROUTINE=[
+ {id:"r1",name:"1 · Sveglia caviglia",presc:"2'",tgt:"Mobilità",load:"Seduto sul bordo del letto, poi in piedi",
+  desc:"20 pompaggi di caviglia per lato (punta su, punta giù, ampiezza piena senza forzare) e 10 circonduzioni per lato. Poi cammina per casa un minuto. Serve a portare sangue al tendine prima di caricarlo: un tendine reattivo caricato pesante da freddo assoluto è il modo più rapido per far salire il numero di domani. NIENTE stretching del polpaccio: in fase reattiva la messa in tensione passiva irrita, e se è inserzionale comprime il tendine contro il calcagno."},
+ {id:"r2",name:"2 · Isometrici — il cuore della routine",presc:"5 × 45\"",tgt:"8 minuti",load:'5 × 45" · recupero 60" · KB 16 kg in mano',secs:45,
+  desc:"Sali sulle punte bilaterale con la KB in mano e mantieni la posizione alta per 45 secondi. In cima SPINGI, circa 70% dello sforzo massimo: devi sentire il polpaccio in tensione, non limitarti a stare in equilibrio. Recupero 60 secondi tra le tenute — è meno dei 2' canonici, ed è una concessione voluta: una routine che fai tutti i giorni vale più di un protocollo perfetto che salti. Effetto analgesico documentato entro 24–48 ore."},
+ {id:"r3",name:"3 · Propriocezione SX — occhi chiusi",presc:"3 × 20\"",tgt:"2 minuti",load:'3 × 20" su cuscino · muro vicino',secs:20,
+  desc:"Cuscino ripiegato sotto il piede sx, muro a fianco per sicurezza, occhi chiusi. Senza riferimento visivo il sistema propriocettivo lavora da solo. È il lavoro permanente sulla caviglia: agisce sulla pre-attivazione dei peronei, l'unica leva utile visto che l'inversione avviene in ~40 ms mentre i peronei reagiscono in 50–80 ms. Non si taglia mai, nemmeno nel picco del blocco Hanson."},
+ {id:"r4",name:"4 · Ponte glutei monopodalico SX",presc:"2 × 10",tgt:"2 minuti",load:"2 × 10 · piede sx su cuscino",
+  desc:"Supino, piede sx sul cuscino instabile, gamba dx sollevata. Spingi attraverso il piede sx fino a portare il bacino in linea retta spalle-ginocchio, scendi lento. Il cuscino chiede controllo di gluteo e caviglia insieme. Chiude la catena posteriore senza caricare il tendine."}
 ];
 const RULES=[
  "Dolore durante il lavoro: fino a 5/10 è accettabile e non danneggia il tendine.",
@@ -194,6 +194,20 @@ function exTick(){
 }
 function markRoutine(){
   if(ROUTINE.every(i=>checks[i.id])){S.rout[TODAY]=true;save();}
+}
+/* timer per singolo esercizio (isometrici, propriocezione) */
+let exTimer={id:null,left:0,iv:null};
+function toggleExTimer(id,secs){
+  if(exTimer.iv){clearInterval(exTimer.iv);}
+  if(exTimer.id===id&&exTimer.iv){exTimer={id:null,left:0,iv:null};return render();}
+  exTimer={id,left:secs,iv:setInterval(()=>{
+    exTimer.left--;
+    if(exTimer.left<=0){clearInterval(exTimer.iv);exTimer.iv=null;beep();}
+    const el=document.getElementById("ext-"+id);
+    if(el) el.textContent=exTimer.iv?exTimer.left+'"':"✓ fatto";
+    if(!exTimer.iv) render();
+  },1000)};
+  render();
 }
 let timerId=null,timerLeft=0,timerTotal=150;
 function tickTimer(){
@@ -300,6 +314,8 @@ function exCard(e,presc,tint,logging){
       <button class="pill" data-open="${e.id}"
         style="background:${op?tint:tint+"12"};color:${op?"#fff":tint}">${op?"▲ Nascondi":"ℹ Come si esegue"}</button>
       ${op?`<div class="desc" style="background:${tint}0a;border-left:3px solid ${tint}">${h(e.desc)}</div>`:""}
+      ${e.secs?`<div><button class="btn ${exTimer.id===e.id&&exTimer.iv?"btnP":"btnG"}" data-ext="${e.id}" data-secs="${e.secs}" style="margin-top:8px">
+        <span id="ext-${e.id}">${exTimer.id===e.id&&exTimer.iv?exTimer.left+'"':"▶ "+e.secs+'"'}</span></button></div>`:""}
       ${e.sec?`<div><button class="btn ${exT&&exT.id===e.id?"btnP":"btnG"}" id="ext-${e.id}" data-ex="${e.id}"
         style="margin-top:8px;${exT&&exT.id===e.id&&exT.phase==="rest"?"background:#57534e;color:#fff":""}">${
         exT&&exT.id===e.id?exLabel():"▶ Avvia "+e.sets+"×"+e.sec+'"'}</button></div>`:""}
@@ -400,9 +416,11 @@ function render(){
     const rd=lastDays(14).map(d=>({k:d.k,v:!!S.rout[d.k]}));
     const nd=rd.filter(x=>x.v).length;
     html+=`<div class="sectitle">Routine quotidiana — 14 minuti</div>`;
-    html+=ROUTINE.map(e=>exCard(e,e.sets?e.sets+" × "+e.sec+'"':"2 × 10","#0891b2",false)).join("");
+    html+=ROUTINE.map(e=>exCard(e,e.presc,"#0891b2",false)).join("");
     html+=`<div class="card" style="margin-top:14px">
       <h2>Costanza — ultimi 14 giorni</h2>
+      <button class="btn ${S.rout[TODAY]?"btnP":"btnG"}" data-rout="1" style="width:100%;padding:12px;margin-bottom:10px">
+        ${S.rout[TODAY]?"✓ Routine di oggi fatta":"Segna la routine di oggi come fatta"}</button>
       <div class="sub">${nd}/14 giorni completati. La costanza vale più della perfezione del singolo protocollo.</div>
       <div class="chart" style="height:26px">${rd.map(d=>`<div title="${short(d.k)}" style="height:${d.v?24:7}px;background:${d.v?"#0891b2":"#e7e5e4"}"></div>`).join("")}</div>
     </div>
@@ -476,6 +494,8 @@ document.addEventListener("click",e=>{
   if(d.reactive){S.reactive=!S.reactive;save();return render();}
   if(d.phase){S.phase=d.phase==="auto"?null:+d.phase;save();return render();}
   if(d.timer){return toggleTimer();}
+  if(d.ext){return toggleExTimer(d.ext,+d.secs);}
+  if(d.rout){S.rout[TODAY]=!S.rout[TODAY];save();return render();}
   if(d.reset){checks={};return render();}
   if(d.copy){return copyExport();}
   if(d.log){
