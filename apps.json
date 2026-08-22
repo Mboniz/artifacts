@@ -3,5 +3,10 @@
     "name": "Prenzo — Your Vegan Menu",
     "url": "https://prenzo.mboniz.com",
     "description": "Analizza il menu di un ristorante e le recensioni, e consiglia cosa ordinare in chiave veg."
+  },
+  {
+    "name": "Mr Splitty",
+    "url": "https://mrsplitty.mboniz.com",
+    "description": "Divide le spese di gruppo e calcola i debiti semplificati: il numero minimo di rimborsi per pareggiare i conti."
   }
 ]
