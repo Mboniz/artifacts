@@ -82,6 +82,28 @@
     font-weight: 500;
   }
 
+  /* Sections */
+  .section + .section { margin-top: 2.5rem; }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+    padding: 0 0.4rem;
+  }
+  .section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .section-note {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--faint);
+  }
+
   /* List */
   .list { border-top: 1px solid var(--line); }
   a.entry {
@@ -144,6 +166,28 @@
     color: var(--muted);
     margin-top: 0.2rem;
     overflow-wrap: anywhere;
+  }
+  .desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 0.15rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .idx.app {
+    color: var(--live);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.3rem;
+  }
+  .idx.app::after {
+    content: "";
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--live);
+    flex-shrink: 0;
   }
   .arrow {
     color: var(--faint);
@@ -327,11 +371,25 @@
     </header>
 
     <main>
-      <div class="list" id="list">
-        <div class="skeleton"></div>
-        <div class="skeleton"></div>
-        <div class="skeleton"></div>
-      </div>
+      <section class="section" id="appsSection" hidden>
+        <div class="section-head">
+          <span class="section-title">App</span>
+          <span class="section-note">con backend · dominio proprio</span>
+        </div>
+        <div class="list" id="appsList"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <span class="section-title">Artifacts</span>
+          <span class="section-note">pagine statiche</span>
+        </div>
+        <div class="list" id="list">
+          <div class="skeleton"></div>
+          <div class="skeleton"></div>
+          <div class="skeleton"></div>
+        </div>
+      </section>
     </main>
 
     <footer>
@@ -355,10 +413,12 @@
   function render(dirs) {
     if (!dirs.length) {
       listEl.innerHTML = '<div class="state">Ancora niente qui. Pubblica il primo artifact dalla chat e comparirà da solo.</div>';
-      countEl.textContent = '0 live';
+      artifactsCount = 0;
+      updateCount();
       return;
     }
-    countEl.textContent = dirs.length + (dirs.length === 1 ? ' live' : ' live');
+    artifactsCount = dirs.length;
+    updateCount();
     listEl.innerHTML = '';
     dirs.forEach((slug, i) => {
       const a = document.createElement('a');
@@ -403,8 +463,56 @@
       '<br><button class="retry" onclick="load()">Riprova</button></div>';
   }
 
+  /* ---- App full-stack: lette da apps.json, stesso origin, nessun rate limit ---- */
+  const appsSection = document.getElementById('appsSection');
+  const appsListEl = document.getElementById('appsList');
+  let appsCount = 0;
+
+  async function loadApps() {
+    try {
+      const res = await fetch('apps.json', { cache: 'no-store' });
+      if (!res.ok) return;
+      const apps = await res.json();
+      if (!Array.isArray(apps) || !apps.length) return;
+
+      appsCount = apps.length;
+      appsListEl.innerHTML = '';
+      apps.forEach((app, i) => {
+        if (!app || !app.url || !app.name) return;
+        const a = document.createElement('a');
+        a.className = 'entry';
+        a.href = app.url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.style.animationDelay = (i * 45) + 'ms';
+        const host = String(app.url).replace(/^https?:\/\//, '').replace(/\/$/, '');
+        a.innerHTML =
+          '<span class="idx app"></span>' +
+          '<span class="body">' +
+            '<span class="name"></span>' +
+            (app.description ? '<span class="desc"></span>' : '') +
+            '<span class="path"></span>' +
+          '</span>' +
+          '<svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg>';
+        a.querySelector('.name').textContent = app.name;
+        if (app.description) a.querySelector('.desc').textContent = app.description;
+        a.querySelector('.path').textContent = host;
+        appsListEl.appendChild(a);
+      });
+      appsSection.hidden = false;
+      updateCount();
+    } catch (e) { /* nessun apps.json: la sezione resta nascosta */ }
+  }
+
+  let artifactsCount = 0;
+  function updateCount() {
+    const total = artifactsCount + appsCount;
+    countEl.textContent = total + ' live';
+  }
+
   async function load() {
     listEl.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>';
+    loadApps();
     try {
       const res = await fetch(API, { headers: { 'Accept': 'application/vnd.github+json' }, cache: 'no-store' });
       if (res.status === 403) { showError(true); return; }
