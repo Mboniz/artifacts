@@ -8,5 +8,10 @@
     "name": "Mr Splitty",
     "url": "https://mrsplitty.mboniz.com",
     "description": "Divide le spese di gruppo e calcola i debiti semplificati: il numero minimo di rimborsi per pareggiare i conti."
+  },
+  {
+    "name": "Album Tier List",
+    "url": "https://tierlist.mboniz.com",
+    "description": "Cerca un artista, scegli i suoi dischi e trascinali nelle fasce da GOAT a D. La tier list si scarica in PNG."
   }
 ]
