@@ -5,57 +5,76 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Artifacts — Marco</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='88'%3E%F0%9F%A5%A6%3C/text%3E%3C/svg%3E">
-<!-- Non indicizzabile da motori di ricerca e crawler AI -->
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 <meta name="googlebot" content="noindex, nofollow">
 <meta name="robots" content="noai, noimageai">
 <meta name="referrer" content="no-referrer">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;450;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #eceef2;
+    --bg: #e9eaec;
     --surface: #ffffff;
     --ink: #14171d;
-    --muted: #767c88;
-    --faint: #aab0bb;
-    --line: #dde1e8;
+    --muted: #6f7480;
+    --faint: #a3a6ae;
+    --line: #ebecef;
+    --hair: #f2f3f6;
+    --edge: #d7d8dd;
     --accent: #2d43e0;
-    --accent-soft: #eaecfb;
+    --accent-soft: #eef0fd;
     --live: #12a670;
     --radius: 14px;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
   body {
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: 'Space Grotesk', -apple-system, sans-serif;
     background: var(--bg);
     color: var(--ink);
     line-height: 1.5;
     min-height: 100vh;
-    padding: clamp(1.25rem, 5vw, 4rem) 1.25rem 3rem;
+    padding: clamp(1.5rem, 6vw, 3.25rem) 1rem 3rem;
     display: flex;
     justify-content: center;
   }
-  .wrap { width: 100%; max-width: 680px; }
+  .wrap { width: 100%; max-width: 560px; display: none; }
+  body.unlocked .wrap { display: block; }
+  body.locked { overflow: hidden; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--edge);
+    border-radius: var(--radius);
+    box-shadow: 0 30px 60px -30px rgba(20,23,29,0.24);
+    overflow: hidden;
+  }
 
   /* Header */
-  header { margin-bottom: 2.25rem; }
-  .eyebrow {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.72rem;
-    letter-spacing: 0.02em;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1.1rem;
+  .head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.375rem 1.125rem;
+    border-bottom: 1px solid var(--line);
   }
-  .eyebrow .dot {
+  h1 { font-size: 1.375rem; font-weight: 700; letter-spacing: -0.025em; line-height: 1.1; }
+  .origin {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6875rem;
+    color: var(--faint);
+    margin-top: 0.3rem;
+  }
+  .live {
+    display: inline-flex; align-items: center; gap: 0.44rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6875rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .live .dot {
     width: 6px; height: 6px; border-radius: 50%;
     background: var(--live);
-    box-shadow: 0 0 0 0 rgba(18,166,112,0.5);
     animation: pulse 2.4s infinite;
   }
   @keyframes pulse {
@@ -63,235 +82,145 @@
     70% { box-shadow: 0 0 0 7px rgba(18,166,112,0); }
     100% { box-shadow: 0 0 0 0 rgba(18,166,112,0); }
   }
-  h1 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(2.4rem, 9vw, 3.4rem);
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    line-height: 1;
-    margin-bottom: 0.85rem;
-  }
-  .sub {
-    font-size: 0.95rem;
-    color: var(--muted);
-    max-width: 30rem;
-  }
-  .count {
-    font-family: 'IBM Plex Mono', monospace;
-    color: var(--ink);
-    font-weight: 500;
-  }
 
   /* Sections */
-  .section + .section { margin-top: 2.5rem; }
-  .section-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 0.5rem;
-    padding: 0 0.4rem;
-  }
-  .section-title {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.05rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-  }
-  .section-note {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.72rem;
+  .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     color: var(--faint);
+    padding: 0.8125rem 1.375rem 0.4375rem;
   }
+  .label.gap { padding-top: 1rem; }
 
-  /* List */
-  .list { border-top: 1px solid var(--line); }
+  /* Rows */
   a.entry {
     display: grid;
-    grid-template-columns: 2.6rem 1fr auto;
+    grid-template-columns: 18px 1fr auto;
     align-items: center;
-    gap: 0.9rem;
-    padding: 1.15rem 0.9rem 1.15rem 0.4rem;
-    border-bottom: 1px solid var(--line);
+    gap: 0.75rem;
+    padding: 0.5625rem 1.375rem;
+    border-top: 1px solid var(--hair);
     text-decoration: none;
     color: inherit;
-    position: relative;
-    transition: background 0.18s ease, padding 0.18s ease;
+    transition: background 0.14s ease;
   }
-  a.entry::before {
-    content: "";
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 2px;
-    background: var(--accent);
-    transform: scaleY(0);
-    transform-origin: center;
-    transition: transform 0.18s ease;
-  }
-  a.entry:hover {
-    background: var(--surface);
-    padding-left: 1rem;
-    border-radius: var(--radius);
-    border-bottom-color: transparent;
-  }
-  a.entry:hover::before { transform: scaleY(0.55); }
-  a.entry:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-    border-radius: var(--radius);
-  }
+  a.entry:hover { background: var(--accent-soft); }
+  a.entry:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   .idx {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.8rem;
-    color: var(--accent);
-    font-weight: 500;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.625rem;
+    color: #b3b6bd;
     text-align: right;
   }
-  .body { min-width: 0; }
+  .idx.app {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--live);
+    justify-self: center;
+    font-size: 0;
+  }
+  .body { display: flex; align-items: baseline; gap: 0.5625rem; min-width: 0; }
   .name {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.12rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    line-height: 1.25;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+    max-width: 100%;
     overflow: hidden;
-    overflow-wrap: anywhere;
+    text-overflow: ellipsis;
   }
   .path {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.76rem;
-    color: var(--muted);
-    margin-top: 0.2rem;
-    overflow-wrap: anywhere;
-  }
-  .desc {
-    font-size: 0.82rem;
-    color: var(--muted);
-    margin-top: 0.15rem;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6875rem;
+    color: #b3b6bd;
+    white-space: nowrap;
     overflow: hidden;
-  }
-  .idx.app {
-    color: var(--live);
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 0.3rem;
-  }
-  .idx.app::after {
-    content: "";
-    width: 5px; height: 5px; border-radius: 50%;
-    background: var(--live);
-    flex-shrink: 0;
+    text-overflow: ellipsis;
   }
   .arrow {
-    color: var(--faint);
-    transition: transform 0.18s ease, color 0.18s ease;
-    flex-shrink: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: #c2c5cc;
+    transition: color 0.14s ease, transform 0.14s ease;
   }
-  a.entry:hover .arrow { transform: translateX(3px); color: var(--accent); }
+  a.entry:hover .arrow { color: var(--accent); transform: translateX(2px); }
 
-  /* Reveal */
-  a.entry { opacity: 0; transform: translateY(6px); animation: rise 0.45s ease forwards; }
-  @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+  a.entry { opacity: 0; animation: rise 0.35s ease forwards; }
+  @keyframes rise { to { opacity: 1; } }
 
   /* States */
   .state {
-    padding: 2.5rem 0.4rem;
+    padding: 1.25rem 1.375rem 1.5rem;
+    border-top: 1px solid var(--hair);
+    font-size: 0.875rem;
     color: var(--muted);
-    font-size: 0.95rem;
-  }
-  .state code {
-    font-family: 'IBM Plex Mono', monospace;
-    background: var(--accent-soft);
-    color: var(--accent);
-    padding: 0.1rem 0.4rem;
-    border-radius: 5px;
-    font-size: 0.85em;
-  }
-  .skeleton {
-    height: 1px; background: var(--line); margin: 0;
-    border-bottom: 1px solid var(--line);
-    padding: 1.15rem 0;
   }
   .retry {
-    margin-top: 0.8rem;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.8rem;
+    margin-top: 0.7rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
     color: var(--accent);
-    background: none; border: 1px solid var(--line);
-    padding: 0.45rem 0.9rem; border-radius: 8px;
+    background: none; border: 1px solid var(--edge);
+    padding: 0.4rem 0.8rem; border-radius: 8px;
     cursor: pointer; transition: background 0.15s;
   }
   .retry:hover { background: var(--accent-soft); }
-
-  footer {
-    margin-top: 2rem;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.72rem;
-    color: var(--faint);
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+  .skeleton {
+    border-top: 1px solid var(--hair);
+    padding: 0.5625rem 1.375rem;
+    height: 2.375rem;
   }
-  footer a { color: var(--muted); text-decoration: none; }
-  footer a:hover { color: var(--accent); }
+  .skeleton span {
+    display: block; height: 0.6875rem; width: 45%;
+    background: var(--hair); border-radius: 4px;
+    margin-top: 0.35rem;
+  }
+
+  .foot {
+    display: flex; justify-content: space-between; gap: 0.5rem;
+    flex-wrap: wrap;
+    padding: 0.8125rem 1.375rem;
+    border-top: 1px solid var(--line);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.625rem;
+    color: var(--faint);
+  }
+  .foot a { color: var(--muted); text-decoration: none; }
+  .foot a:hover { color: var(--accent); }
 
   @media (prefers-reduced-motion: reduce) {
     * { animation: none !important; transition: none !important; }
-    .eyebrow .dot { animation: none; }
-    a.entry { opacity: 1 !important; transform: none !important; }
+    a.entry { opacity: 1 !important; }
   }
 
   /* Gate */
-  body.locked { overflow: hidden; }
-  .wrap { display: none; }
-  body.unlocked .wrap { display: block; }
   #gate {
-    position: fixed;
-    inset: 0;
+    position: fixed; inset: 0;
     background: var(--bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     padding: 1.5rem;
     z-index: 50;
   }
   body.unlocked #gate { display: none; }
-  .gate-card {
-    width: 100%;
-    max-width: 22rem;
-    text-align: center;
-  }
-  .gate-lock { font-size: 2rem; line-height: 1; margin-bottom: 1.1rem; }
-  .gate-card h2 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.6rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    margin-bottom: 0.5rem;
-  }
+  .gate-card { width: 100%; max-width: 20rem; text-align: center; }
+  .gate-lock { font-size: 1.75rem; line-height: 1; margin-bottom: 1rem; }
+  .gate-card h2 { font-size: 1.375rem; font-weight: 700; letter-spacing: -0.025em; }
   .gate-card p {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6875rem;
     color: var(--muted);
-    margin-bottom: 1.5rem;
+    margin: 0.35rem 0 1.35rem;
   }
   #pwd {
     width: 100%;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 1.25rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.125rem;
     letter-spacing: 0.35em;
     text-align: center;
-    padding: 0.9rem 0.6rem;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    padding: 0.8rem 0.6rem;
+    border: 1px solid var(--edge);
+    border-radius: 10px;
     background: var(--surface);
     color: var(--ink);
     outline: none;
@@ -309,44 +238,33 @@
     80% { transform: translateX(2px); }
   }
   .gate-msg {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6875rem;
     color: #d93b3b;
-    margin-top: 0.9rem;
+    margin-top: 0.8rem;
     min-height: 1rem;
     visibility: hidden;
   }
   #gate.error .gate-msg { visibility: visible; }
   .gate-btn {
-    margin-top: 1rem;
+    margin-top: 0.9rem;
     width: 100%;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.95rem;
+    font-size: 0.9375rem;
     font-weight: 600;
     color: #fff;
     background: var(--accent);
     border: none;
-    padding: 0.8rem;
-    border-radius: var(--radius);
+    padding: 0.75rem;
+    border-radius: 10px;
     cursor: pointer;
     transition: opacity 0.15s;
   }
   .gate-btn:hover { opacity: 0.88; }
 
-  /* Mobile: righe più leggibili, colonne compatte */
-  @media (max-width: 520px) {
-    a.entry {
-      grid-template-columns: 1.6rem 1fr auto;
-      gap: 0.7rem;
-      padding: 1.1rem 0.5rem 1.1rem 0.3rem;
-      align-items: start;
-    }
-    a.entry:hover { padding-left: 0.5rem; }
-    .idx { font-size: 0.72rem; padding-top: 0.15rem; }
-    .name { font-size: 1.08rem; }
-    .path { font-size: 0.72rem; }
-    .arrow { margin-top: 0.15rem; }
-    h1 { font-size: 2.6rem; }
+  @media (max-width: 460px) {
+    .body { flex-direction: column; gap: 0.1rem; align-items: flex-start; }
+    a.entry { align-items: center; padding-top: 0.6rem; padding-bottom: 0.6rem; }
+    .name { white-space: normal; }
   }
 </style>
 </head>
@@ -364,50 +282,64 @@
   </div>
 
   <div class="wrap">
-    <header>
-      <div class="eyebrow"><span class="dot"></span>mboniz.github.io / artifacts</div>
-      <h1>Artifacts</h1>
-      <p class="sub">Tutto quello che costruisco in chat, pubblicato e in un posto solo. <span class="count" id="count">—</span></p>
-    </header>
-
-    <main>
-      <section class="section" id="appsSection" hidden>
-        <div class="section-head">
-          <span class="section-title">App</span>
-          <span class="section-note">con backend · dominio proprio</span>
+    <div class="card">
+      <div class="head">
+        <div>
+          <h1>Artifacts</h1>
+          <div class="origin">mboniz.github.io / artifacts</div>
         </div>
-        <div class="list" id="appsList"></div>
+        <div class="live"><span class="dot"></span><span id="count">—</span></div>
+      </div>
+
+      <section id="appsSection" hidden>
+        <div class="label">App</div>
+        <div id="appsList"></div>
       </section>
 
-      <section class="section">
-        <div class="section-head">
-          <span class="section-title">Artifacts</span>
-          <span class="section-note">pagine statiche</span>
-        </div>
-        <div class="list" id="list">
-          <div class="skeleton"></div>
-          <div class="skeleton"></div>
-          <div class="skeleton"></div>
+      <section>
+        <div class="label gap">Pagine statiche</div>
+        <div id="list">
+          <div class="skeleton"><span></span></div>
+          <div class="skeleton"><span></span></div>
+          <div class="skeleton"><span></span></div>
         </div>
       </section>
-    </main>
 
-    <footer>
-      <span id="updated">Aggiornata in tempo reale dal repo</span>
-      <a href="https://github.com/Mboniz/artifacts" target="_blank" rel="noopener">Mboniz/artifacts →</a>
-    </footer>
+      <div class="foot">
+        <span>Aggiornata in tempo reale dal repo</span>
+        <a href="https://github.com/Mboniz/artifacts" target="_blank" rel="noopener">Mboniz/artifacts →</a>
+      </div>
+    </div>
   </div>
 
 <script>
-  // Cartelle da NON mostrare in home (aggiungi qui slug da nascondere)
   const EXCLUDE = ['hello'];
   const API = 'https://api.github.com/repos/Mboniz/artifacts/contents/';
 
   const listEl = document.getElementById('list');
   const countEl = document.getElementById('count');
+  const appsSection = document.getElementById('appsSection');
+  const appsListEl = document.getElementById('appsList');
+
+  let artifactsCount = 0;
+  let appsCount = 0;
 
   function prettify(slug) {
     return slug.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  function updateCount() {
+    countEl.textContent = (artifactsCount + appsCount) + ' live';
+  }
+
+  function row(cls, idxHtml, arrow) {
+    const a = document.createElement('a');
+    a.className = 'entry';
+    a.innerHTML =
+      '<span class="idx ' + cls + '">' + idxHtml + '</span>' +
+      '<span class="body"><span class="name"></span><span class="path"></span></span>' +
+      '<span class="arrow">' + arrow + '</span>';
+    return a;
   }
 
   function render(dirs) {
@@ -421,19 +353,12 @@
     updateCount();
     listEl.innerHTML = '';
     dirs.forEach((slug, i) => {
-      const a = document.createElement('a');
-      a.className = 'entry';
+      const a = row('', String(i + 1).padStart(2, '0'), '→');
       a.href = slug + '/';
-      a.style.animationDelay = (i * 45) + 'ms';
-      a.innerHTML =
-        '<span class="idx">' + String(i + 1).padStart(2, '0') + '</span>' +
-        '<span class="body">' +
-          '<span class="name" data-slug="' + slug + '">' + prettify(slug) + '</span>' +
-          '<span class="path">/' + slug + '/</span>' +
-        '</span>' +
-        '<svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+      a.style.animationDelay = (i * 40) + 'ms';
+      a.querySelector('.name').textContent = prettify(slug);
+      a.querySelector('.path').textContent = '/' + slug + '/';
       listEl.appendChild(a);
-      // Migliora il nome leggendo il <title> reale della pagina (same-origin, nessun rate limit)
       upgradeTitle(slug, a.querySelector('.name'));
     });
   }
@@ -446,11 +371,10 @@
       const doc = new DOMParser().parseFromString(html, 'text/html');
       const t = doc.querySelector('title');
       if (t && t.textContent.trim()) {
-        // pulisce eventuali suffissi tipo " — Marco" o " | ..."
         const clean = t.textContent.trim().split(/\s[—|·]\s/)[0].trim();
         if (clean) nameEl.textContent = clean;
       }
-    } catch (e) { /* fallback: resta lo slug prettificato */ }
+    } catch (e) {}
   }
 
   function showError(rateLimited) {
@@ -463,55 +387,33 @@
       '<br><button class="retry" onclick="load()">Riprova</button></div>';
   }
 
-  /* ---- App full-stack: lette da apps.json, stesso origin, nessun rate limit ---- */
-  const appsSection = document.getElementById('appsSection');
-  const appsListEl = document.getElementById('appsList');
-  let appsCount = 0;
-
   async function loadApps() {
     try {
       const res = await fetch('apps.json', { cache: 'no-store' });
       if (!res.ok) return;
       const apps = await res.json();
       if (!Array.isArray(apps) || !apps.length) return;
-
       appsCount = apps.length;
       appsListEl.innerHTML = '';
       apps.forEach((app, i) => {
         if (!app || !app.url || !app.name) return;
-        const a = document.createElement('a');
-        a.className = 'entry';
+        const a = row('app', '', '↗');
         a.href = app.url;
         a.target = '_blank';
         a.rel = 'noopener';
-        a.style.animationDelay = (i * 45) + 'ms';
-        const host = String(app.url).replace(/^https?:\/\//, '').replace(/\/$/, '');
-        a.innerHTML =
-          '<span class="idx app"></span>' +
-          '<span class="body">' +
-            '<span class="name"></span>' +
-            (app.description ? '<span class="desc"></span>' : '') +
-            '<span class="path"></span>' +
-          '</span>' +
-          '<svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg>';
+        a.style.animationDelay = (i * 40) + 'ms';
+        a.title = app.description || '';
         a.querySelector('.name').textContent = app.name;
-        if (app.description) a.querySelector('.desc').textContent = app.description;
-        a.querySelector('.path').textContent = host;
+        a.querySelector('.path').textContent = String(app.url).replace(/^https?:\/\//, '').replace(/\/$/, '');
         appsListEl.appendChild(a);
       });
       appsSection.hidden = false;
       updateCount();
-    } catch (e) { /* nessun apps.json: la sezione resta nascosta */ }
-  }
-
-  let artifactsCount = 0;
-  function updateCount() {
-    const total = artifactsCount + appsCount;
-    countEl.textContent = total + ' live';
+    } catch (e) {}
   }
 
   async function load() {
-    listEl.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>';
+    listEl.innerHTML = '<div class="skeleton"><span></span></div><div class="skeleton"><span></span></div><div class="skeleton"><span></span></div>';
     loadApps();
     try {
       const res = await fetch(API, { headers: { 'Accept': 'application/vnd.github+json' }, cache: 'no-store' });
@@ -562,14 +464,9 @@
   pwd.addEventListener('keydown', e => { if (e.key === 'Enter') attempt(); });
   pwd.addEventListener('input', () => gate.classList.remove('error'));
 
-  
   let saved = null;
   try { saved = localStorage.getItem(KEY); } catch (e) {}
-  if (saved === k()) {
-    unlock();
-  } else {
-    pwd.focus();
-  }
+  if (saved === k()) { unlock(); } else { pwd.focus(); }
 </script>
 </body>
 </html>
