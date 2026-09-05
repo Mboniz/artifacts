@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Integrazione per endurance a dieta vegetale — guida all'acquisto</title>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="robots" content="noai, noimageai">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F4F5F1;
+  --card:#FFFFFF;
+  --ink:#16211D;
+  --soft:#5C6A64;
+  --faint:#8B978F;
+  --rule:#DCE0D7;
+  --go:#1C6B47;
+  --go-bg:#EBF3ED;
+  --no:#A0412A;
+  --no-bg:#F7EDE9;
+  --mark:#9A7B15;
+  --mark-bg:#F5F0DE;
+  --sans:'Archivo',system-ui,-apple-system,sans-serif;
+  --serif:'Newsreader',Georgia,serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:96px}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--serif);font-size:17px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit}
+
+/* ---------- shell ---------- */
+.shell{max-width:1120px;margin:0 auto;padding:0 20px 80px;}
+.cols{display:grid;grid-template-columns:210px 1fr;gap:44px;align-items:start}
+@media(max-width:900px){.cols{grid-template-columns:1fr;gap:0}}
+
+/* ---------- masthead ---------- */
+header.top{padding:52px 0 30px;border-bottom:1.5px solid var(--ink)}
+h1{
+  font-family:var(--serif);font-weight:500;font-size:clamp(30px,5.2vw,46px);
+  line-height:1.08;letter-spacing:-.02em;margin:0 0 14px;max-width:15ch;
+}
+h1 em{font-style:italic}
+.sub{font-size:16.5px;color:var(--soft);max-width:56ch;margin:0}
+.stamp{
+  font-family:var(--sans);font-size:12px;font-weight:500;color:var(--faint);
+  margin:20px 0 0;letter-spacing:.01em;
+}
+
+/* ---------- sidebar nav ---------- */
+nav.side{position:sticky;top:24px;font-family:var(--sans);font-size:13.5px;padding-top:34px}
+nav.side ol{list-style:none;margin:0;padding:0}
+nav.side li{margin:0 0 1px}
+nav.side a{
+  display:block;padding:5px 10px;text-decoration:none;color:var(--soft);
+  border-left:2px solid transparent;border-radius:0 4px 4px 0;transition:.12s;
+}
+nav.side a:hover{color:var(--ink);background:#EAECE5}
+nav.side a.on{color:var(--ink);font-weight:600;border-left-color:var(--go);background:#EAECE5}
+nav.side .grp{
+  font-size:11px;font-weight:600;color:var(--faint);padding:16px 10px 5px;
+  letter-spacing:.04em;
+}
+@media(max-width:900px){nav.side{display:none}}
+
+/* mobile nav */
+.mobnav{display:none}
+@media(max-width:900px){
+  .mobnav{
+    display:block;position:sticky;top:0;z-index:40;margin:0 -20px;
+    background:rgba(244,245,241,.94);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--rule);
+  }
+  .mobnav .scroller{display:flex;gap:6px;overflow-x:auto;padding:10px 20px;scrollbar-width:none}
+  .mobnav .scroller::-webkit-scrollbar{display:none}
+  .mobnav a{
+    flex:0 0 auto;font-family:var(--sans);font-size:13px;font-weight:500;
+    text-decoration:none;color:var(--soft);padding:6px 12px;
+    border:1px solid var(--rule);border-radius:20px;background:var(--card);white-space:nowrap;
+  }
+  .mobnav a.on{color:var(--card);background:var(--ink);border-color:var(--ink)}
+}
+
+/* ---------- sections ---------- */
+section{padding-top:52px}
+h2{
+  font-family:var(--serif);font-weight:500;font-size:26px;letter-spacing:-.015em;
+  margin:0 0 6px;
+}
+.lede{color:var(--soft);font-size:16px;margin:0 0 22px;max-width:62ch}
+p{max-width:66ch}
+
+/* ---------- protocol table ---------- */
+.proto{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:14.5px}
+.proto th{
+  text-align:left;font-weight:600;font-size:11.5px;color:var(--faint);
+  padding:0 10px 8px;border-bottom:1px solid var(--rule);letter-spacing:.03em;
+}
+.proto th:last-child,.proto td:last-child{text-align:right}
+.proto td{padding:11px 10px;border-bottom:1px solid var(--rule);vertical-align:baseline}
+.proto tr{cursor:pointer}
+.proto tbody tr:hover td{background:#EAECE5}
+.proto .nm{font-weight:600;color:var(--ink)}
+.proto .ds{font-variant-numeric:tabular-nums;white-space:nowrap}
+.proto .wn{color:var(--soft);font-size:13.5px}
+.proto .pr{color:var(--faint);font-variant-numeric:tabular-nums}
+.rank{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:20px;height:20px;border-radius:3px;background:var(--ink);color:var(--paper);
+  font-size:11px;font-weight:700;margin-right:9px;flex:0 0 auto;
+}
+.rank.dim{background:#C6CCC3;color:#4A544E}
+.total{
+  font-family:var(--sans);font-size:13.5px;color:var(--soft);
+  margin:16px 0 0;padding-top:14px;
+}
+.total b{color:var(--ink)}
+@media(max-width:640px){
+  .proto .wn{display:none}
+  .proto th:nth-child(3),.proto td:nth-child(3){display:none}
+}
+
+/* ---------- excluded chips ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin:18px 0 0;padding:0;list-style:none}
+.chips li{
+  font-family:var(--sans);font-size:13px;color:var(--no);background:var(--no-bg);
+  border:1px solid #E8D5CE;padding:4px 11px;border-radius:3px;
+}
+
+/* ---------- rules ---------- */
+.rules{counter-reset:r;list-style:none;margin:0;padding:0;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:2px}
+.rules li{
+  counter-increment:r;background:var(--card);padding:20px 22px;
+  border:1px solid var(--rule);
+}
+.rules li::before{
+  content:counter(r);font-family:var(--sans);font-size:11px;font-weight:700;
+  color:var(--faint);display:block;margin-bottom:8px;
+}
+.rules b{display:block;font-family:var(--sans);font-size:14.5px;font-weight:600;margin-bottom:5px}
+.rules span{font-size:15px;color:var(--soft);line-height:1.55}
+
+/* ---------- search ---------- */
+.search{
+  display:flex;align-items:center;gap:10px;background:var(--card);
+  border:1px solid var(--rule);padding:10px 14px;margin:0 0 4px;
+}
+.search input{
+  flex:1;border:0;outline:0;background:transparent;font-family:var(--sans);
+  font-size:15px;color:var(--ink);
+}
+.search input::placeholder{color:var(--faint)}
+.search svg{flex:0 0 auto;opacity:.45}
+.noresult{font-family:var(--sans);font-size:14px;color:var(--faint);padding:24px 2px;display:none}
+
+/* ---------- product panels ---------- */
+.panel{background:var(--card);border:1px solid var(--rule);border-top:0}
+.panel:first-of-type{border-top:1px solid var(--rule)}
+.panel.hide{display:none}
+.phead{
+  display:flex;align-items:baseline;gap:14px;width:100%;
+  background:none;border:0;padding:16px 18px;cursor:pointer;text-align:left;
+  font:inherit;color:inherit;
+}
+.phead:hover{background:#F6F7F3}
+.phead:focus-visible{outline:2px solid var(--go);outline-offset:-2px}
+.ptitle{font-family:var(--sans);font-size:16px;font-weight:600;flex:1;min-width:0}
+.pdose{
+  font-family:var(--sans);font-size:13.5px;color:var(--soft);
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.caret{font-family:var(--sans);color:var(--faint);font-size:13px;transition:transform .18s;flex:0 0 auto}
+.panel.open .caret{transform:rotate(90deg)}
+.pbody{display:none;padding:0 18px 24px;border-top:1px solid var(--rule);margin-top:-1px}
+.panel.open .pbody{display:block}
+.pbody > p:first-child{margin-top:18px}
+@media(max-width:560px){
+  .pdose{display:none}
+  .phead{padding:14px 15px}
+  .pbody{padding:0 15px 20px}
+}
+
+/* spec strip */
+.spec{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:1px;background:var(--rule);border:1px solid var(--rule);margin:18px 0 22px;
+}
+.spec div{background:var(--card);padding:12px 14px}
+.spec dt{font-family:var(--sans);font-size:11px;font-weight:600;color:var(--faint);margin:0 0 3px}
+.spec dd{font-family:var(--sans);font-size:14.5px;margin:0;line-height:1.4}
+
+/* THE device: cerca / evita */
+.ce{display:grid;grid-template-columns:1fr 1fr;margin:22px 0;border:1.5px solid var(--ink)}
+.ce > div{padding:16px 18px}
+.ce .yes{background:var(--go-bg);border-right:1.5px solid var(--ink)}
+.ce .not{background:var(--no-bg)}
+.ce h4{
+  font-family:var(--sans);font-size:12px;font-weight:700;margin:0 0 10px;
+  letter-spacing:.02em;
+}
+.ce .yes h4{color:var(--go)}
+.ce .not h4{color:var(--no)}
+.ce ul{margin:0;padding:0;list-style:none}
+.ce li{
+  font-family:var(--sans);font-size:14px;line-height:1.45;padding:0 0 0 16px;
+  position:relative;margin-bottom:8px;
+}
+.ce li:last-child{margin-bottom:0}
+.ce .yes li::before{content:'';position:absolute;left:0;top:8px;width:7px;height:7px;background:var(--go);border-radius:50%}
+.ce .not li::before{content:'';position:absolute;left:0;top:10px;width:8px;height:1.5px;background:var(--no)}
+@media(max-width:560px){
+  .ce{grid-template-columns:1fr}
+  .ce .yes{border-right:0;border-bottom:1.5px solid var(--ink)}
+}
+
+/* callout */
+.note{
+  border-left:3px solid var(--mark);background:var(--mark-bg);
+  padding:13px 16px;margin:20px 0;font-size:15.5px;line-height:1.55;
+}
+.note b{font-family:var(--sans);font-size:14px}
+.note p{margin:0;max-width:none}
+.note p + p{margin-top:8px}
+
+/* ---------- buy order (real sequence) ---------- */
+.seq{list-style:none;margin:0;padding:0;border-left:1.5px solid var(--rule);margin-left:9px}
+.seq li{position:relative;padding:0 0 26px 26px}
+.seq li:last-child{padding-bottom:0}
+.seq li::before{
+  content:'';position:absolute;left:-6px;top:7px;width:11px;height:11px;
+  border-radius:50%;background:var(--paper);border:2.5px solid var(--go);
+}
+.seq .when{font-family:var(--sans);font-size:12px;font-weight:700;color:var(--go);margin-bottom:2px}
+.seq .what{font-family:var(--sans);font-size:15.5px;font-weight:600;margin-bottom:3px}
+.seq .why{font-size:15px;color:var(--soft);max-width:56ch}
+
+/* ---------- closing ---------- */
+.three{
+  background:var(--ink);color:var(--paper);padding:30px 32px;margin-top:14px;
+}
+.three h3{font-family:var(--serif);font-weight:500;font-size:22px;margin:0 0 10px;color:var(--paper)}
+.three p{color:#C3CCC6;margin:0 0 14px;max-width:60ch}
+.three ol{font-family:var(--sans);font-size:16px;font-weight:600;margin:0;padding-left:20px;line-height:1.9}
+.three li::marker{color:#7E9186}
+@media(max-width:560px){.three{padding:24px 20px;margin-left:-20px;margin-right:-20px}}
+
+footer{
+  margin-top:56px;padding-top:20px;border-top:1px solid var(--rule);
+  font-family:var(--sans);font-size:12.5px;color:var(--faint);max-width:70ch;
+}
+
+@media(prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+<header class="top">
+  <h1>Cosa prendere, e <em>cosa guardare</em> sulla confezione</h1>
+  <p class="sub">Integrazione per chi corre molto e mangia vegetale. Nove voci, le dosi che hanno evidenza dietro, e per ciascuna i due o tre dettagli d'etichetta che separano il prodotto giusto da quello che costa il quadruplo.</p>
+  <p class="stamp">Guida all'acquisto · settembre 2026</p>
+</header>
+
+<div class="mobnav">
+  <div class="scroller" id="mobscroll">
+    <a href="#protocollo">Protocollo</a>
+    <a href="#etichetta">Etichetta</a>
+    <a href="#schede">Schede</a>
+    <a href="#ordine">Ordine</a>
+    <a href="#tre">Priorità</a>
+  </div>
+</div>
+
+<div class="cols">
+
+  <nav class="side" aria-label="Indice">
+    <ol id="sidenav">
+      <li><a href="#protocollo">Il protocollo</a></li>
+      <li><a href="#escluse">Cosa non prendere</a></li>
+      <li><a href="#etichetta">Leggere un'etichetta</a></li>
+      <li class="grp">Schede prodotto</li>
+      <li><a href="#s-d3">Vitamina D3 + K2</a></li>
+      <li><a href="#s-creatina">Creatina</a></li>
+      <li><a href="#s-proteine">Proteine</a></li>
+      <li><a href="#s-omega">Omega-3</a></li>
+      <li><a href="#s-glicina">Glicina</a></li>
+      <li><a href="#s-b12">Vitamina B12</a></li>
+      <li><a href="#s-magnesio">Magnesio</a></li>
+      <li><a href="#s-caffeina">Caffeina</a></li>
+      <li class="grp">In pratica</li>
+      <li><a href="#ordine">Ordine di acquisto</a></li>
+      <li><a href="#tre">Se ne tieni tre</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <!-- ================= PROTOCOLLO ================= -->
+    <section id="protocollo">
+      <h2>Il protocollo</h2>
+      <p class="lede">In ordine di quanto contano. Tocca una riga per aprire la scheda corrispondente.</p>
+
+      <table class="proto">
+        <thead>
+          <tr><th>Prodotto</th><th>Dose</th><th>Quando</th><th>€/mese</th></tr>
+        </thead>
+        <tbody>
+          <tr data-go="s-d3"><td class="nm"><span class="rank">1</span>Vitamina D3 da lichene + K2-MK7</td><td class="ds">2000 UI + 100 µg</td><td class="wn">Col pasto più grasso</td><td class="pr">~2</td></tr>
+          <tr data-go="s-creatina"><td class="nm"><span class="rank">2</span>Creatina monoidrato</td><td class="ds">5 g</td><td class="wn">Ora indifferente</td><td class="pr">~8</td></tr>
+          <tr data-go="s-proteine"><td class="nm"><span class="rank">3</span>Proteine — target totale</td><td class="ds">1,8–2,0 g/kg</td><td class="wn">4 pasti da ~30 g</td><td class="pr">—</td></tr>
+          <tr data-go="s-omega"><td class="nm"><span class="rank">4</span>Omega-3 EPA+DHA da alghe</td><td class="ds">1–1,5 g</td><td class="wn">Con un pasto</td><td class="pr">~18</td></tr>
+          <tr data-go="s-glicina"><td class="nm"><span class="rank">5</span>Glicina + vitamina C</td><td class="ds">3 g + 50 mg</td><td class="wn">45' prima della forza</td><td class="pr">~2</td></tr>
+          <tr data-go="s-b12"><td class="nm"><span class="rank dim">6</span>Vitamina B12 cianocobalamina</td><td class="ds">250 µg</td><td class="wn">A stomaco vuoto</td><td class="pr">~1</td></tr>
+          <tr data-go="s-magnesio"><td class="nm"><span class="rank dim">7</span>Magnesio bisglicinato</td><td class="ds">200 mg elementari</td><td class="wn">Sera</td><td class="pr">~8</td></tr>
+          <tr data-go="s-proteine"><td class="nm"><span class="rank dim">8</span>Isolato di soia in polvere</td><td class="ds">25–30 g</td><td class="wn">Solo se manchi il target</td><td class="pr">~10</td></tr>
+          <tr data-go="s-caffeina"><td class="nm"><span class="rank dim">9</span>Caffeina anidra</td><td class="ds">4–5 mg/kg</td><td class="wn">Gare e sedute chiave</td><td class="pr">~1</td></tr>
+        </tbody>
+      </table>
+      <p class="total">Totale realistico <b>40–50 € al mese</b>. L'omega-3 da alghe è da solo un terzo della spesa.</p>
+    </section>
+
+    <!-- ================= ESCLUSE ================= -->
+    <section id="escluse">
+      <h2>Cosa non prendere</h2>
+      <p class="lede">Tutte voci con evidenza assente, irrilevante per la maratona, o attivamente controproducente.</p>
+      <ul class="chips">
+        <li>Ferro senza referto</li><li>Bicarbonato di sodio</li><li>BCAA</li>
+        <li>Glutammina</li><li>HMB</li><li>Beta-alanina</li><li>Chetoni esogeni</li>
+        <li>Succo di ciliegia acida</li><li>Vitamina C &gt;1 g</li><li>Vitamina E</li>
+        <li>Multivitaminici generici</li>
+      </ul>
+      <div class="note">
+        <p><b>Il caso degli antiossidanti.</b> Vitamina C e E ad alte dosi bloccano la segnalazione dei radicali liberi che guida la biogenesi mitocondriale. In un blocco costruito per allargare il motore aerobico, prenderli è il contrario dell'obiettivo. La vitamina C che arriva dal cibo non c'entra e va benissimo.</p>
+        <p><b>Il caso del ferro.</b> È l'unica voce di questa lista che potrebbe servire davvero, ma solo con ferritina e saturazione della transferrina alla mano. Integrato alla cieca in un uomo adulto il rischio è il sovraccarico. Controlla anche che non sia nascosto dentro un multivitaminico.</p>
+      </div>
+    </section>
+
+    <!-- ================= ETICHETTA ================= -->
+    <section id="etichetta">
+      <h2>Leggere un'etichetta</h2>
+      <p class="lede">Sei controlli che valgono per qualsiasi prodotto, prima ancora di sapere cosa contiene.</p>
+      <ul class="rules">
+        <li><b>Numero di notifica al Ministero</b><span>Ogni integratore venduto legalmente in Italia ce l'ha, in fondo all'etichetta o sul fondo della confezione. Se manca, nessuno ha verificato la composizione.</span></li>
+        <li><b>La tabella, non il fronte</b><span>Il fronte dice «1000 mg di olio di alghe». La tabella dice quanti mg di principio attivo ci sono per dose giornaliera. Conta solo il secondo numero.</span></li>
+        <li><b>Quante capsule fanno una dose</b><span>Il prezzo per confezione non dice nulla. Calcola €/giorno: prezzo diviso capsule diviso capsule per dose. Un barattolo da 90 che ne chiede 3 al giorno dura un mese.</span></li>
+        <li><b>Certificazione vegana sul prodotto</b><span>Le capsule sono spesso in gelatina bovina o di pesce. Cerca V-Label, Vegan Society o VeganOK, oppure «capsula di HPMC / pullulan». «Vegetale» da solo non basta.</span></li>
+        <li><b>Pochi ingredienti</b><span>Quindici componenti servono a giustificare il prezzo, non a funzionare. Un buon prodotto ha il principio attivo, l'agente di carica e la capsula.</span></li>
+        <li><b>Niente miscele non scomposte</b><span>«Complesso brevettato 2500 mg» senza le quantità singole significa che non sai cosa stai comprando. Rimetti giù la confezione.</span></li>
+      </ul>
+      <div class="note">
+        <p><b>Sulle certificazioni antidoping.</b> Da amatore non sei soggetto a controlli, quindi non sono obbligatorie. Restano però il miglior proxy della qualità industriale: un lotto certificato è un lotto che qualcuno ha davvero analizzato. A parità di prezzo cerca Informed Sport, Cologne List o NSF Certified for Sport — soprattutto su creatina e proteine in polvere.</p>
+      </div>
+    </section>
+
+    <!-- ================= SCHEDE ================= -->
+    <section id="schede">
+      <h2>Schede prodotto</h2>
+      <p class="lede">Otto schede, chiuse per default. Cerca il nome di un prodotto o di un ingrediente per filtrarle.</p>
+
+      <div class="search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4.3-4.3"/></svg>
+        <input type="search" id="q" placeholder="Cerca: creatina, magnesio, capsula, dose…" aria-label="Cerca nelle schede">
+      </div>
+      <p class="noresult" id="noresult">Nessuna scheda corrisponde. Prova con un termine più corto.</p>
+
+      <div id="panels">
+
+        <!-- D3 -->
+        <article class="panel" id="s-d3">
+          <button class="phead" aria-expanded="false"><span class="ptitle">Vitamina D3 + K2</span><span class="pdose">2000 UI + 100 µg / die</span><span class="caret">›</span></button>
+          <div class="pbody">
+            <p>Alle latitudini italiane la sintesi cutanea copre il fabbisogno solo tra maggio e settembre, e solo con esposizione reale. Chi si allena presto la mattina, chi è coperto per abitudine o per indicazione dermatologica, e chiunque passi l'inverno a 45° di latitudine arriva a febbraio in carenza. È l'integratore con il caso più solido di tutta la lista.</p>
+            <dl class="spec">
+              <div><dt>Forma</dt><dd>Colecalciferolo da lichene</dd></div>
+              <div><dt>Dose</dt><dd>2000 UI al giorno</dd></div>
+              <div><dt>Periodo</dt><dd>Tutto l'anno, senza pausa</dd></div>
+              <div><dt>Con</dt><dd>K2-MK7 90–120 µg</dd></div>
+            </dl>
+            <div class="ce">
+              <div class="yes"><h4>Cerca in etichetta</h4><ul>
+                <li>«Colecalciferolo (D3) da lichene» — è l'unica D3 vegana</li>
+                <li>Veicolo oleoso: gocce in olio d'oliva, MCT o cocco</li>
+                <li>K2 dichiarata ≥99% trans-isomero</li>
+                <li>Materie prime MenaQ7 o K2VITAL sulla K2</li>
+              </ul></div>
+              <div class="not"><h4>Evita</h4><ul>
+                <li>Vitamina D2 (ergocalciferolo): alza meno e dura meno</li>
+                <li>Boli mensili da 25.000–50.000 UI</li>
+                <li>Compresse secche senza veicolo grasso</li>
+              </ul></div>
+            </div>
+            <p><strong>Assunzione.</strong> È liposolubile: presa a stomaco vuoto ne assorbi una frazione. Va con il pasto più grasso della giornata, tutti i giorni. La somministrazione quotidiana è la forma con l'evidenza migliore — i megaboli intermittenti danno picchi e valli, e in alcuni trial hanno prodotto più cadute e più fratture della dose giornaliera.</p>
+            <p><strong>Formati convenienti.</strong> Le gocce con D3 e K2 già combinate costano quanto la sola D3 e ti risparmiano una capsula. Una boccetta da 30 ml dura 5–6 mesi.</p>
+            <div class="note"><p><b>Se il dosaggio resta sotto 30 ng/mL</b> nonostante l'integrazione, si sale a 4000 UI/die, che è entro l'upper limit di sicurezza per adulti. Oltre serve supervisione medica con calcemia seriata.</p></div>
+          </div>
+        </article>
+
+        <!-- CREATINA -->
+        <article class="panel" id="s-creatina">
+          <button class="phead" aria-expanded="false"><span class="ptitle">Creatina monoidrato</span><span class="pdose">5 g / die</span><span class="caret">›</span></button>
+          <div class="pbody">
+            <p>Le fonti alimentari di creatina sono carne e pesce: a dieta vegetale le riserve muscolari partono dal 20–30% più basse, il che rende questa popolazione la migliore rispondente in assoluto. Il beneficio non è sulla resistenza pura ma sulla qualità del lavoro di forza, sulla massa magra e sul supporto alla risintesi di glicogeno.</p>
+            <dl class="spec">
+              <div><dt>Forma</dt><dd>Solo monoidrato</dd></div>
+              <div><dt>Dose</dt><dd>5 g, tutti i giorni</dd></div>
+              <div><dt>Carico</dt><dd>Non serve</dd></div>
+              <div><dt>Formato</dt><dd>Polvere, 500 g o 1 kg</dd></div>
+            </dl>
+            <div class="ce">
+              <div class="yes"><h4>Cerca in etichetta</h4><ul>
+                <li>Logo <strong>Creapure</strong> — materia prima da un unico stabilimento tedesco</li>
+                <li>Ingrediente unico: creatina monoidrato e basta</li>
+                <li>Misurino incluso, così 5 g sono un gesto e non una pesata</li>
+              </ul></div>
+              <div class="not"><h4>Evita</h4><ul>
+                <li>Creatina HCl, kre-alkalyn, etil-estere, «tamponata»</li>
+                <li>Blend che mescolano più forme</li>
+                <li>Capsule: ne servono 8–10 per arrivare a 5 g, a tripla spesa</li>
+              </ul></div>
+            </div>
+            <p><strong>Perché il Creapure.</strong> Le materie prime a basso costo possono contenere diciandiamide e creatinina come sottoprodotti di sintesi. La differenza di prezzo sull'intero barattolo è di pochi euro. Sulle forme alternative: costano il triplo, l'evidenza è quasi tutta sul monoidrato, e nessuna ha mai dimostrato superiorità in un confronto diretto.</p>
+            <p><strong>Prezzo di riferimento.</strong> 25–30 € per 500 g di Creapure sono 100 giorni di assunzione, cioè circa 0,27 € al giorno. Se paghi molto di più stai comprando il barattolo.</p>
+            <div class="note"><p><b>Da dire al medico prima del prelievo.</b> La creatina alza la creatinina sierica di 0,1–0,3 mg/dL per semplice turnover del substrato, senza alcun effetto renale. Segnalata, non è un problema; non segnalata, produce un accertamento inutile. Se vuoi un valore pulito, sospendi tre settimane prima: le riserve muscolari calano lentamente e non perdi l'adattamento di forza.</p></div>
+            <div class="note"><p><b>Il rovescio in maratona.</b> La creatina porta con sé 0,8–1,5 kg di acqua intracellulare. Su 42 km è una tassa reale sull'economia di corsa: vale la pena rivalutarla in fase di scarico verso una gara obiettivo.</p></div>
+          </div>
+        </article>
+
+        <!-- PROTEINE -->
+        <article class="panel" id="s-proteine">
+          <button class="phead" aria-expanded="false"><span class="ptitle">Proteine — target e polveri</span><span class="pdose">1,8–2,0 g/kg</span><span class="caret">›</span></button>
+          <div class="pbody">
+            <p>La voce con l'impatto maggiore di tutta la guida, ed è quasi tutta cibo. Le proteine vegetali hanno digeribilità e contenuto di leucina più bassi delle animali, quindi la soglia va alzata rispetto alle raccomandazioni generiche. Conta di più nei periodi di rehab e di costruzione della forza.</p>
+            <dl class="spec">
+              <div><dt>Target</dt><dd>1,8–2,0 g per kg al giorno</dd></div>
+              <div><dt>Distribuzione</dt><dd>4 pasti da ~30 g</dd></div>
+              <div><dt>Leucina</dt><dd>2,5–3 g per pasto</dd></div>
+              <div><dt>Polvere</dt><dd>Isolato di soia</dd></div>
+            </dl>
+            <p><strong>Fonti che ci arrivano davvero.</strong> Soia in tutte le forme — tofu, tempeh, edamame, latte di soia — più seitan, legumi e latticini se li usi. Le combinazioni cereali più legumi coprono il profilo aminoacidico nell'arco della giornata: non serve farlo nello stesso pasto.</p>
+            <p>La soglia di leucina è il punto tecnico: sotto i 2,5 g per pasto la sintesi proteica muscolare non si accende del tutto, ed è la ragione per cui quattro pasti da 30 g battono due da 60 g.</p>
+            <div class="ce">
+              <div class="yes"><h4>Cerca in etichetta</h4><ul>
+                <li><strong>Isolato</strong> di soia — profilo aminoacidico e leucina migliori tra le fonti vegetali</li>
+                <li>Proteine per 100 g <strong>sopra l'85%</strong></li>
+                <li>In alternativa: miscela pisello + riso, che insieme si completano</li>
+              </ul></div>
+              <div class="not"><h4>Evita</h4><ul>
+                <li>«Concentrato» al 60–70%: sono carboidrati a prezzo di proteine</li>
+                <li>Zuccheri aggiunti nei primi tre ingredienti</li>
+                <li>Formule all-in-one con creatina e vitamine dentro: nulla è dosabile</li>
+                <li>Pisello o riso da soli, che sono incompleti</li>
+              </ul></div>
+            </div>
+          </div>
+        </article>
+
+        <!-- OMEGA 3 -->
+        <article class="panel" id="s-omega">
+          <button class="phead" aria-expanded="false"><span class="ptitle">Omega-3 EPA+DHA da alghe</span><span class="pdose">1–1,5 g / die</span><span class="caret">›</span></button>
+          <div class="pbody">
+            <p>La dieta vegetale è ricca di ALA — noci, semi di lino — ma la conversione ALA verso EPA si ferma al 5–8%, e verso DHA sotto l'1%. L'olio di alghe è l'unica fonte vegetale che fornisce direttamente le forme attive: sono le stesse alghe da cui i pesci prendono le proprie.</p>
+            <dl class="spec">
+              <div><dt>Dose</dt><dd>1–1,5 g di EPA+DHA sommati</dd></div>
+              <div><dt>Fonte</dt><dd>Olio di microalghe</dd></div>
+              <div><dt>Assunzione</dt><dd>Con un pasto grasso</dd></div>
+              <div><dt>Conservazione</dt><dd>Frigo dopo l'apertura</dd></div>
+            </dl>
+            <div class="note"><p><b>L'errore più comune e più costoso.</b> Il fronte dice «olio di alghe 1000 mg»: non è la dose di omega-3. Girala e leggi la tabella — spesso quei 1000 mg di olio contengono 250–300 mg di EPA+DHA, e ti servono quattro capsule al giorno invece di una. È il modo classico di pagare quattro volte il prezzo reale.</p></div>
+            <div class="ce">
+              <div class="yes"><h4>Cerca in etichetta</h4><ul>
+                <li>mg di <strong>EPA e DHA scomposti</strong>, per dose giornaliera</li>
+                <li>Valore <strong>TOTOX sotto 10</strong> — misura l'ossidazione dell'olio</li>
+                <li>Vetro scuro o blister opaco</li>
+              </ul></div>
+              <div class="not"><h4>Evita</h4><ul>
+                <li>Olio di lino spacciato per omega-3 completo: contiene solo ALA</li>
+                <li>Etichette con soli «omega-3 totali» non scomposti</li>
+                <li>Confezioni vicine alla scadenza o stoccate al caldo</li>
+              </ul></div>
+            </div>
+            <p><strong>Formato.</strong> Comprane due mesi per volta e non di più: è l'unico prodotto della lista che si ossida davvero, e il formato grande qui non conviene. Pochi produttori dichiarano il TOTOX; chi lo fa ha qualcosa da mostrare.</p>
+          </div>
+        </article>
+
+        <!-- GLICINA -->
+        <article class="panel" id="s-glicina">
+          <button class="phead" aria-expanded="false"><span class="ptitle">Glicina + vitamina C</span><span class="pdose">3 g + 50 mg</span><span class="caret">›</span></button>
+          <div class="pbody">
+            <p>Il protocollo con la migliore base meccanicistica per la sintesi di collagene tendineo usa gelatina, che è collagene animale. Questa è l'alternativa coerente con una dieta vegetale: stesso razionale — portare il substrato aminoacidico in circolo nella finestra in cui il tendine viene caricato — con evidenza più debole.</p>
+            <dl class="spec">
+              <div><dt>Forma</dt><dd>Glicina in polvere</dd></div>
+              <div><dt>Dose</dt><dd>3 g in acqua</dd></div>
+              <div><dt>Timing</dt><dd>45 minuti prima del carico</dd></div>
+              <div><dt>Con</dt><dd>50 mg di vitamina C</dd></div>
+            </dl>
+            <p><strong>Il timing è tutto il punto.</strong> L'aminoacido deve essere in circolo quando il lavoro eccentrico carica il tendine. Presa in un altro momento della giornata non fa nulla. E il pezzo che conta davvero resta il carico meccanico: senza lo stimolo, l'integrazione da sola non produce niente.</p>
+            <p>Per i 50 mg di vitamina C non serve comprare nulla: bastano un kiwi o mezza arancia.</p>
+            <div class="ce">
+              <div class="yes"><h4>Cerca in etichetta</h4><ul>
+                <li>Glicina come <strong>ingrediente unico</strong></li>
+                <li>Polvere sfusa con misurino — è dolciastra e si scioglie bene</li>
+              </ul></div>
+              <div class="not"><h4>Evita</h4><ul>
+                <li>I «collagene vegan»: sono miscele di precursori a prezzo di collagene</li>
+                <li>Collagene marino o bovino, che non sono vegetali</li>
+              </ul></div>
+            </div>
+            <div class="note"><p><b>Doppio uso.</b> La glicina ha evidenza modesta sulla latenza del sonno se presa 60 minuti prima di coricarsi. Nei giorni in cui la seduta di forza è serale, una sola dose copre entrambi gli scopi.</p></div>
+          </div>
+        </article>
+
+        <!-- B12 -->
+        <article class="panel" id="s-b12">
+          <button class="phead" aria-expanded="false"><span class="ptitle">Vitamina B12</span><span class="pdose">250 µg / die</span><span class="caret">›</span></button>
+          <div class="pbody">
+            <p>Non esiste una fonte vegetale affidabile di B12. In una dieta che tende al vegano l'integrazione non è opzionale, e il costo è talmente basso da non meritare discussione: una confezione annuale sta sotto i 10 €.</p>
+            <dl class="spec">
+              <div><dt>Forma</dt><dd>Cianocobalamina</dd></div>
+              <div><dt>Dose</dt><dd>250 µg al giorno</dd></div>
+              <div><dt>Alternativa</dt><dd>2000 µg una volta a settimana</dd></div>
+              <div><dt>Assunzione</dt><dd>A stomaco vuoto</dd></div>
+            </dl>
+            <div class="ce">
+              <div class="yes"><h4>Cerca in etichetta</h4><ul>
+                <li><strong>Cianocobalamina</strong>: decenni di dati, stabile, economica</li>
+                <li>Compresse normali o sublinguali, indifferente</li>
+              </ul></div>
+              <div class="not"><h4>Evita</h4><ul>
+                <li>Il sovrapprezzo per la metilcobalamina «più biodisponibile»</li>
+              </ul></div>
+            </div>
+            <p><strong>Sulla forma.</strong> La metilcobalamina viene venduta come superiore, ma non lo è in modo dimostrato ed è meno stabile alla luce e al calore. Il contenuto di cianuro della cianocobalamina è nell'ordine dei microgrammi, meno di quello presente in una mandorla.</p>
+            <div class="note"><p><b>Il marcatore che conta.</b> La B12 sierica misura anche la quota legata all'aptocorrina, biologicamente inattiva: un valore nominalmente normale può nascondere un deficit tissutale. Il dato che discrimina è l'<strong>omocisteina</strong> — normale con folati normali significa che il metabolismo gira.</p></div>
+          </div>
+        </article>
+
+        <!-- MAGNESIO -->
+        <article class="panel" id="s-magnesio">
+          <button class="phead" aria-expanded="false"><span class="ptitle">Magnesio bisglicinato</span><span class="pdose">200 mg elementari</span><span class="caret">›</span></button>
+          <div class="pbody">
+            <p>Il magnesio sierico è un marcatore povero, perché il 99% del magnesio corporeo è intracellulare: un valore normale nel sangue non esclude riserve basse. In un atleta con volume alto e sonno corto l'integrazione serale è ragionevole, senza aspettative miracolose.</p>
+            <dl class="spec">
+              <div><dt>Forma</dt><dd>Bisglicinato</dd></div>
+              <div><dt>Dose</dt><dd>200 mg di magnesio elementare</dd></div>
+              <div><dt>Quando</dt><dd>Sera, 60' prima di dormire</dd></div>
+            </dl>
+            <div class="note"><p><b>L'insidia del numero in etichetta.</b> Molte confezioni dichiarano il peso del sale, non del minerale. Il magnesio elementare è circa il <strong>14% del bisglicinato</strong>: «1000 mg di magnesio bisglicinato» significa circa 140 mg di magnesio vero. Cerca la riga «di cui magnesio» o «magnesio elementare» nella tabella nutrizionale. Se non c'è, il produttore sta nascondendo qualcosa.</p></div>
+            <div class="ce">
+              <div class="yes"><h4>Cerca in etichetta</h4><ul>
+                <li>«Magnesio bisglicinato» come unica fonte</li>
+                <li>Magnesio <strong>elementare dichiarato</strong> in mg</li>
+              </ul></div>
+              <div class="not"><h4>Evita</h4><ul>
+                <li>Ossido di magnesio: biodisponibilità sotto il 5%</li>
+                <li>Bisglicinato «buffered» o «tamponato»: è tagliato con ossido</li>
+                <li>Bustine effervescenti, che aggiungono sodio e dolcificanti</li>
+              </ul></div>
+            </div>
+          </div>
+        </article>
+
+        <!-- CAFFEINA -->
+        <article class="panel" id="s-caffeina">
+          <button class="phead" aria-expanded="false"><span class="ptitle">Caffeina anidra</span><span class="pdose">4–5 mg/kg</span><span class="caret">›</span></button>
+          <div class="pbody">
+            <p>È l'ergogenico con l'evidenza più solida che esista sull'endurance: 2–4% su prove di durata, replicato per decenni. L'unico della lista che produce un effetto percepibile nella singola prestazione.</p>
+            <dl class="spec">
+              <div><dt>Dose</dt><dd>4–5 mg per kg</dd></div>
+              <div><dt>Timing</dt><dd>45–60 minuti prima</dd></div>
+              <div><dt>Uso</dt><dd>Gare e sedute chiave</dd></div>
+              <div><dt>Emivita</dt><dd>5–6 ore</dd></div>
+            </dl>
+            <div class="ce">
+              <div class="yes"><h4>Cerca in etichetta</h4><ul>
+                <li>Compresse da 100 o 200 mg di <strong>caffeina anidra</strong></li>
+                <li>Dose singola dichiarata e divisibile</li>
+              </ul></div>
+              <div class="not"><h4>Evita</h4><ul>
+                <li>I pre-workout: stimolanti multipli in dosi non scomposte</li>
+                <li>L'espresso come unità di misura: varia da 60 a 90 mg</li>
+              </ul></div>
+            </div>
+            <p><strong>Le due regole che contano più della dose.</strong> Provala in allenamento almeno due volte prima di usarla in gara, perché la tolleranza gastrica è individuale e il giorno della gara non è il momento per scoprirlo. E non abituare l'organismo alla dose piena: il caffè quotidiano va benissimo, ma la dose da prestazione resta riservata alle occasioni.</p>
+            <div class="note"><p><b>Sul sonno.</b> Con un'emivita di 5–6 ore, una dose pomeridiana è ancora per metà in circolo a mezzanotte. Nessuna assunzione dopo le 14 nei giorni normali.</p></div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ================= ORDINE ================= -->
+    <section id="ordine">
+      <h2>Ordine di acquisto</h2>
+      <p class="lede">Comprati insieme costano 120 € in un colpo e finiscono in momenti diversi. Scaglionali.</p>
+      <ol class="seq">
+        <li>
+          <div class="when">Subito</div>
+          <div class="what">D3 + K2 · creatina · B12 · glicina</div>
+          <div class="why">Le due priorità vere, più due voci dal costo quasi nullo.</div>
+        </li>
+        <li>
+          <div class="when">Entro un mese</div>
+          <div class="what">Omega-3 · magnesio</div>
+          <div class="why">La D3 va avviata prima dell'inverno; questi possono aspettare senza perdere nulla.</div>
+        </li>
+        <li>
+          <div class="when">Solo se serve</div>
+          <div class="what">Isolato di soia</div>
+          <div class="why">Dopo aver contato le proteine per una settimana vera. Molti scoprono di arrivarci già.</div>
+        </li>
+        <li>
+          <div class="when">Prima del blocco specifico</div>
+          <div class="what">Caffeina anidra</div>
+          <div class="why">Da testare nelle lunghe di qualità, mesi prima della gara obiettivo.</div>
+        </li>
+      </ol>
+      <div class="note">
+        <p><b>Dove comprare.</b> Farmacia e parafarmacia per le referenze semplici. I portali specializzati per creatina e proteine, dove il prezzo per grammo è nettamente migliore. Evita i marketplace generalisti per l'omega-3: non sai come è stato stoccato.</p>
+        <p><b>Quando conviene il formato grande.</b> Solo su ciò che ha lunga scadenza e consumo quotidiano garantito: creatina, glicina, proteine. Mai sull'omega-3.</p>
+      </div>
+    </section>
+
+    <!-- ================= TRE ================= -->
+    <section id="tre">
+      <h2>Se ne tieni solo tre</h2>
+      <p class="lede">Nessuna di queste voci ti farà correre più forte in modo percepibile. Il beneficio è chiudere carenze reali e sostenere il lavoro di forza.</p>
+      <div class="three">
+        <h3>L'ordine di importanza vero</h3>
+        <p>Tutto il resto è margine. E dormire otto ore invece di sette conta più di questa lista messa insieme.</p>
+        <ol>
+          <li>Vitamina D</li>
+          <li>Proteine totali</li>
+          <li>Creatina</li>
+        </ol>
+      </div>
+    </section>
+
+    <footer>
+      Questa non è consulenza medica. Le dosi di vitamina D e qualsiasi decisione sul ferro vanno confermate con un medico sulla base di esami recenti. Le raccomandazioni si applicano ad adulti sani in allenamento; gravidanza, patologie e terapie in corso cambiano il quadro.
+    </footer>
+
+  </main>
+</div>
+</div>
+
+<script>
+(function(){
+  // --- accordions ---
+  var panels = Array.prototype.slice.call(document.querySelectorAll('.panel'));
+  panels.forEach(function(p){
+    var btn = p.querySelector('.phead');
+    btn.addEventListener('click', function(){
+      var open = p.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+  function openPanel(id){
+    var p = document.getElementById(id);
+    if(!p) return;
+    if(!p.classList.contains('open')){
+      p.classList.add('open');
+      p.querySelector('.phead').setAttribute('aria-expanded','true');
+    }
+    p.scrollIntoView({block:'start', behavior:'smooth'});
+  }
+
+  // --- protocol rows jump to panel ---
+  document.querySelectorAll('.proto tr[data-go]').forEach(function(tr){
+    tr.addEventListener('click', function(){ openPanel(tr.getAttribute('data-go')); });
+  });
+
+  // --- sidebar links to panels open them ---
+  document.querySelectorAll('#sidenav a, .mobnav a').forEach(function(a){
+    var h = a.getAttribute('href');
+    if(h && h.indexOf('#s-') === 0){
+      a.addEventListener('click', function(){ 
+        var p = document.getElementById(h.slice(1));
+        if(p && !p.classList.contains('open')){
+          p.classList.add('open');
+          p.querySelector('.phead').setAttribute('aria-expanded','true');
+        }
+      });
+    }
+  });
+
+  // --- search filter ---
+  var q = document.getElementById('q');
+  var nores = document.getElementById('noresult');
+  q.addEventListener('input', function(){
+    var t = q.value.trim().toLowerCase();
+    var shown = 0;
+    panels.forEach(function(p){
+      if(!t){ p.classList.remove('hide'); shown++; return; }
+      var hit = p.textContent.toLowerCase().indexOf(t) !== -1;
+      p.classList.toggle('hide', !hit);
+      if(hit){ shown++; 
+        p.classList.add('open');
+        p.querySelector('.phead').setAttribute('aria-expanded','true');
+      }
+    });
+    nores.style.display = shown ? 'none' : 'block';
+  });
+
+  // --- scrollspy ---
+  var links = Array.prototype.slice.call(document.querySelectorAll('#sidenav a, .mobnav a'));
+  var targets = links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); });
+  function spy(){
+    var best = -1, bestTop = -1e9;
+    targets.forEach(function(el, i){
+      if(!el) return;
+      var top = el.getBoundingClientRect().top - 120;
+      if(top <= 0 && top > bestTop){ bestTop = top; best = i; }
+    });
+    links.forEach(function(a,i){ a.classList.toggle('on', i === best); });
+    if(best > -1){
+      var act = document.querySelector('.mobnav a.on');
+      if(act && act.scrollIntoView) act.scrollIntoView({block:'nearest', inline:'center'});
+    }
+  }
+  var tick = false;
+  window.addEventListener('scroll', function(){
+    if(tick) return; tick = true;
+    requestAnimationFrame(function(){ spy(); tick = false; });
+  }, {passive:true});
+  spy();
+})();
+</script>
+</body>
+</html>
