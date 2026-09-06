@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Scooter 125 nuovi per Milano — settembre 2026</title>
+<title>Scooter 125 nuovi per Milano — 15 modelli, metodologia v12</title>
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 <meta name="googlebot" content="noindex, nofollow">
 <meta name="robots" content="noai, noimageai">
-<meta name="description" content="Dieci scooter 125 nuovi sotto i 3.000 € di listino, confrontati per l'uso urbano a Milano: punteggi ispezionabili, soglie di trattativa e concessionari dove vederli.">
+<meta name="description" content="Quindici scooter 125 nuovi per l'uso urbano a Milano: qualità tecnica ispezionabile, calcolo riproducibile del Value di listino, schede a confronto e piano visite ai concessionari.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -21,6 +21,7 @@
     --blu:#0B4FA8;
     --blu-tenue:#DEE7F5;
     --ocra:#8A6A1F;
+    --ocra-tenue:#F3EBD6;
     --linea:#C9CCC8;
     --wrap:1120px;
     --prosa:68ch;
@@ -52,14 +53,14 @@
   .hero p.occhiello{font-size:1.15rem;color:var(--ghisa);max-width:60ch;margin-top:1.1em}
   .data{font-size:.92rem;color:var(--ghisa);margin:2rem 0 2.4rem}
 
-  /* ---- targhe del gruppo di testa ---- */
+  /* ---- targhe della testa tecnica ---- */
   .targhe{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:14px;margin:0 0 12px}
   .targa{display:flex;background:#fff;border:1px solid var(--inchiostro);border-radius:5px;overflow:hidden;text-decoration:none;color:inherit}
   .targa .banda{background:var(--blu);color:#fff;width:34px;flex:0 0 34px;display:flex;align-items:center;justify-content:center;font-family:"Saira Condensed",sans-serif;font-size:.7rem;font-weight:600;writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:.14em}
-  .targa .corpo{padding:14px 16px 15px}
+  .targa .corpo{display:block;padding:14px 16px 15px}
   .targa .voto{font-family:"Saira Condensed",sans-serif;font-size:2.5rem;font-weight:700;line-height:.95;display:block}
-  .targa .nome{font-family:"Saira Condensed",sans-serif;font-size:1.32rem;font-weight:600;line-height:1.12;margin:.28em 0 .12em}
-  .targa .prezzo{font-size:.95rem;color:var(--ghisa)}
+  .targa .nome{display:block;font-family:"Saira Condensed",sans-serif;font-size:1.32rem;font-weight:600;line-height:1.12;margin:.28em 0 .12em}
+  .targa .prezzo{display:block;font-size:.95rem;color:var(--ghisa);line-height:1.35}
   .targa:hover .nome{color:var(--blu)}
   .nota-targhe{font-size:.95rem;color:var(--ghisa);max-width:62ch;margin:0 0 40px}
 
@@ -69,6 +70,7 @@
   /* ---- tabelle ---- */
   .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.4em 0}
   table{border-collapse:collapse;width:100%;font-size:.93rem;min-width:640px;background:var(--carta-alt)}
+  table.stretta{min-width:0}
   caption{text-align:left;font-size:.93rem;color:var(--ghisa);padding-bottom:.7em}
   th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--linea);vertical-align:top}
   thead th{font-family:"Saira Condensed",sans-serif;font-weight:600;font-size:1rem;background:var(--inchiostro);color:#fff;border-bottom:0;position:sticky;top:0}
@@ -79,11 +81,15 @@
   .pari:hover{background:var(--blu-tenue)}
   td .modello{font-weight:600}
   .verifica{color:var(--ocra)}
+  .nd{color:var(--ghisa);text-align:right;white-space:nowrap}
   .piccolo{font-size:.88rem;color:var(--ghisa)}
 
-  /* ---- formule ---- */
+  /* ---- formule e stato ---- */
   .formula{background:var(--carta-alt);border-left:3px solid var(--blu);padding:13px 16px;margin:0 0 1em;font-size:.95rem}
   .formula b{font-family:"Saira Condensed",sans-serif;font-size:1.05rem;font-weight:600;display:block;margin-bottom:.2em}
+  .stato{background:var(--ocra-tenue);border-left:3px solid var(--ocra);padding:15px 18px;margin:0 0 1.4em;font-size:.97rem;max-width:var(--prosa)}
+  .stato p:last-child{margin-bottom:0}
+  .stato b{font-family:"Saira Condensed",sans-serif;font-size:1.05rem;font-weight:600;display:block;margin-bottom:.2em}
 
   /* ---- concessionari ---- */
   #mappa{height:420px;width:100%;border:1px solid var(--inchiostro);border-radius:5px;background:var(--carta-alt);margin:1.6em 0 .6em}
@@ -97,6 +103,10 @@
   .dealer dd{margin:0}
   .dealer .modelli{margin:0;padding-left:1.05em}
   .dealer .modelli li{margin:.1em 0}
+  .dealer .ordine{font-family:"Saira Condensed",sans-serif;font-size:.8rem;font-weight:600;letter-spacing:.12em;color:#fff;background:var(--blu);display:inline-block;padding:1px 8px;border-radius:3px;margin-bottom:.5em}
+  .dealer.secondaria{border-top-color:var(--ocra)}
+  .dealer.secondaria .ordine{background:var(--ocra)}
+  .dealer.secondaria .zona{color:var(--ocra)}
 
   ul.lista{max-width:var(--prosa);padding-left:1.15em;margin:1em 0}
   ul.lista li{margin:.3em 0}
@@ -121,233 +131,210 @@
   <div class="wrap">
     <p class="sopratitolo">Guida all'acquisto</p>
     <h1>Scooter 125 nuovi<br>per Milano</h1>
-    <p class="occhiello prosa">Dieci modelli con listino sotto i 3.000 € franco concessionario, confrontati per un uso quotidiano in città: pavé, rotaie del tram, manovre da fermo e ricovero in un box condiviso con un'auto.</p>
-    <p class="data">Aggiornato al 6 settembre 2026</p>
+    <p class="occhiello prosa">Quindici modelli valutati per un uso quotidiano in città: pavé, rotaie del tram, manovre da fermo e ricovero in un box condiviso con un'auto. L'ordine è per qualità tecnica; il punteggio commerciale si chiude con listini e comparabili verificati.</p>
+    <p class="data">Aggiornato al 6 settembre 2026 · metodologia v12</p>
   </div>
 </header>
 
 <div class="wrap">
   <section style="padding-top:38px">
-    <h2>Tre a pari merito</h2>
-    <p class="prosa">Con i prezzi pubblicizzati, tre modelli chiudono a 8,8 su 10 con scarti di pochi millesimi. Non c'è un vincitore: l'ordine reale lo decideranno i preventivi chiavi in mano.</p>
+    <h2>La testa della qualità tecnica</h2>
+    <p class="prosa">Tre modelli chiudono la qualità tecnica a 8,7 su 10. È un ordine di consultazione, non una classifica commerciale: il confronto sui prezzi si fa sui preventivi chiavi in mano.</p>
 
     <div class="targhe">
-      <a class="targa" href="https://www.peugeot-motocycles.it/gamma/tweet-125-fl-gt/" target="_blank" rel="noopener">
-        <span class="banda">PARI</span>
+      <a class="targa" href="https://www.piaggio.com/it_IT/modelli/liberty/liberty-125-4s3v-2025/" target="_blank" rel="noopener">
+        <span class="banda">TECNICA</span>
         <span class="corpo">
-          <span class="voto">8,8</span>
-          <span class="nome">Peugeot Tweet FL 125 GT</span>
-          <span class="prezzo">2.499 € f.c. &middot; ABS 2 canali &middot; 16/16</span>
+          <span class="voto">8,7</span>
+          <span class="nome">Piaggio Liberty 125</span>
+          <span class="prezzo">Praticità 9,4 · rete capillare · 16/14</span>
         </span>
       </a>
       <a class="targa" href="https://kymco.it/Prodotti/_agl-125nx/" target="_blank" rel="noopener">
-        <span class="banda">PARI</span>
+        <span class="banda">TECNICA</span>
         <span class="corpo">
-          <span class="voto">8,8</span>
+          <span class="voto">8,7</span>
           <span class="nome">Kymco Agility NX 125</span>
-          <span class="prezzo">2.590 € f.c. &middot; ABS + TCS &middot; 16/14</span>
+          <span class="prezzo">Sicurezza 9,5 · ABS 2 canali + TCS · 16/14</span>
         </span>
       </a>
-      <a class="targa" href="https://vogeitaly.it/sfida-sr16-125-air/" target="_blank" rel="noopener">
-        <span class="banda">PARI</span>
+      <a class="targa" href="https://www.honda.it/motorcycles/range/scooter/sh-mode-125/overview.html" target="_blank" rel="noopener">
+        <span class="banda">TECNICA</span>
         <span class="corpo">
-          <span class="voto">8,8</span>
-          <span class="nome">Voge Sfida SR16 125 Air</span>
-          <span class="prezzo">2.390 € f.c. &middot; ABS + TCS &middot; 16/14</span>
+          <span class="voto">8,7</span>
+          <span class="nome">Honda SH Mode 125</span>
+          <span class="prezzo">118 kg · sella 765 mm · affidabilità 9,4</span>
         </span>
       </a>
     </div>
-    <p class="nota-targhe">Il Piaggio Liberty è incluso a 3.050 € come eccezione dichiarata di 50 € sul perimetro.</p>
+
+    <div class="stato">
+      <b>Perimetro e stato dei punteggi</b>
+      <p>Perimetro economico indicativo: circa 3.000 € franco concessionario, con il Liberty ammesso a 3.050 €. Il costo chiavi in mano si confronta separatamente.</p>
+      <p>Value di listino e Scooter Score restano <span class="verifica">n.d.</span> finché versione, listino ufficiale e comparabili non sono documentati: le caselle mancanti restano vuote, senza voti neutri di riempimento.</p>
+    </div>
   </section>
 
   <section>
-    <h2>Come è costruito il punteggio</h2>
-    <p class="prosa">Ogni voto deriva dalle formule qui sotto e dai valori pubblicati nelle tabelle successive: con gli stessi input si riottiene lo stesso ordine.</p>
+    <h2>Come si costruisce il punteggio</h2>
+    <p class="prosa">Quattro formule, applicate agli stessi input pubblicati nelle tabelle: chi rifà il calcolo riottiene lo stesso risultato.</p>
 
     <div class="prosa">
       <div class="formula">
-        <b>Scooter Score</b>
-        30% praticità urbana + 25% pavé, buche e binari + 20% sicurezza + 10% affidabilità + 10% normativa Milano + 5% prestazioni
+        <b>Qualità tecnica Q</b>
+        30% praticità + 25% pavé, buche e binari + 20% sicurezza + 10% affidabilità + 10% normativa + 5% prestazioni
       </div>
       <div class="formula">
-        <b>Voto</b>
-        55,6% Scooter Score + 44,4% Deal Score
+        <b>Scooter Score — modello nuovo</b>
+        75% Q + 25% Value di listino
       </div>
       <div class="formula">
-        <b>Deal Score</b>
+        <b>Voto — esemplare usato</b>
+        5/9 Q + 4/9 Deal Score
+      </div>
+      <div class="formula">
+        <b>Deal Score usato</b>
         70% Deal Value + 20% condizione + 10% venditore e garanzia
       </div>
     </div>
 
-    <p class="prosa">Trattandosi di veicoli nuovi, condizione vale 10 e venditore/garanzia vale 9 per tutti. Il Deal Value è un giudizio ancorato da 0 a 10 che pesa insieme prezzo confrontabile, accessori realmente inclusi, garanzia e assistenza, rete e rivendibilità attesa; le evidenze che lo sostengono sono elencate più avanti.</p>
+    <p class="prosa">L'offerta di un veicolo nuovo si giudica su campi autonomi — chiavi in mano omogeneo, dotazione, garanzia, disponibilità e comodità — senza Deal Score e senza Personal Fit numerico.</p>
+    <p class="prosa">Sui nuovi la normativa vale 10 per tutti e quindi non discrimina; i pesi tecnici restano quelli del master. Sugli usati il listino originario non entra nel voto: un modello nato caro può essere un ottimo affare di seconda mano.</p>
   </section>
 
   <section>
-    <h2>La classifica</h2>
-    <p class="prosa">Il nome di ogni modello porta alla scheda ufficiale del costruttore, con foto, colori e dotazioni.</p>
+    <h2>Value di listino: calcolo riproducibile</h2>
+
+    <div class="prosa">
+      <div class="formula">
+        <b>Value</b>
+        MAX(0; MIN(10; 6 + 20 × D)) &nbsp;con&nbsp; D = (R − P) / R
+      </div>
+    </div>
+
+    <ul class="lista">
+      <li><b>P</b> — listino ufficiale della versione più il costo verificato del paniere utile mancante. Le promozioni nazionali e di concessionario restano fuori da P.</li>
+      <li><b>Paniere iniziale</b> — veicolo standard. Bauletto e parabrezza sono uno scenario separato, quotato a parte; le dotazioni presenti si contano tutte.</li>
+      <li><b>Comparabili</b> — almeno tre versioni equivalenti di almeno due altre marche, target escluso, allineate su categoria, sicurezza, motore e prestazioni, peso e manovrabilità, comfort, rete e garanzia. Le differenze ammesse vanno scritte una per una; una qualità sintetica simile non basta.</li>
+      <li><b>R</b> — mediana dei prezzi omogenei dei comparabili verificati.</li>
+    </ul>
+
     <div class="scroll">
-      <table>
-        <caption>Voti su 10. Le prime tre righe sono un pari merito.</caption>
-        <thead>
-          <tr>
-            <th>Pos.</th><th>Modello</th><th class="num">Scooter<br>Score</th><th class="num">Deal<br>Value</th><th class="num">Deal<br>Score</th><th class="num">Voto</th><th class="num">Prezzo f.c.</th><th>Qualità del prezzo</th>
-          </tr>
-        </thead>
+      <table class="stretta">
+        <caption>Ancoraggi convenzionali: un punto di Value ogni cinque punti percentuali di vantaggio sul mercato di riferimento.</caption>
+        <thead><tr><th>Posizionamento rispetto a R</th><th class="num">Value</th></tr></thead>
         <tbody>
-          <tr class="pari">
-            <td>1=</td>
-            <td class="modello"><a href="https://www.peugeot-motocycles.it/gamma/tweet-125-fl-gt/" target="_blank" rel="noopener">Peugeot Tweet FL 125 GT</a></td>
-            <td class="num">8,3</td><td class="num">9,4</td><td class="num">9,5</td><td class="voto-cel">8,8</td><td class="num">2.499 €</td>
-            <td>Promo dealer per la GT; il listino Peugeot “da 2.499 €” può riferirsi alla versione base, <span class="verifica">allestimento da confermare</span></td>
-          </tr>
-          <tr class="pari">
-            <td>1=</td>
-            <td class="modello"><a href="https://kymco.it/Prodotti/_agl-125nx/" target="_blank" rel="noopener">Kymco Agility NX 125</a></td>
-            <td class="num">8,7</td><td class="num">8,8</td><td class="num">9,1</td><td class="voto-cel">8,8</td><td class="num">2.590 €</td>
-            <td>Promo dealer o nazionale; listino di riferimento 2.690 €</td>
-          </tr>
-          <tr class="pari">
-            <td>1=</td>
-            <td class="modello"><a href="https://vogeitaly.it/sfida-sr16-125-air/" target="_blank" rel="noopener">Voge Sfida SR16 125 Air</a></td>
-            <td class="num">8,5</td><td class="num">9,1</td><td class="num">9,3</td><td class="voto-cel">8,8</td><td class="num">2.390 €</td>
-            <td>Promo dealer, <span class="verifica">disponibilità e pacchetto accessori da confermare</span></td>
-          </tr>
-          <tr>
-            <td>4</td>
-            <td class="modello"><a href="https://sym-italia.it/bwt-125/" target="_blank" rel="noopener">SYM BWT 125 E5+</a></td>
-            <td class="num">8,4</td><td class="num">8,4</td><td class="num">8,8</td><td class="voto-cel">8,6</td><td class="num">1.999 €</td>
-            <td>Listino ufficiale corrente</td>
-          </tr>
-          <tr>
-            <td>5</td>
-            <td class="modello"><a href="https://sym-italia.it/symphony-sr-e5-2026/" target="_blank" rel="noopener">SYM Symphony 125 SR MY26</a></td>
-            <td class="num">8,5</td><td class="num">8,1</td><td class="num">8,6</td><td class="voto-cel">8,5</td><td class="num">2.299 €</td>
-            <td>Listino ufficiale MY26; il precedente SR E5+ resta a 2.199 €</td>
-          </tr>
-          <tr>
-            <td>6=</td>
-            <td class="modello"><a href="https://www.peugeot-motocycles.it/model/kisbee-m/51" target="_blank" rel="noopener">Peugeot Kisbee M 125 Active</a></td>
-            <td class="num">8,4</td><td class="num">8,0</td><td class="num">8,5</td><td class="voto-cel">8,4</td><td class="num">2.099 €</td>
-            <td>Listino ufficiale Active</td>
-          </tr>
-          <tr>
-            <td>6=</td>
-            <td class="modello"><a href="https://sym-italia.it/symphony-125i-my26/" target="_blank" rel="noopener">SYM Symphony 125i MY26</a></td>
-            <td class="num">8,5</td><td class="num">7,6</td><td class="num">8,2</td><td class="voto-cel">8,4</td><td class="num">2.499 €</td>
-            <td>Listino ufficiale, con parabrezza e bauletto SHAD da 33 l</td>
-          </tr>
-          <tr>
-            <td>6=</td>
-            <td class="modello"><a href="https://sym-italia.it/symphony-st-125-euro-5-plus/" target="_blank" rel="noopener">SYM Symphony ST 125 ABS/TCS</a></td>
-            <td class="num">8,5</td><td class="num">7,7</td><td class="num">8,3</td><td class="voto-cel">8,4</td><td class="num">2.799 €</td>
-            <td>Promo ufficiale; listino 2.899 €</td>
-          </tr>
-          <tr>
-            <td>9=</td>
-            <td class="modello"><a href="https://www.piaggio.com/it_IT/modelli/liberty/liberty-125-4s3v-2025/" target="_blank" rel="noopener">Piaggio Liberty 125</a></td>
-            <td class="num">8,7</td><td class="num">7,0</td><td class="num">7,8</td><td class="voto-cel">8,3</td><td class="num">3.050 €</td>
-            <td>Listino ufficiale; eccezione di 50 € al perimetro</td>
-          </tr>
-          <tr>
-            <td>9=</td>
-            <td class="modello"><a href="https://www.honda.it/motorcycles/range/scooter/sh-mode-125/overview.html" target="_blank" rel="noopener">Honda SH Mode 125</a></td>
-            <td class="num">8,6</td><td class="num">7,0</td><td class="num">7,8</td><td class="voto-cel">8,3</td><td class="num">2.790 €</td>
-            <td>Listino ufficiale</td>
-          </tr>
+          <tr><td>30% più caro</td><td class="voto-cel">0</td></tr>
+          <tr><td>20% più caro</td><td class="voto-cel">2</td></tr>
+          <tr><td>10% più caro</td><td class="voto-cel">4</td></tr>
+          <tr><td>In linea</td><td class="voto-cel">6</td></tr>
+          <tr><td>5% meno caro</td><td class="voto-cel">7</td></tr>
+          <tr><td>10% meno caro</td><td class="voto-cel">8</td></tr>
+          <tr><td>15% meno caro</td><td class="voto-cel">9</td></tr>
+          <tr><td>Almeno 20% meno caro</td><td class="voto-cel">10</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="piccolo prosa">Per il SR16 Air è usato lo Scooter Score del modello base SR16: la versione ad aria va provata prima di assegnarle un punteggio autonomo.</p>
+
+    <p class="prosa">Il risultato del calcolo si usa così com'è. Con versione, listino o comparabili non validati, Value e Scooter Score restano n.d. e il modello non riceve rango commerciale.</p>
   </section>
 
   <section>
-    <h2>Da dove viene lo Scooter Score</h2>
+    <h2>I quindici modelli</h2>
+    <p class="prosa">Ordinati per qualità tecnica non arrotondata. I listini in colonna sono riferimenti di lavoro da riverificare sul preventivo; il nome porta alla scheda ufficiale del costruttore.</p>
+    <div class="scroll">
+      <table>
+        <caption>Q tecnica su 10. Value e Scooter Score si compilano quando i comparabili sono documentati.</caption>
+        <thead>
+          <tr>
+            <th>Modello e versione</th><th class="num">Q tecnica</th><th>Listino di lavoro</th><th class="num">Value<br>listino</th><th class="num">Scooter<br>Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="pari"><td class="modello"><a href="https://www.piaggio.com/it_IT/modelli/liberty/liberty-125-4s3v-2025/" target="_blank" rel="noopener">Piaggio Liberty 125</a> <span class="piccolo">versione S da separare</span></td><td class="voto-cel">8,7</td><td>3.050 € <span class="piccolo">storico</span></td><td class="nd">n.d.</td><td class="nd">n.d.</td></tr>
+          <tr class="pari"><td class="modello"><a href="https://kymco.it/Prodotti/_agl-125nx/" target="_blank" rel="noopener">Kymco Agility NX 125</a></td><td class="voto-cel">8,7</td><td>2.690 € <span class="piccolo">storico</span></td><td class="nd">n.d.</td><td class="nd">n.d.</td></tr>
+          <tr class="pari"><td class="modello"><a href="https://www.honda.it/motorcycles/range/scooter/sh-mode-125/overview.html" target="_blank" rel="noopener">Honda SH Mode 125</a></td><td class="voto-cel">8,7</td><td>2.790 € <span class="piccolo">storico</span></td><td class="nd">n.d.</td><td class="nd">n.d.</td></tr>
+          <tr><td class="modello"><a href="https://kymco.it/Prodotti/_p125-s-p/" target="_blank" rel="noopener">Kymco People S 125 ABS</a></td><td class="voto-cel">8,6</td><td>2.990 € <span class="piccolo">storico</span></td><td class="nd">n.d.</td><td class="nd">n.d.</td></tr>
+          <tr><td class="modello"><a href="https://sym-italia.it/symphony-sr-e5-2026/" target="_blank" rel="noopener">SYM Symphony SR MY26</a></td><td class="voto-cel">8,5</td><td>2.299 € <span class="piccolo">storico</span></td><td class="nd">n.d.</td><td class="nd">n.d.</td></tr>
+          <tr><td class="modello"><a href="https://vogeitaly.it/sfida-sr16/" target="_blank" rel="noopener">Voge SR16 Air 125</a></td><td class="voto-cel">8,5</td><td class="verifica">da verificare</td><td class="nd">n.d.</td><td class="nd">n.d.</td></tr>
+          <tr><td class="modello"><a href="https://sym-italia.it/symphony-125i-my26/" target="_blank" rel="noopener">SYM Symphony 125i MY26</a></td><td class="voto-cel">8,5</td><td>2.499 € <span class="piccolo">storico</span></td><td class="nd">n.d.</td><td class="nd">n.d.</td></tr>
+          <tr><td class="modello"><a href="https://sym-italia.it/symphony-st-125-euro-5-plus/" target="_blank" rel="noopener">SYM Symphony ST 125 ABS/TCS</a></td><td class="voto-cel">8,5</td><td>2.899 € <span class="piccolo">storico</span></td><td class="nd">n.d.</td><td class="nd">n.d.</td></tr>
+          <tr><td class="modello"><a href="https://sym-italia.it/bwt-125/" target="_blank" rel="noopener">SYM BWT 125 E5+</a></td><td class="voto-cel">8,4</td><td>1.999 € <span class="piccolo">storico</span></td><td class="nd">n.d.</td><td class="nd">n.d.</td></tr>
+          <tr><td class="modello"><a href="https://www.kl-motors.com/btre/" target="_blank" rel="noopener">KL B-Tre 125</a></td><td class="voto-cel">8,4</td><td>2.090 € <span class="piccolo">storico</span></td><td class="nd">n.d.</td><td class="nd">n.d.</td></tr>
+          <tr><td class="modello"><a href="https://swm-motorcycles.it/swm-moto/c-fly-125/" target="_blank" rel="noopener">SWM C-Fly 125</a></td><td class="voto-cel">8,4</td><td class="verifica">da verificare</td><td class="nd">n.d.</td><td class="nd">n.d.</td></tr>
+          <tr><td class="modello"><a href="https://www.peugeot-motocycles.it/models/kisbee-m" target="_blank" rel="noopener">Peugeot Kisbee M Active</a></td><td class="voto-cel">8,4</td><td>2.099 € <span class="piccolo">storico</span></td><td class="nd">n.d.</td><td class="nd">n.d.</td></tr>
+          <tr><td class="modello"><a href="https://www.peugeot-motocycles.it/models" target="_blank" rel="noopener">Peugeot Tweet FL GT</a></td><td class="voto-cel">8,3</td><td class="verifica">da verificare</td><td class="nd">n.d.</td><td class="nd">n.d.</td></tr>
+          <tr><td class="modello"><a href="https://www.honda.it/motorcycles/range/scooter/vision-110/specifications.html" target="_blank" rel="noopener">Honda Vision 110</a> <span class="piccolo">model year da confermare</span></td><td class="voto-cel">8,3</td><td class="verifica">da verificare</td><td class="nd">n.d.</td><td class="nd">n.d.</td></tr>
+          <tr><td class="modello"><a href="https://kymco.it/Prodotti/_mic125p/" target="_blank" rel="noopener">Kymco Micare 125</a></td><td class="voto-cel">8,1</td><td>2.190 € <span class="piccolo">storico</span></td><td class="nd">n.d.</td><td class="nd">n.d.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="piccolo prosa">La Q tecnica è quella del master per modello base e va validata su versione e model year. Il SR16 Air si valuta per conto suo, non eredita la qualità della standard; Tweet GT, Vision e Liberty/S richiedono l'identificazione esatta dell'allestimento. Il People S ha una Q tecnica non arrotondata di 8,56.</p>
+  </section>
+
+  <section>
+    <h2>Cosa serve per chiudere lo scoring</h2>
+    <ul class="lista">
+      <li>Q tecnica validata per allestimento e model year, non solo per modello base.</li>
+      <li>Listini ufficiali della versione esatta, con la data della rilevazione.</li>
+      <li>Costo verificato del paniere utile mancante, voce per voce.</li>
+      <li>Almeno tre comparabili equivalenti di due altre marche per ciascun modello, con le differenze ammesse messe per iscritto.</li>
+    </ul>
+    <p class="prosa">Con questi quattro elementi il Value si calcola e lo Scooter Score dei nuovi si chiude sulla ponderazione 75/25.</p>
+  </section>
+
+  <section>
+    <h2>Da dove viene la qualità tecnica</h2>
     <div class="scroll">
       <table>
         <thead>
-          <tr><th>Modello</th><th class="num">Praticità<br>30%</th><th class="num">Pavé<br>25%</th><th class="num">Sicurezza<br>20%</th><th class="num">Affidabilità<br>10%</th><th class="num">Normativa<br>10%</th><th class="num">Prestazioni<br>5%</th><th class="num">Score</th></tr>
+          <tr><th>Modello</th><th class="num">Praticità<br>30%</th><th class="num">Pavé<br>25%</th><th class="num">Sicurezza<br>20%</th><th class="num">Affidabilità<br>10%</th><th class="num">Normativa<br>10%</th><th class="num">Prestazioni<br>5%</th><th class="num">Q</th></tr>
         </thead>
         <tbody>
-          <tr><td>Tweet FL 125 GT</td><td class="num">7,8</td><td class="num">8,5</td><td class="num">8,2</td><td class="num">8,0</td><td class="num">10,0</td><td class="num">7,8</td><td class="voto-cel">8,3</td></tr>
-          <tr><td>Agility NX 125</td><td class="num">7,8</td><td class="num">8,8</td><td class="num">9,5</td><td class="num">8,2</td><td class="num">10,0</td><td class="num">8,0</td><td class="voto-cel">8,7</td></tr>
-          <tr><td>Sfida SR16 125 / Air</td><td class="num">7,7</td><td class="num">8,8</td><td class="num">9,2</td><td class="num">7,3</td><td class="num">10,0</td><td class="num">8,2</td><td class="voto-cel">8,5</td></tr>
-          <tr><td>BWT 125</td><td class="num">9,1</td><td class="num">8,5</td><td class="num">7,0</td><td class="num">8,0</td><td class="num">10,0</td><td class="num">7,4</td><td class="voto-cel">8,4</td></tr>
-          <tr><td>Symphony 125 SR</td><td class="num">9,2</td><td class="num">8,4</td><td class="num">7,4</td><td class="num">8,0</td><td class="num">10,0</td><td class="num">7,8</td><td class="voto-cel">8,5</td></tr>
-          <tr><td>Kisbee M 125</td><td class="num">9,0</td><td class="num">8,4</td><td class="num">7,0</td><td class="num">8,0</td><td class="num">10,0</td><td class="num">7,4</td><td class="voto-cel">8,4</td></tr>
-          <tr><td>Symphony 125i</td><td class="num">9,3</td><td class="num">8,4</td><td class="num">7,0</td><td class="num">8,0</td><td class="num">10,0</td><td class="num">7,8</td><td class="voto-cel">8,5</td></tr>
-          <tr><td>Symphony ST 125</td><td class="num">8,1</td><td class="num">8,6</td><td class="num">8,5</td><td class="num">8,0</td><td class="num">10,0</td><td class="num">7,8</td><td class="voto-cel">8,5</td></tr>
           <tr><td>Liberty 125</td><td class="num">9,4</td><td class="num">8,2</td><td class="num">8,0</td><td class="num">8,7</td><td class="num">10,0</td><td class="num">7,8</td><td class="voto-cel">8,7</td></tr>
-          <tr><td>SH Mode 125</td><td class="num">9,6</td><td class="num">8,3</td><td class="num">6,8</td><td class="num">9,4</td><td class="num">10,0</td><td class="num">7,8</td><td class="voto-cel">8,6</td></tr>
+          <tr><td>Agility NX 125</td><td class="num">7,8</td><td class="num">8,8</td><td class="num">9,5</td><td class="num">8,2</td><td class="num">10,0</td><td class="num">8,0</td><td class="voto-cel">8,7</td></tr>
+          <tr><td>SH Mode 125</td><td class="num">9,6</td><td class="num">8,3</td><td class="num">6,8</td><td class="num">9,4</td><td class="num">10,0</td><td class="num">7,8</td><td class="voto-cel">8,7</td></tr>
+          <tr><td>People S 125</td><td class="num">7,9</td><td class="num">8,8</td><td class="num">8,8</td><td class="num">8,2</td><td class="num">10,0</td><td class="num">8,2</td><td class="voto-cel">8,6</td></tr>
+          <tr><td>Symphony SR 125</td><td class="num">9,2</td><td class="num">8,4</td><td class="num">7,4</td><td class="num">8,0</td><td class="num">10,0</td><td class="num">7,8</td><td class="voto-cel">8,5</td></tr>
+          <tr><td>SR16 125 <span class="piccolo">Air da validare</span></td><td class="num">7,7</td><td class="num">8,8</td><td class="num">9,2</td><td class="num">7,3</td><td class="num">10,0</td><td class="num">8,2</td><td class="voto-cel">8,5</td></tr>
+          <tr><td>Symphony 125</td><td class="num">9,3</td><td class="num">8,4</td><td class="num">7,0</td><td class="num">8,0</td><td class="num">10,0</td><td class="num">7,8</td><td class="voto-cel">8,5</td></tr>
+          <tr><td>Symphony ST 125</td><td class="num">8,1</td><td class="num">8,6</td><td class="num">8,5</td><td class="num">8,0</td><td class="num">10,0</td><td class="num">7,8</td><td class="voto-cel">8,5</td></tr>
+          <tr><td>BWT 125</td><td class="num">9,1</td><td class="num">8,5</td><td class="num">7,0</td><td class="num">8,0</td><td class="num">10,0</td><td class="num">7,4</td><td class="voto-cel">8,4</td></tr>
+          <tr><td>B-Tre 125</td><td class="num">9,0</td><td class="num">8,2</td><td class="num">8,2</td><td class="num">6,4</td><td class="num">10,0</td><td class="num">7,3</td><td class="voto-cel">8,4</td></tr>
+          <tr><td>C-Fly 125</td><td class="num">7,8</td><td class="num">8,4</td><td class="num">9,4</td><td class="num">6,8</td><td class="num">10,0</td><td class="num">7,8</td><td class="voto-cel">8,4</td></tr>
+          <tr><td>Kisbee M 125</td><td class="num">9,0</td><td class="num">8,4</td><td class="num">7,0</td><td class="num">8,0</td><td class="num">10,0</td><td class="num">7,4</td><td class="voto-cel">8,4</td></tr>
+          <tr><td>Tweet 125</td><td class="num">7,8</td><td class="num">8,5</td><td class="num">8,2</td><td class="num">8,0</td><td class="num">10,0</td><td class="num">7,8</td><td class="voto-cel">8,3</td></tr>
+          <tr><td>Vision 110</td><td class="num">9,7</td><td class="num">7,4</td><td class="num">6,5</td><td class="num">9,4</td><td class="num">10,0</td><td class="num">5,8</td><td class="voto-cel">8,3</td></tr>
+          <tr><td>Micare 125</td><td class="num">9,2</td><td class="num">7,2</td><td class="num">6,8</td><td class="num">8,1</td><td class="num">10,0</td><td class="num">7,2</td><td class="voto-cel">8,1</td></tr>
         </tbody>
       </table>
     </div>
-  </section>
-
-  <section>
-    <h2>Le evidenze dietro il Deal Value</h2>
-    <div class="scroll">
-      <table>
-        <thead>
-          <tr><th>Modello</th><th>Prezzo</th><th>Accessori inclusi o da aggiungere</th><th>Garanzia e assistenza</th><th>Rete e rivendibilità</th><th class="num">Deal<br>Value</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Tweet FL GT</td><td>2.499 € promo</td><td>Nessuno confermato; prevedere 150–250 € per bauletto e parabrezza</td><td>Peugeot fino a 4 anni o 60.000 km sui nuovi idonei, <span class="verifica">da confermare</span></td><td>Media</td><td class="voto-cel">9,4</td></tr>
-          <tr><td>Agility NX</td><td>2.590 € promo, 100 € sotto listino</td><td>Bauletto dichiarato incluso</td><td>Kymco, <span class="verifica">da riportare sul preventivo</span></td><td>Buona</td><td class="voto-cel">8,8</td></tr>
-          <tr><td>Sfida SR16 Air</td><td>2.390 € promo</td><td>Bauletto, parabrezza e paramani dichiarati; <span class="verifica">verificare il pacchetto</span></td><td>Voge, <span class="verifica">da confermare</span></td><td>Ancora incerta</td><td class="voto-cel">9,1</td></tr>
-          <tr><td>BWT 125</td><td>1.999 € listino</td><td>Bauletto di serie; parabrezza da quotare</td><td>SYM Best Care</td><td>Media-buona</td><td class="voto-cel">8,4</td></tr>
-          <tr><td>Symphony SR MY26</td><td>2.299 € listino</td><td>Vano da 18 l; bauletto e parabrezza da quotare, circa 150–250 €</td><td>SYM Best Care</td><td>Media-buona</td><td class="voto-cel">8,1</td></tr>
-          <tr><td>Kisbee M 125</td><td>2.099 € listino</td><td>Kit top case da 33 l ufficiale 277 €; parabrezzino 102 €</td><td>Peugeot fino a 4 anni o 60.000 km sui nuovi idonei</td><td>Media</td><td class="voto-cel">8,0</td></tr>
-          <tr><td>Symphony 125i MY26</td><td>2.499 € listino</td><td>Bauletto SHAD da 33 l e parabrezza inclusi</td><td>4 anni di garanzia più 4 di assistenza stradale</td><td>Media-buona</td><td class="voto-cel">7,6</td></tr>
-          <tr><td>Symphony ST 125</td><td>2.799 € promo</td><td>Bauletto, parabrezza e copri-strumentazione inclusi in promo</td><td>SYM Best Care</td><td>Media-buona</td><td class="voto-cel">7,7</td></tr>
-          <tr><td>Liberty 125</td><td>3.050 € listino</td><td>Bauletto e parabrezza extra, circa 200–350 €</td><td>Piaggio</td><td>Alta</td><td class="voto-cel">7,0</td></tr>
-          <tr><td>SH Mode 125</td><td>2.790 € listino</td><td>Bauletto e parabrezza extra, circa 200–350 €</td><td>Honda</td><td>Alta</td><td class="voto-cel">7,0</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="piccolo prosa">Il 7,6 del Symphony 125i è prudente rispetto alla dotazione di serie: con un chiavi in mano vicino a 2.800 € e i quattro anni riportati sul contratto, diventa uno dei migliori acquisti reali della lista.</p>
   </section>
 
   <section>
     <h2>Le schede a confronto</h2>
-    <p class="prosa">I pesi sono in ordine di marcia. Dove il costruttore pubblica solo il peso a secco, la conversione è indicata come stima.</p>
+    <p class="prosa">I pesi in ordine di marcia e quelli a secco sono definiti in modo diverso e vanno confrontati solo con l'omologo: per il C-Fly il costruttore pubblica il secco. I dati restano storici e vanno ricontrollati sul model year in concessionaria.</p>
     <div class="scroll">
       <table>
         <thead>
-          <tr><th>Modello</th><th class="num">Totale stimato</th><th>Motore</th><th>Raffr.</th><th class="num">Peso</th><th class="num">Largh.</th><th class="num">Sella</th><th>Ruote</th><th>Freni</th><th>Sottosella</th></tr>
+          <tr><th>Modello</th><th class="num">Totale stimato</th><th>Motore</th><th>Raffr.</th><th class="num">Peso</th><th class="num">Largh.</th><th class="num">Sella</th><th>Ruote</th><th>Freni e sicurezza</th><th>Sottosella e carico</th></tr>
         </thead>
         <tbody>
-          <tr><td class="modello">Tweet FL 125 GT</td><td class="num">2.800–3.050 €</td><td>11,5 CV; 10,3 Nm</td><td>Aria</td><td class="num">~111 kg<br><span class="piccolo">106 a secco</span></td><td class="num verifica">da rilevare</td><td class="num">790 mm</td><td>16/16</td><td>2 dischi, ABS 2 canali</td><td>Capacità non pubblicata; provare col casco</td></tr>
-          <tr><td class="modello">Agility NX 125</td><td class="num">2.890 €</td><td>11 CV; 10,5 Nm</td><td>Aria</td><td class="num">132 kg</td><td class="num">747 mm</td><td class="num">805 mm</td><td>16/14</td><td>2 dischi, ABS 2 canali, TCS</td><td>Integrale dichiarato, bauletto incluso</td></tr>
-          <tr><td class="modello">Sfida SR16 125 Air</td><td class="num">2.690 €</td><td>10,9 CV; 10,3 Nm</td><td>Aria</td><td class="num">~132 kg<br><span class="piccolo">126 a secco</span></td><td class="num">760 mm</td><td class="num">795 mm</td><td>16/14</td><td>2 dischi, ABS, TCS</td><td>Da provare; pacchetto accessori dichiarato</td></tr>
-          <tr><td class="modello">BWT 125 E5+</td><td class="num">2.299 €</td><td>~9,5 CV</td><td>Aria</td><td class="num">106 kg</td><td class="num">708 mm</td><td class="num">~780 mm</td><td>16/14</td><td>CBS, disco anteriore</td><td>Piccolo; il bauletto compensa</td></tr>
-          <tr><td class="modello">Symphony 125 SR MY26</td><td class="num">2.599 €</td><td>11,4 CV; 10,3 Nm</td><td>Aria</td><td class="num">125 kg</td><td class="num">690 mm</td><td class="num">790 mm</td><td>16/16</td><td>Dischi 260/240 mm, CBS</td><td>18 l; top case da quotare</td></tr>
-          <tr><td class="modello">Kisbee M 125</td><td class="num">2.399 € base<br><span class="piccolo">2.676 € col top case</span></td><td>11,4 CV; 10,3 Nm</td><td>Aria</td><td class="num">120 kg<br><span class="piccolo">114 a secco</span></td><td class="num">690 mm</td><td class="num">770 mm</td><td>16/16</td><td>2 dischi, CBS</td><td>Integrale dichiarato; top case 33 l extra</td></tr>
+          <tr><td class="modello">Liberty 125 / S</td><td class="num">3.300–3.420 €</td><td>~11 CV</td><td>Aria</td><td class="num">~124 kg</td><td class="num">690 mm</td><td class="num">~790 mm</td><td>16/14</td><td>ABS anteriore, tamburo posteriore</td><td>Vano da provare; bauletto extra</td></tr>
+          <tr><td class="modello">Agility NX 125</td><td class="num">2.890 €</td><td>11 CV; 10,5 Nm</td><td>Aria</td><td class="num">132 kg</td><td class="num">747 mm</td><td class="num">805 mm</td><td>16/14</td><td>2 dischi, ABS 2 canali, TCS</td><td>Integrale dichiarato più bauletto incluso</td></tr>
+          <tr><td class="modello">SH Mode 125</td><td class="num">3.090–3.240 €</td><td>11,8 CV</td><td>Liquido</td><td class="num">118 kg</td><td class="num">670 mm</td><td class="num">765 mm</td><td>16/14</td><td>CBS, disco e tamburo</td><td>18,5 l, casco integrale dichiarato</td></tr>
+          <tr><td class="modello">People S 125 ABS</td><td class="num">3.190 €</td><td>10,6 CV; 10 Nm</td><td>Aria</td><td class="num">130 kg</td><td class="num">700 mm</td><td class="num">800 mm</td><td>16/14</td><td>2 dischi, ABS 2 canali</td><td>Integrale più bauletto 33 l, parabrezza e paramani di serie</td></tr>
+          <tr><td class="modello">Symphony SR MY26</td><td class="num">2.599 €</td><td>11,4 CV; 10,3 Nm</td><td>Aria</td><td class="num">125 kg</td><td class="num">690 mm</td><td class="num">790 mm</td><td>16/16</td><td>Dischi 260/240 mm, CBS</td><td>18 l; top case da quotare</td></tr>
+          <tr><td class="modello">SR16 125 Air</td><td class="num">2.690 €</td><td>10,9 CV; 10,3 Nm</td><td>Aria</td><td class="num">~132 kg <span class="piccolo">stimati</span></td><td class="num">760 mm</td><td class="num">795 mm</td><td>16/14</td><td>2 dischi, ABS, TCS</td><td>Vano da provare; pacchetto accessori dichiarato</td></tr>
           <tr><td class="modello">Symphony 125i MY26</td><td class="num">2.799 €</td><td>11,4 CV; 10,3 Nm</td><td>Aria</td><td class="num">122 kg</td><td class="num">685 mm</td><td class="num">780 mm</td><td>16/16</td><td>Dischi 260/240 mm, CBS</td><td>18 l più SHAD da 33 l incluso</td></tr>
           <tr><td class="modello">Symphony ST 125</td><td class="num">3.099 €</td><td>~12,2 CV</td><td>Liquido</td><td class="num">~133 kg</td><td class="num">~735 mm</td><td class="num">~790 mm</td><td>16/14</td><td>2 dischi, ABS, TCS</td><td>30 l più bauletto incluso in promo</td></tr>
-          <tr><td class="modello">Liberty 125</td><td class="num">3.300–3.420 €</td><td>~11 CV</td><td>Aria</td><td class="num">~124 kg</td><td class="num">690 mm</td><td class="num">~790 mm</td><td>16/14</td><td>ABS anteriore, tamburo posteriore</td><td>Da provare; bauletto extra</td></tr>
-          <tr><td class="modello">SH Mode 125</td><td class="num">3.090–3.240 €</td><td>11,8 CV; 12 Nm</td><td>Liquido</td><td class="num">118 kg</td><td class="num">670 mm</td><td class="num">765 mm</td><td>16/14</td><td>CBS, disco e tamburo</td><td>18,5 l, casco integrale dichiarato</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section>
-    <h2>Fino a quanto conviene pagare</h2>
-    <p class="prosa">Non sono listini ma soglie decisionali chiavi in mano, con gli accessori necessari già conteggiati. Sotto la soglia il modello merita una visita prioritaria; sopra, il gruppo di testa resta preferibile.</p>
-    <div class="scroll">
-      <table>
-        <thead><tr><th>Modello</th><th class="num">Soglia chiavi in mano</th><th>Cosa deve comprendere</th></tr></thead>
-        <tbody>
-          <tr><td class="modello">Tweet FL GT</td><td class="voto-cel">3.000 €</td><td>Allestimento GT con ABS a due canali, bauletto o sconto equivalente</td></tr>
-          <tr><td class="modello">Agility NX</td><td class="voto-cel">3.000 €</td><td>Bauletto e condizioni di garanzia messe per iscritto</td></tr>
-          <tr><td class="modello">Sfida SR16 Air</td><td class="voto-cel">2.850 €</td><td>Pacchetto accessori dichiarato e garanzia</td></tr>
-          <tr><td class="modello">BWT 125</td><td class="voto-cel">2.400 €</td><td>Bauletto e garanzia; meglio con parabrezza</td></tr>
-          <tr><td class="modello">Symphony SR MY26</td><td class="voto-cel">2.650 €</td><td>MY26 corretto e messa in strada; meglio con bauletto e parabrezza</td></tr>
-          <tr><td class="modello">Kisbee M 125</td><td class="voto-cel">2.550 €</td><td>Top case incluso o sconto sufficiente a montarlo</td></tr>
-          <tr><td class="modello">Symphony 125i MY26</td><td class="voto-cel">2.850 €</td><td>SHAD da 33 l, parabrezza e i quattro più quattro anni per iscritto</td></tr>
-          <tr><td class="modello">Symphony ST 125</td><td class="voto-cel">3.150 €</td><td>ABS, TCS e pacchetto promo completo</td></tr>
-          <tr><td class="modello">Liberty 125</td><td class="voto-cel">3.300 €</td><td>Chiavi in mano; oltre, chiedere bauletto e parabrezza o uno sconto</td></tr>
-          <tr><td class="modello">SH Mode 125</td><td class="voto-cel">3.100 €</td><td>Chiavi in mano con almeno un accessorio utile incluso</td></tr>
+          <tr><td class="modello">BWT 125 E5+</td><td class="num">2.299 €</td><td>~9,5 CV</td><td>Aria</td><td class="num">~106 kg <span class="piccolo">dichiarati</span></td><td class="num">708 mm</td><td class="num">~780 mm</td><td>16/14</td><td>CBS, disco anteriore</td><td>Vano piccolo; il bauletto compensa</td></tr>
+          <tr><td class="modello">KL B-Tre 125</td><td class="num">2.390 €</td><td>8,7 CV; 8,6 Nm</td><td>Aria</td><td class="num">111 kg</td><td class="num verifica">da rilevare</td><td class="num">790 mm</td><td>16/14</td><td class="verifica">frenata da verificare</td><td>Bauletto dichiarato dall'offerta milanese</td></tr>
+          <tr><td class="modello">SWM C-Fly 125</td><td class="num">2.790 €</td><td>12 CV; 11,7 Nm</td><td>Liquido</td><td class="num">136 kg <span class="piccolo">a secco</span></td><td class="num">720 mm</td><td class="num">790 mm</td><td>16/14</td><td>2 dischi, ABS, TCS</td><td>Bauletto e parabrezza dichiarati; vano da provare</td></tr>
+          <tr><td class="modello">Kisbee M 125</td><td class="num">2.399 € base<br><span class="piccolo">2.676 € col top case</span></td><td>11,4 CV; 10,3 Nm</td><td>Aria</td><td class="num">120 kg<br><span class="piccolo">114 a secco</span></td><td class="num">690 mm</td><td class="num">770 mm</td><td>16/16</td><td>2 dischi, CBS</td><td>Integrale dichiarato; top case 33 l extra</td></tr>
+          <tr><td class="modello">Tweet FL 125 GT</td><td class="num">2.800–3.050 €</td><td>11,5 CV; 10,3 Nm</td><td>Aria</td><td class="num">~111 kg<br><span class="piccolo">106 a secco</span></td><td class="num verifica">da rilevare</td><td class="num">790 mm</td><td>16/16</td><td>2 dischi, ABS 2 canali</td><td>Capacità non pubblicata; provare col casco, bauletto extra</td></tr>
+          <tr><td class="modello">Vision 110 MY2025</td><td class="num">2.400–2.430 €</td><td>8,7 CV; 9 Nm</td><td>Aria</td><td class="num">100 kg</td><td class="num">686 mm</td><td class="num">785 mm</td><td>16/14</td><td>Disco e tamburo, CBS</td><td>Vano da provare; bauletto extra</td></tr>
+          <tr><td class="modello">Micare 125</td><td class="num">2.390 €</td><td>8,8 CV; 9,8 Nm</td><td>Aria</td><td class="num">108 kg</td><td class="num">700 mm</td><td class="num nd">n.d.</td><td>14/14</td><td>2 dischi, CBS</td><td>Vano non quantificato; portapacchi e doppio vano anteriore</td></tr>
         </tbody>
       </table>
     </div>
@@ -359,24 +346,47 @@
       <table>
         <thead><tr><th>Modello</th><th>Punti di forza</th><th>Punti di debolezza</th><th>La verifica che decide</th></tr></thead>
         <tbody>
-          <tr><td class="modello">Tweet FL GT</td><td>Leggero, doppia ruota da 16, ABS a due canali, prezzo</td><td>Niente TCS; allestimento e accessori da chiarire</td><td>Preventivo GT completo e prova del casco nel sottosella</td></tr>
-          <tr><td class="modello">Agility NX</td><td>Pacchetto di sicurezza completo, bauletto incluso, rete Kymco</td><td>132 kg e sella a 805 mm</td><td>Manovre da fermo e totale chiavi in mano</td></tr>
-          <tr><td class="modello">Sfida SR16 Air</td><td>Dotazione ricchissima per il prezzo, ABS e TCS, accessori invernali</td><td>Rete e storico ancora giovani; il più largo del gruppo</td><td>Qualità percepita e accessori messi per iscritto</td></tr>
-          <tr><td class="modello">BWT 125</td><td>Prezzo, 106 kg, pedana piatta</td><td>Niente ABS né TCS, meno potente, vano ridotto</td><td>Comfort sul pavé e resa della frenata CBS</td></tr>
-          <tr><td class="modello">Symphony SR MY26</td><td>Doppia ruota da 16, vano da 18 l, 11,4 CV, prezzo</td><td>Niente ABS</td><td>Differenza reale rispetto al Symphony 125i</td></tr>
-          <tr><td class="modello">Kisbee M 125</td><td>120 kg, doppia ruota da 16, sella a 770 mm, prezzo</td><td>Niente ABS; accessori ufficiali cari</td><td>Ergonomia e costo finale col top case</td></tr>
-          <tr><td class="modello">Symphony 125i MY26</td><td>Pacchetto completo di serie e copertura di quattro più quattro anni</td><td>Niente ABS</td><td>Chiavi in mano: può salire parecchio in classifica</td></tr>
-          <tr><td class="modello">Symphony ST 125</td><td>ABS e TCS, motore a liquido, vano da 30 l</td><td>Peso e prezzo più alti della famiglia</td><td>Se carico e comfort valgono il sovrapprezzo</td></tr>
-          <tr><td class="modello">Liberty 125</td><td>Compatto, rete capillare, la migliore rivendibilità</td><td>Prezzo, ABS solo anteriore, accessori a parte</td><td>Sconto o pacchetto accessori, e confronto ergonomico</td></tr>
-          <tr><td class="modello">SH Mode 125</td><td>Leggero, stretto, sella bassa, qualità e rete Honda</td><td>Niente ABS; ruota posteriore da 14</td><td>Ergonomia e prezzo chiavi in mano</td></tr>
+          <tr><td class="modello">Liberty</td><td>Compatto, rete capillare e rivendibilità</td><td>Prezzo, ABS solo anteriore, accessori a parte</td><td>Sconto o pacchetto accessori, e confronto ergonomico</td></tr>
+          <tr><td class="modello">Agility NX</td><td>Pacchetto di sicurezza completo, bauletto, rete Kymco</td><td>132 kg e sella a 805 mm</td><td>Manovre da fermo e totale chiavi in mano</td></tr>
+          <tr><td class="modello">SH Mode</td><td>Leggero, stretto, sella bassa, qualità Honda</td><td>Niente ABS; ruota posteriore da 14</td><td>Ergonomia e prezzo chiavi in mano</td></tr>
+          <tr><td class="modello">People S</td><td>ABS a 2 canali, dotazione completa, carico, ruote alte</td><td>130 kg, sella a 800 mm, più caro dell'NX</td><td>Ergonomia e conferma di accessori e 5PRO</td></tr>
+          <tr><td class="modello">Symphony SR</td><td>Doppia ruota da 16, vano da 18 l, 11,4 CV, prezzo</td><td>Niente ABS</td><td>Differenza reale rispetto al MY26 base</td></tr>
+          <tr><td class="modello">SR16 Air</td><td>Rapporto dotazione/prezzo, ABS e TCS</td><td>Rete e storico ancora giovani; il più largo del gruppo</td><td>Qualità percepita e accessori messi per iscritto</td></tr>
+          <tr><td class="modello">Symphony MY26</td><td>Pacchetto completo di serie e copertura quattro più quattro anni</td><td>Niente ABS</td><td>Preventivo e dotazione a confronto</td></tr>
+          <tr><td class="modello">Symphony ST</td><td>ABS e TCS, motore a liquido, vano da 30 l</td><td>Peso e prezzo</td><td>Se carico e comfort valgono il sovrapprezzo</td></tr>
+          <tr><td class="modello">BWT</td><td>Prezzo, peso, pedana piatta</td><td>Niente ABS né TCS, meno potente, vano ridotto</td><td>Comfort sul pavé e resa della frenata CBS</td></tr>
+          <tr><td class="modello">B-Tre</td><td>Leggero, 16/14, pedana piatta, prezzo</td><td>Rete e affidabilità meno provate; frenata da chiarire</td><td>Assistenza locale e dotazione reale</td></tr>
+          <tr><td class="modello">C-Fly</td><td>Motore a liquido da 12 CV, ABS e TCS, dotazione</td><td>Pesante; rete e storico del modello da verificare</td><td>Peso nelle manovre e assistenza SWM</td></tr>
+          <tr><td class="modello">Kisbee M</td><td>120 kg in ordine di marcia, 16/16, sella a 770 mm, prezzo</td><td>Niente ABS; accessori ufficiali cari</td><td>Ergonomia e costo finale col top case</td></tr>
+          <tr><td class="modello">Tweet GT</td><td>Leggero, doppia ruota da 16, ABS a 2 canali, prezzo</td><td>Niente TCS; accessori e allestimento non chiari</td><td>Preventivo GT completo e prova del casco</td></tr>
+          <tr><td class="modello">Vision 110</td><td>100 kg, stretto, affidabilità Honda, prezzo di stock</td><td>Solo 110 cc, niente ABS, tamburo posteriore</td><td>Model year esatto e disponibilità dell'offerta</td></tr>
+          <tr><td class="modello">Micare</td><td>108 kg, compatto, prezzo, rete Kymco</td><td>Ruote 14/14, niente ABS, meno potente</td><td>Pavé e capacità reale del vano</td></tr>
         </tbody>
       </table>
     </div>
   </section>
 
   <section>
+    <h2>Quanto pesa la ponderazione</h2>
+    <p class="prosa">Il tracker calcola lo Scooter Score su tre ponderazioni, così ogni rango si legge con il suo intervallo di minimo e massimo, a un decimale.</p>
+    <div class="prosa">
+      <div class="formula"><b>S20</b> 80% Q + 20% Value</div>
+      <div class="formula"><b>S25</b> 75% Q + 25% Value — ponderazione adottata</div>
+      <div class="formula"><b>S30</b> 70% Q + 30% Value</div>
+    </div>
+    <p class="prosa">Esempio di verifica delle formule, non riferito a uno scooter reale: con Q = 8, P = 2.400 € e comparabili a 2.800, 3.000 e 3.200 €, si ottiene R = 3.000 €, D = 20% e Value = 10, quindi S20 = 8,4, S25 = 8,5 e S30 = 8,6. Lo stesso mezzo da usato, con Deal Score 9, varrebbe 8,44 senza che il listino entri nel conto.</p>
+    <p class="prosa">La sensibilità della classifica reale si misura quando i Value sono validati.</p>
+  </section>
+
+  <section>
+    <h2>Offerte e trattativa</h2>
+    <p class="prosa">Il confronto tra offerte si fa su prezzo cash più messa in strada più costo del paniere richiesto ancora mancante, tenendo separata la dotazione standard dagli extra di concessionario.</p>
+    <p class="prosa">Garanzia, assistenza, disponibilità e comodità restano campi autonomi del giudizio: entrano nella scelta finale, non nel punteggio tecnico. Un veicolo nuovo non riceve premi numerici per il fatto di essere nuovo.</p>
+  </section>
+
+  <section>
     <h2>Dove vederli a Milano</h2>
-    <p class="prosa">Quattro indirizzi coprono tutti e dieci i modelli, e tre bastano per il gruppo di testa. Le sedi di via Tiraboschi condividono lo stesso civico, quindi una sola sosta copre Kymco, Voge e Honda.</p>
+    <p class="prosa">Tre tappe coprono i modelli da provare per primi, tutte vicine a casa o all'ufficio. Le sedi di via Tiraboschi condividono lo stesso civico, quindi una sola sosta copre Kymco e Voge.</p>
 
     <div id="mappa" role="img" aria-label="Mappa dei concessionari a Milano: viale Ortles 81, via Gerolamo Tiraboschi 1, via Gioacchino Murat 60, via Giorgio Chavez 1"></div>
     <p class="piccolo">Gli indirizzi completi, i recapiti e gli orari sono nelle schede qui sotto.</p>
@@ -384,54 +394,61 @@
     <div class="dealers">
 
       <div class="dealer">
-        <h3>Bikerservice</h3>
-        <p class="zona">Zona sud, Corvetto e Vigentino</p>
+        <p class="ordine">TAPPA 1</p>
+        <h3>Biker Service</h3>
+        <p class="zona">Zona sud, Corvetto e Vigentino · circa 1 km da casa</p>
         <dl>
           <dt>Indirizzo</dt>
           <dd><a href="https://www.google.com/maps/search/?api=1&amp;query=Viale+Ortles+81+Milano" target="_blank" rel="noopener">Viale Ortles 81</a></dd>
           <dt>Telefono</dt><dd><a href="tel:+390287067136">02 8706 7136</a></dd>
           <dt>Orari</dt><dd>8:30–12:30 e 14:00–19:00; sabato 9:00–12:30 e 14:30–18:30. Domenica chiuso.</dd>
           <dt>Cosa vedere</dt>
-          <dd><ul class="modelli"><li>Symphony 125i MY26</li><li>Symphony 125 SR</li><li>Symphony ST 125</li><li>BWT 125</li></ul></dd>
+          <dd><ul class="modelli"><li>Symphony 125i MY26</li><li>Symphony SR</li><li>Symphony ST</li><li>BWT 125</li></ul></dd>
+          <dt>Da portare a casa</dt><dd>Un preventivo scritto per almeno due configurazioni.</dd>
         </dl>
       </div>
 
       <div class="dealer">
+        <p class="ordine">TAPPA 2</p>
         <h3>S.N. Moto e Moto Speed</h3>
-        <p class="zona">Corso Lodi e Porta Romana</p>
+        <p class="zona">Corso Lodi e Porta Romana · sullo stesso tragitto</p>
         <dl>
           <dt>Indirizzo</dt>
           <dd><a href="https://www.google.com/maps/search/?api=1&amp;query=Via+Gerolamo+Tiraboschi+1+Milano" target="_blank" rel="noopener">Via Gerolamo Tiraboschi 1</a> — due concessionari allo stesso civico</dd>
           <dt>Telefono</dt><dd>S.N. Moto <a href="tel:+390255010062">02 5501 0062</a> · Moto Speed <a href="tel:+39025450864">02 545 0864</a></dd>
           <dt>Orari</dt><dd>Lunedì solo 15:00–19:30; da martedì 9:30–12:30 e 15:00–19:30; sabato fino alle 18:30. Domenica chiuso.</dd>
           <dt>Cosa vedere</dt>
-          <dd><ul class="modelli"><li>Agility NX 125</li><li>Sfida SR16 125 e SR16 Air</li><li>SH Mode 125</li></ul></dd>
+          <dd><ul class="modelli"><li>Agility NX 125</li><li>People S 125 ABS</li><li>Micare 125</li><li>Voge SR16 e SR16 Air</li></ul></dd>
+          <dt>Da verificare</dt><dd>Quali unità sono davvero in sede e che cosa comprende ogni promozione.</dd>
         </dl>
       </div>
 
       <div class="dealer">
+        <p class="ordine">TAPPA 3</p>
         <h3>BikeZone</h3>
-        <p class="zona">Zona nord, Isola e Bovisa</p>
+        <p class="zona">Zona nord, Isola e Bovisa · circa 1,5 km dall'ufficio</p>
         <dl>
           <dt>Indirizzo</dt>
           <dd><a href="https://www.google.com/maps/search/?api=1&amp;query=Via+Gioacchino+Murat+60+Milano" target="_blank" rel="noopener">Via Gioacchino Murat 60</a></dd>
           <dt>Telefono</dt><dd><a href="tel:+390245373510">02 4537 3510</a></dd>
           <dt>Orari</dt><dd>8:30–12:30 e 14:30–18:30; sabato solo mattina fino alle 12:30. Domenica chiuso.</dd>
           <dt>Cosa vedere</dt>
-          <dd><ul class="modelli"><li>Tweet FL 125 GT</li><li>Kisbee M 125</li><li>Liberty 125</li></ul></dd>
+          <dd><ul class="modelli"><li>Tweet FL 125 GT</li><li>Kisbee M 125</li></ul></dd>
+          <dt>Da portare</dt><dd>Il proprio casco integrale per la prova del sottosella.</dd>
         </dl>
       </div>
 
-      <div class="dealer">
-        <h3>Honda Point</h3>
-        <p class="zona">Zona nord-est, Loreto e Turro</p>
+      <div class="dealer secondaria">
+        <p class="ordine">BENCHMARK</p>
+        <h3>Piaggio e Honda</h3>
+        <p class="zona">Riferimento ergonomico, con prezzo concordato al telefono</p>
         <dl>
-          <dt>Indirizzo</dt>
-          <dd><a href="https://www.google.com/maps/search/?api=1&amp;query=Via+Giorgio+Chavez+1+Milano" target="_blank" rel="noopener">Via Giorgio Chavez 1</a>, concessionaria ufficiale Honda per Milano e Monza</dd>
-          <dt>Telefono</dt><dd><a href="tel:+390226158 56">02 261 5856</a></dd>
-          <dt>Orari</dt><dd>9:00–12:30 e 14:30–19:00; sabato fino alle 18:00. Domenica chiuso.</dd>
-          <dt>Cosa vedere</dt>
-          <dd><ul class="modelli"><li>SH Mode 125, spesso in pronta consegna</li><li>Il resto della gamma Honda 125</li></ul></dd>
+          <dt>Che cosa serve</dt>
+          <dd>Liberty 125 e SH Mode 125 come metro di paragone su seduta, larghezza e manovre.</dd>
+          <dt>Honda Point</dt>
+          <dd><a href="https://www.google.com/maps/search/?api=1&amp;query=Via+Giorgio+Chavez+1+Milano" target="_blank" rel="noopener">Via Giorgio Chavez 1</a> · <a href="tel:+390226158556">02 261 5856</a> · 9:00–12:30 e 14:30–19:00, sabato fino alle 18:00.</dd>
+          <dt>Condizione</dt>
+          <dd>Vale la trasferta solo con un prezzo chiavi in mano già dato al telefono.</dd>
         </dl>
       </div>
 
@@ -443,6 +460,7 @@
       <li>Retromarcia da seduti e spinta a mano in pendenza, che è la manovra vera del box.</li>
       <li>Larghezza misurata agli specchi, confrontata con il varco del proprio garage.</li>
       <li>Spazio per le ginocchia dietro lo scudo e ampiezza reale della pedana.</li>
+      <li>Salita sul cavalletto centrale da soli, a veicolo carico.</li>
       <li>Il proprio casco integrale dentro il sottosella, provato fisicamente.</li>
       <li>Raggio di sterzo completo da fermo.</li>
     </ul>
@@ -451,7 +469,8 @@
   <section>
     <h2>Cosa chiedere sul preventivo</h2>
     <ul class="lista">
-      <li>Totale chiavi in mano, con il prezzo in contanti e il costo del finanziamento indicati separatamente.</li>
+      <li>Totale chiavi in mano come riferimento principale, con la rata mensile come informazione accessoria.</li>
+      <li>Prezzo cash e costo totale del finanziamento indicati separatamente.</li>
       <li>Anno, model year e allestimento esatti riportati sul contratto.</li>
       <li>Messa in strada, targa e immatricolazione, specificando se sono incluse.</li>
       <li>Tipo di frenata: CBS oppure ABS, con il numero di canali, e presenza del controllo di trazione.</li>
@@ -459,32 +478,35 @@
       <li>Durata e condizioni della garanzia e dell'assistenza stradale.</li>
       <li>Data reale di consegna e colore effettivamente disponibile.</li>
       <li>Costo e scadenza del primo tagliando.</li>
-      <li>Preventivo di responsabilità civile e furto, separato dal prezzo del veicolo.</li>
+      <li>Prova fisica di seduta, cavalletto, manovre da fermo e casco nel sottosella.</li>
     </ul>
   </section>
 </div>
 
 <footer class="wrap">
-  <p>Prezzi, promozioni, disponibilità, dotazioni e durata delle garanzie vanno confermati dal concessionario sul preventivo scritto. Le promozioni cambiano di mese in mese e possono ribaltare l'ordine del gruppo di testa.</p>
+  <p>Prezzi, promozioni, disponibilità, dotazioni e durata delle garanzie vanno confermati dal concessionario sul preventivo scritto. Le formule sono operative: il rango commerciale si assegna quando listini e comparabili sono documentati.</p>
   <h3 style="margin-top:1.4em">Fonti</h3>
   <ul>
-    <li><a href="https://www.peugeot-motocycles.it/gamma/tweet-125-fl-gt/" target="_blank" rel="noopener">Peugeot Tweet 125 FL GT</a></li>
-    <li><a href="https://www.peugeot-motocycles.it/model/kisbee-m/51" target="_blank" rel="noopener">Peugeot Kisbee M</a></li>
-    <li><a href="https://kymco.it/Prodotti/_agl-125nx/" target="_blank" rel="noopener">Kymco Agility NX 125</a></li>
-    <li><a href="https://vogeitaly.it/sfida-sr16-125-air/" target="_blank" rel="noopener">Voge Sfida SR16 125 Air</a></li>
-    <li><a href="https://vogeitaly.it/sfida-sr16/" target="_blank" rel="noopener">Voge Sfida SR16 125</a></li>
+    <li><a href="https://www.peugeot-motocycles.it/models" target="_blank" rel="noopener">Gamma Peugeot e prezzi correnti</a></li>
+    <li><a href="https://www.peugeot-motocycles.it/models/kisbee-m" target="_blank" rel="noopener">Peugeot Kisbee M: configuratore e accessori</a></li>
     <li><a href="https://sym-italia.it/category/125cc/" target="_blank" rel="noopener">Gamma SYM 125</a></li>
+    <li><a href="https://sym-italia.it/symphony-sr-e5-2026/" target="_blank" rel="noopener">SYM Symphony SR MY26</a></li>
     <li><a href="https://sym-italia.it/symphony-125i-my26/" target="_blank" rel="noopener">SYM Symphony 125i MY26</a></li>
-    <li><a href="https://sym-italia.it/symphony-sr-e5-2026/" target="_blank" rel="noopener">SYM Symphony 125 SR MY26</a></li>
     <li><a href="https://sym-italia.it/symphony-st-125-euro-5-plus/" target="_blank" rel="noopener">SYM Symphony ST 125</a></li>
     <li><a href="https://sym-italia.it/bwt-125/" target="_blank" rel="noopener">SYM BWT 125</a></li>
+    <li><a href="https://www.sym-global.com/symphonysr" target="_blank" rel="noopener">Specifiche globali Symphony SR</a></li>
+    <li><a href="https://kymco.it/Prodotti/_agl-125nx/" target="_blank" rel="noopener">Kymco Agility NX 125</a></li>
+    <li><a href="https://kymco.it/Prodotti/_p125-s-p/" target="_blank" rel="noopener">Kymco People S 125 ABS</a></li>
+    <li><a href="https://kymco.it/Prodotti/_mic125p/" target="_blank" rel="noopener">Kymco Micare 125</a></li>
+    <li><a href="https://vogeitaly.it/sfida-sr16/" target="_blank" rel="noopener">Voge Sfida SR16</a></li>
+    <li><a href="https://www.kl-motors.com/btre/" target="_blank" rel="noopener">KL B-Tre 125</a></li>
+    <li><a href="https://swm-motorcycles.it/swm-moto/c-fly-125/" target="_blank" rel="noopener">SWM C-Fly 125</a></li>
     <li><a href="https://www.piaggio.com/it_IT/modelli/liberty/liberty-125-4s3v-2025/" target="_blank" rel="noopener">Piaggio Liberty 125</a></li>
-    <li><a href="https://www.honda.it/motorcycles/range/scooter/sh-mode-125/specifications.html" target="_blank" rel="noopener">Honda SH Mode 125</a></li>
+    <li><a href="https://www.honda.it/motorcycles/range/scooter/sh-mode-125/overview.html" target="_blank" rel="noopener">Honda SH Mode 125</a></li>
     <li><a href="https://www.honda.it/motorcycles/range/scooter/vision-110/specifications.html" target="_blank" rel="noopener">Honda Vision 110</a></li>
-    <li><a href="https://www.bikerservice.it/" target="_blank" rel="noopener">Bikerservice</a></li>
+    <li><a href="https://www.bikerservice.it/" target="_blank" rel="noopener">Biker Service</a></li>
     <li><a href="https://dealer.moto.it/snmoto" target="_blank" rel="noopener">S.N. Moto</a></li>
-    <li><a href="https://www.bikezone.it/" target="_blank" rel="noopener">BikeZone</a></li>
-    <li><a href="https://www.hondapoint.com/" target="_blank" rel="noopener">Honda Point</a></li>
+    <li><a href="https://www.bikezone.it/chi-siamo/" target="_blank" rel="noopener">BikeZone</a></li>
   </ul>
 </footer>
 
@@ -497,10 +519,10 @@
     return;
   }
   var sedi = [
-    {n:'Bikerservice', v:'Viale Ortles 81', m:'SYM — Symphony, SR, ST, BWT', lat:45.441009, lng:9.212030},
-    {n:'S.N. Moto e Moto Speed', v:'Via Gerolamo Tiraboschi 1', m:'Kymco, Voge e Honda', lat:45.451850, lng:9.207690},
-    {n:'BikeZone', v:'Via Gioacchino Murat 60', m:'Peugeot e Piaggio', lat:45.500620, lng:9.190539},
-    {n:'Honda Point', v:'Via Giorgio Chavez 1', m:'Honda', lat:45.491990, lng:9.226418}
+    {n:'Biker Service', v:'Viale Ortles 81', m:'Tappa 1 — SYM: Symphony, SR, ST, BWT', lat:45.441009, lng:9.212030, p:1},
+    {n:'S.N. Moto e Moto Speed', v:'Via Gerolamo Tiraboschi 1', m:'Tappa 2 — Kymco e Voge', lat:45.451850, lng:9.207690, p:1},
+    {n:'BikeZone', v:'Via Gioacchino Murat 60', m:'Tappa 3 — Peugeot e Piaggio', lat:45.500620, lng:9.190539, p:1},
+    {n:'Honda Point', v:'Via Giorgio Chavez 1', m:'Benchmark — SH Mode, con prezzo telefonico', lat:45.491990, lng:9.226418, p:0}
   ];
 
   var map = L.map('mappa', {scrollWheelZoom:false});
@@ -509,16 +531,18 @@
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   }).addTo(map);
 
-  var icona = L.divIcon({
-    className:'',
-    html:'<span style="display:block;width:16px;height:16px;border-radius:50%;background:#0B4FA8;border:3px solid #fff;box-shadow:0 0 0 1px #23282C"></span>',
-    iconSize:[16,16],
-    iconAnchor:[8,8]
-  });
+  function icona(colore){
+    return L.divIcon({
+      className:'',
+      html:'<span style="display:block;width:16px;height:16px;border-radius:50%;background:'+colore+';border:3px solid #fff;box-shadow:0 0 0 1px #23282C"></span>',
+      iconSize:[16,16],
+      iconAnchor:[8,8]
+    });
+  }
 
   var punti = [];
   sedi.forEach(function(s){
-    L.marker([s.lat, s.lng], {icon:icona, title:s.n})
+    L.marker([s.lat, s.lng], {icon:icona(s.p ? '#0B4FA8' : '#8A6A1F'), title:s.n})
       .addTo(map)
       .bindPopup('<strong>'+s.n+'</strong><br>'+s.v+'<br>'+s.m);
     punti.push([s.lat, s.lng]);
