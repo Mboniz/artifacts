@@ -13,5 +13,10 @@
     "name": "Album Tier List",
     "url": "https://tierlist.mboniz.com",
     "description": "Cerca un artista, scegli i suoi dischi e trascinali nelle fasce da GOAT a D. La tier list si scarica in PNG."
+  },
+  {
+    "name": "Diario integratori",
+    "url": "https://diario.mboniz.com",
+    "description": "Il diario quotidiano degli integratori: cosa prendere, cosa hai preso, come ti senti e come vanno gli allenamenti. Privato, con login."
   }
 ]
