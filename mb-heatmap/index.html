@@ -181,12 +181,15 @@ function buildMapView(key){
       <button>Mostra tutte</button></div>`;
   const map=L.map(`map-${key}`,{zoomControl:false});
   L.control.zoom({position:'bottomleft'}).addTo(map);
-  const baseClassica=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    {maxZoom:19,attribution:'© OpenStreetMap'});
+  // la pagina ha referrer "no-referrer": i tile server (OSM in testa) rifiutano richieste senza Referer,
+  // quindi sui soli tile si manda l'origine del sito
+  const TP='strict-origin';
+  const baseClassica=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {maxZoom:19,referrerPolicy:TP,attribution:'© OpenStreetMap'});
   const baseChiara=L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-    {maxZoom:20,subdomains:'abcd',attribution:'© OpenStreetMap © CARTO'});
+    {maxZoom:20,subdomains:'abcd',referrerPolicy:TP,attribution:'© OpenStreetMap © CARTO'});
   const baseRilievi=L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-    {maxZoom:17,attribution:'© OpenTopoMap (CC-BY-SA) · © OpenStreetMap'});
+    {maxZoom:17,referrerPolicy:TP,attribution:'© OpenTopoMap (CC-BY-SA) · © OpenStreetMap'});
   baseClassica.addTo(map);
   L.control.layers({'Classica':baseClassica,'Chiara':baseChiara,'Rilievi':baseRilievi},
     null,{position:'topright',collapsed:true}).addTo(map);
