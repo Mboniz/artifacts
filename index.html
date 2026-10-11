@@ -188,6 +188,7 @@
   }
   .foot a { color: var(--muted); text-decoration: none; }
   .foot a:hover { color: var(--accent); }
+  .foot-links { display: flex; gap: 0.875rem; }
 
   @media (prefers-reduced-motion: reduce) {
     * { animation: none !important; transition: none !important; }
@@ -307,13 +308,16 @@
 
       <div class="foot">
         <span>Aggiornata in tempo reale dal repo</span>
-        <a href="https://github.com/Mboniz/artifacts" target="_blank" rel="noopener">Mboniz/artifacts →</a>
+        <span class="foot-links">
+          <a href="privacy/">Privacy</a>
+          <a href="https://github.com/Mboniz/artifacts" target="_blank" rel="noopener">Mboniz/artifacts →</a>
+        </span>
       </div>
     </div>
   </div>
 
 <script>
-  const EXCLUDE = ['hello'];
+  const EXCLUDE = ['hello', 'dolomiti', 'privacy'];
   const API = 'https://api.github.com/repos/Mboniz/artifacts/contents/';
 
   const listEl = document.getElementById('list');
