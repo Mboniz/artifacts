@@ -1054,7 +1054,6 @@
   btnGps.addEventListener('click', function(){
     if(cercando) return;
     cercando = true;
-    btnGps.classList.remove('trovata');
     btnGps.classList.add('cerca');
     btnGps.setAttribute('aria-busy', 'true');
     avvisa('cerco la tua posizione…');
@@ -1063,7 +1062,6 @@
 
   map.on('locationfound', function(e){
     if(!cercando) return;
-    fineRicerca();
     map.setView(e.latlng, Math.max(map.getZoom(), 11));
     if(cerchioPrecisione) map.removeLayer(cerchioPrecisione);
     cerchioPrecisione = L.circle(e.latlng, {
@@ -1074,7 +1072,9 @@
     setTimeout(function(){ var el = cerchio.getElement(); if(el) el.classList.add('svanisce'); }, 3500);
     setTimeout(function(){ map.removeLayer(cerchio); if(cerchioPrecisione === cerchio) cerchioPrecisione = null; }, 5000);
     var precisione = e.accuracy < 1000 ? Math.round(e.accuracy) + ' m' : (e.accuracy/1000).toFixed(1) + ' km';
+    /* la ricerca resta bloccata fino al nome del luogo: un secondo tocco non sovrappone due partenze */
     nominaPunto(e.latlng, function(n){
+      fineRicerca();
       impostaOrigine(e.latlng, n, true);
       input.value = n || '';
       avvisa('parti da <b>' + (n || 'la tua posizione') + '</b> · precisione ±' + precisione);
