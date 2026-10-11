@@ -43,6 +43,8 @@
     font-size:9px!important;backdrop-filter:blur(6px);
   }
   .leaflet-control-attribution a{color:var(--glacier-dim)!important}
+  /* OSM ha colori pieni: lo sfondo va smorzato perché il velo di quota resti leggibile */
+  .base-calma{filter:grayscale(.85) brightness(1.06) contrast(.88)}
   .leaflet-control-zoom{border:none!important;box-shadow:var(--ombra)!important}
   .leaflet-control-zoom a{
     background:var(--vetro)!important;color:var(--ghiaccio)!important;
@@ -448,7 +450,7 @@
   L.control.zoom({position:'bottomright'}).addTo(map);
 
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    maxZoom:19,
+    maxZoom:19, className:'base-calma',
     attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · quote: Terrain Tiles · isocrone: Geoapify'
   }).addTo(map);
 
@@ -487,7 +489,7 @@
       if(h < t){
         var giu = (t - h) / 900; if(giu > 1) giu = 1;
         d[p]=42; d[p+1]=54; d[p+2]=68;
-        d[p+3]= 38 + 26*giu;
+        d[p+3]= 78 + 62*giu;
       } else {
         s[p]=255; s[p+1]=255; s[p+2]=255; s[p+3]=255;
       }
