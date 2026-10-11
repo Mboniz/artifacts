@@ -100,6 +100,7 @@
     align-items:center;gap:10px;background:rgba(17,24,39,.92);color:#fff;padding:7px 8px 7px 14px;border-radius:22px;
     font-size:12.5px;box-shadow:0 2px 12px rgba(0,0,0,.25)}
   .isoBanner button{background:#2f8f4e;color:#fff;border:none;border-radius:16px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer}
+.tiles-chiare{filter:grayscale(1) brightness(1.12) contrast(.82)}
 </style></head>
 <body>
 <div class="topbar">
@@ -186,8 +187,8 @@ function buildMapView(key){
   const TP='strict-origin';
   const baseClassica=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {maxZoom:19,referrerPolicy:TP,attribution:'© OpenStreetMap'});
-  const baseChiara=L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-    {maxZoom:20,subdomains:'abcd',referrerPolicy:TP,attribution:'© OpenStreetMap © CARTO'});
+  const baseChiara=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {maxZoom:19,referrerPolicy:TP,className:'tiles-chiare',attribution:'© OpenStreetMap'});
   const baseRilievi=L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
     {maxZoom:17,referrerPolicy:TP,attribution:'© OpenTopoMap (CC-BY-SA) · © OpenStreetMap'});
   baseClassica.addTo(map);
