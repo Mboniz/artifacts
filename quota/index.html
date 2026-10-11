@@ -36,7 +36,6 @@
     -webkit-font-smoothing:antialiased;overflow:hidden;
   }
   #map{position:fixed;inset:0;background:#0B1016}
-  #map.puntamento{cursor:crosshair}
   .leaflet-container{font-family:"IBM Plex Mono",monospace;background:#0B1016}
   .leaflet-control-attribution{
     background:rgba(11,16,22,.72)!important;color:var(--nebbia)!important;
@@ -106,14 +105,26 @@
   .esiti button:last-child{border-bottom:none}
   .esiti button:hover,.esiti button:focus-visible{background:rgba(159,231,245,.12);outline:none}
   .esiti button small{display:block;color:var(--nebbia);font-size:10.5px;margin-top:2px}
-  .suggerimento{
+  .avviso{
     pointer-events:auto;max-width:560px;margin:8px auto 0;
-    background:rgba(159,231,245,.14);border:1px solid var(--glacier);
-    border-radius:9px;padding:8px 12px;
-    font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--glacier);
-    display:none;text-align:center;
+    background:var(--vetro);backdrop-filter:blur(16px);
+    border:1px solid var(--glacier);border-radius:9px;padding:8px 12px;
+    font-family:"IBM Plex Mono",monospace;font-size:11px;line-height:1.5;color:var(--glacier);
+    box-shadow:var(--ombra);text-align:center;
+    opacity:0;transform:translateY(-6px);visibility:hidden;
+    transition:opacity .2s,transform .2s,visibility 0s .2s;
   }
-  .suggerimento.visibile{display:block}
+  .avviso.visibile{opacity:1;transform:none;visibility:visible;transition:opacity .2s,transform .2s}
+  .avviso.errore{border-color:var(--ambra);color:var(--ambra)}
+  .avviso b{color:var(--ghiaccio);font-weight:500}
+
+  /* geolocalizzazione: in ricerca il mirino pulsa, a posizione trovata resta acceso */
+  .icona.cerca svg{animation:pulsa 1s ease-in-out infinite}
+  .icona.cerca{color:var(--glacier);border-color:rgba(159,231,245,.45);cursor:progress}
+  .icona.trovata{background:rgba(159,231,245,.18);border-color:var(--glacier);color:var(--glacier)}
+  @keyframes pulsa{50%{opacity:.25;transform:scale(.82)}}
+  .precisione{transition:opacity 1.2s,fill-opacity 1.2s}
+  .precisione.svanisce{opacity:0;fill-opacity:0}
 
   /* ---------- pannello ---------- */
   .pannello{
@@ -310,6 +321,25 @@
     background:rgba(242,166,90,.3);border:2px solid var(--ambra);
     box-shadow:0 0 0 5px rgba(242,166,90,.14),0 2px 10px rgba(0,0,0,.6);
   }
+  /* scheda del punto toccato */
+  .scheda .leaflet-popup-content-wrapper{
+    background:var(--vetro);backdrop-filter:blur(16px);color:var(--ghiaccio);
+    border:1px solid var(--linea);border-radius:11px;box-shadow:var(--ombra);
+  }
+  .scheda .leaflet-popup-tip{background:rgba(11,16,22,.9);box-shadow:none}
+  .scheda .leaflet-popup-content{margin:11px 13px;font-family:"IBM Plex Mono",monospace;font-size:11px;line-height:1.55;color:var(--nebbia)}
+  .scheda .leaflet-popup-close-button{color:var(--nebbia)!important;top:3px!important;right:3px!important}
+  .scheda .quota{font-size:15px;color:var(--ghiaccio);font-weight:500}
+  .scheda .quota.su{color:var(--glacier)}
+  .scheda button{
+    display:block;width:100%;margin-top:9px;padding:8px 10px;
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.04em;
+    background:rgba(159,231,245,.14);color:var(--glacier);
+    border:1px solid rgba(159,231,245,.45);border-radius:8px;cursor:pointer;
+  }
+  .scheda button:hover{border-color:var(--glacier)}
+  .scheda button:focus-visible{outline:2px solid var(--glacier);outline-offset:2px}
+  .scheda button[disabled]{opacity:.5;cursor:progress}
   .pin-sonda{
     width:12px;height:12px;border-radius:2px;transform:rotate(45deg);
     background:transparent;border:2px solid var(--ghiaccio);
@@ -326,7 +356,7 @@
     .didascalia{margin-bottom:13px}
     .leaflet-control-zoom{display:none}
   }
-  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
@@ -344,11 +374,8 @@
     <button class="icona" id="btnGps" title="Usa la mia posizione" aria-label="Usa la mia posizione">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="9"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg>
     </button>
-    <button class="icona" id="btnPin" title="Scegli sulla mappa" aria-label="Scegli sulla mappa" aria-pressed="false">
-      <svg viewBox="0 0 24 24"><path d="M12 22s7-6.3 7-12a7 7 0 1 0-14 0c0 5.7 7 12 7 12z"/><circle cx="12" cy="10" r="2.4"/></svg>
-    </button>
   </div>
-  <div class="suggerimento" id="suggerimento">tocca la mappa per fissare la partenza · tocca di nuovo l'icona per annullare</div>
+  <div class="avviso" id="avviso" role="status" aria-live="polite"></div>
 </div>
 
 <section class="pannello" id="pannello">
@@ -415,7 +442,7 @@
 
   <button class="cta" id="cta" disabled>imposta prima la partenza</button>
 
-  <div class="sonda" id="sonda">Tocca un punto sulla mappa per leggerne la quota.</div>
+  <div class="sonda" id="sonda">Tocca la mappa per leggere la quota e scegliere la partenza. Tieni premuto per fissarla subito.</div>
 
   <div class="legenda">
     <span><i class="buona"></i>fresco raggiungibile</span>
@@ -439,7 +466,7 @@
   var origine = null, nomeOrigine = '';
   var aree = null, areeVisibili = false;
   var deposito = new Map(), memoDem = new Map(), memoIso = new Map();
-  var avvisato = false, puntamento = false;
+  var avvisato = false;
 
   /* ---------------- mappa ---------------- */
 
@@ -900,6 +927,7 @@
   var rigaPartenza = document.getElementById('partenza');
   var testoPartenza = document.getElementById('partenzaTesto');
   var pinOrigine = null, pinMeta = null, rotta = null, pinSonda = null;
+  var btnGps = document.getElementById('btnGps');
 
   var NOME = { drive:'in auto', bicycle:'in bici', walk:'a piedi' };
 
@@ -938,8 +966,9 @@
     nascondiAree();
   }
 
-  function impostaOrigine(latlng, nome){
+  function impostaOrigine(latlng, nome, daGps){
     origine = latlng;
+    btnGps.classList.toggle('trovata', !!daGps);
     nomeOrigine = nome || '';
     if(pinOrigine) map.removeLayer(pinOrigine);
     pinOrigine = L.marker(latlng, {
@@ -999,67 +1028,127 @@
     if(!esiti.contains(e.target) && e.target !== input) esiti.classList.remove('aperto');
   });
 
+  /* ---- avvisi sotto la barra ---- */
+
+  var avviso = document.getElementById('avviso');
+  var timerAvviso = null;
+
+  function avvisa(html, errore){
+    clearTimeout(timerAvviso);
+    avviso.innerHTML = html;
+    avviso.classList.toggle('errore', !!errore);
+    avviso.classList.add('visibile');
+    timerAvviso = setTimeout(function(){ avviso.classList.remove('visibile'); }, errore ? 7000 : 4000);
+  }
+
   /* ---- geolocalizzazione ---- */
 
-  document.getElementById('btnGps').addEventListener('click', function(){
-    sonda.textContent = 'Cerco la tua posizione…';
-    map.locate({setView:true, maxZoom:11, enableHighAccuracy:false});
-    map.once('locationfound', function(e){
-      nominaPunto(e.latlng, function(n){
-        impostaOrigine(e.latlng, n);
-        input.value = n || '';
-        sonda.textContent = 'Partenza impostata sulla tua posizione.';
-      });
-    });
-    map.once('locationerror', function(){
-      sonda.textContent = 'Posizione non disponibile. Cerca un luogo o scegli sulla mappa.';
+  var cercando = false, cerchioPrecisione = null;
+
+  function fineRicerca(){
+    cercando = false;
+    btnGps.classList.remove('cerca');
+    btnGps.removeAttribute('aria-busy');
+  }
+
+  btnGps.addEventListener('click', function(){
+    if(cercando) return;
+    cercando = true;
+    btnGps.classList.remove('trovata');
+    btnGps.classList.add('cerca');
+    btnGps.setAttribute('aria-busy', 'true');
+    avvisa('cerco la tua posizione…');
+    map.locate({setView:false, enableHighAccuracy:false, timeout:12000, maximumAge:60000});
+  });
+
+  map.on('locationfound', function(e){
+    if(!cercando) return;
+    fineRicerca();
+    map.setView(e.latlng, Math.max(map.getZoom(), 11));
+    if(cerchioPrecisione) map.removeLayer(cerchioPrecisione);
+    cerchioPrecisione = L.circle(e.latlng, {
+      radius:e.accuracy, className:'precisione', interactive:false,
+      color:'#9FE7F5', weight:1, opacity:.8, fillColor:'#9FE7F5', fillOpacity:.12
+    }).addTo(map);
+    var cerchio = cerchioPrecisione;
+    setTimeout(function(){ var el = cerchio.getElement(); if(el) el.classList.add('svanisce'); }, 3500);
+    setTimeout(function(){ map.removeLayer(cerchio); if(cerchioPrecisione === cerchio) cerchioPrecisione = null; }, 5000);
+    var precisione = e.accuracy < 1000 ? Math.round(e.accuracy) + ' m' : (e.accuracy/1000).toFixed(1) + ' km';
+    nominaPunto(e.latlng, function(n){
+      impostaOrigine(e.latlng, n, true);
+      input.value = n || '';
+      avvisa('parti da <b>' + (n || 'la tua posizione') + '</b> · precisione ±' + precisione);
     });
   });
 
-  /* ---- scelta sulla mappa ---- */
-
-  var btnPin = document.getElementById('btnPin');
-  var suggerimento = document.getElementById('suggerimento');
-
-  btnPin.addEventListener('click', function(){
-    puntamento = !puntamento;
-    btnPin.setAttribute('aria-pressed', String(puntamento));
-    suggerimento.classList.toggle('visibile', puntamento);
-    document.getElementById('map').classList.toggle('puntamento', puntamento);
+  map.on('locationerror', function(e){
+    if(!cercando) return;
+    fineRicerca();
+    var testo = e.code === 1
+      ? 'Permesso di posizione negato: abilitalo nelle impostazioni del browser, oppure cerca un luogo.'
+      : e.code === 3
+        ? 'La posizione non arriva: riprova, oppure cerca un luogo o tocca la mappa.'
+        : 'Posizione non disponibile: cerca un luogo o tocca la mappa.';
+    avvisa(testo, true);
   });
+
+  /* ---- tocco sulla mappa: scheda del punto ---- */
+
+  function fissaQui(latlng, chiudi){
+    nominaPunto(latlng, function(n){
+      if(chiudi) map.closePopup();
+      if(pinSonda){ map.removeLayer(pinSonda); pinSonda = null; }
+      impostaOrigine(latlng, n);
+      input.value = n || '';
+      avvisa('parti da <b>' + (n || 'il punto scelto') + '</b>');
+    });
+  }
 
   map.on('click', function(e){
-    if(puntamento){
-      puntamento = false;
-      btnPin.setAttribute('aria-pressed', 'false');
-      suggerimento.classList.remove('visibile');
-      document.getElementById('map').classList.remove('puntamento');
-      nominaPunto(e.latlng, function(n){
-        impostaOrigine(e.latlng, n);
-        input.value = n || '';
-        sonda.textContent = 'Partenza fissata sul punto scelto.';
-      });
-      return;
-    }
-
-    sonda.textContent = 'lettura…';
     if(pinSonda) map.removeLayer(pinSonda);
-    pinSonda = L.marker(e.latlng, {
+    var segno = pinSonda = L.marker(e.latlng, {
       icon: L.divIcon({className:'', html:'<div class="pin-sonda"></div>', iconSize:[12,12], iconAnchor:[6,6]}),
-      keyboard:false
+      keyboard:false, interactive:false
     }).addTo(map);
 
+    var box = document.createElement('div');
+    var riga = document.createElement('div');
+    riga.textContent = 'lettura…';
+    var bottone = document.createElement('button');
+    bottone.type = 'button';
+    bottone.textContent = 'parti da qui';
+    bottone.addEventListener('click', function(){
+      bottone.disabled = true;
+      bottone.textContent = 'imposto…';
+      fissaQui(e.latlng, true);
+    });
+    box.appendChild(riga);
+    box.appendChild(bottone);
+
+    var scheda = L.popup({className:'scheda', offset:[0,-4], autoPanPaddingTopLeft:[20,120], maxWidth:240})
+      .setLatLng(e.latlng).setContent(box);
+    scheda.on('remove', function(){
+      map.removeLayer(segno);
+      if(pinSonda === segno) pinSonda = null;
+    });
+    scheda.openOn(map);
+
     quotaDi(e.latlng, function(h){
-      if(h === null || !isFinite(h)){ sonda.textContent = 'Quota non disponibile qui.'; return; }
+      if(h === null || !isFinite(h)){ riga.textContent = 'Quota non disponibile qui.'; return; }
       var m = Math.round(h), sopra = m >= soglia;
-      var testo = '<b class="' + (sopra ? 'su' : '') + '">' + m + ' m</b> · ' +
+      var testo = '<span class="quota' + (sopra ? ' su' : '') + '">' + m + ' m</span><br>' +
         (sopra ? (m - soglia) + ' m sopra soglia' : 'sotto soglia di ' + (soglia - m) + ' m');
       if(origine){
         var km = map.distance(origine, e.latlng)/1000;
         testo += '<br>' + (km < 10 ? km.toFixed(1) : Math.round(km)) + ' km dalla partenza';
       }
-      sonda.innerHTML = testo;
+      riga.innerHTML = testo;
     });
+  });
+
+  /* pressione lunga (o tasto destro): partenza immediata */
+  map.on('contextmenu', function(e){
+    fissaQui(e.latlng, true);
   });
 
   /* ---- soglia ---- */
