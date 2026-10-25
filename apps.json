@@ -23,5 +23,10 @@
     "name": "Hanson's Plan",
     "url": "https://hanson.mboniz.com",
     "description": "Il planner della maratona col metodo Hanson: 18 settimane in una griglia, passi target dall'obiettivo e registrazione rapida di ogni seduta. Privato, con login."
+  },
+  {
+    "name": "LapManuale",
+    "url": "https://lapmanuale.mboniz.com",
+    "description": "Il tracker di corsa collegato a Strava: carico, zone FC, personal best, gare e piano settimanale. Accesso con Strava, su approvazione."
   }
 ]
