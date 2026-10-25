@@ -18,5 +18,10 @@
     "name": "Diario integratori",
     "url": "https://diario.mboniz.com",
     "description": "Il diario quotidiano degli integratori: cosa prendere, cosa hai preso, come ti senti e come vanno gli allenamenti. Privato, con login."
+  },
+  {
+    "name": "Hanson's Plan",
+    "url": "https://hanson.mboniz.com",
+    "description": "Il planner della maratona col metodo Hanson: 18 settimane in una griglia, passi target dall'obiettivo e registrazione rapida di ogni seduta. Privato, con login."
   }
 ]
