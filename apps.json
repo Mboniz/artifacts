@@ -18,5 +18,10 @@
     "name": "Diario integratori",
     "url": "https://diario.mboniz.com",
     "description": "Il diario quotidiano degli integratori: cosa prendere, cosa hai preso, come ti senti e come vanno gli allenamenti. Privato, con login."
+  },
+  {
+    "name": "L'Oracolo del Poveraccio",
+    "url": "https://oracolo.mboniz.com",
+    "description": "Stai per sbloccare l'ex? L'oracolo gira una carta dei tarocchi e ti ricorda perché no. Un motivo diverso a ogni consulto."
   }
 ]
