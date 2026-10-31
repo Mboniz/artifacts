@@ -109,6 +109,7 @@
   }
   .lbl .tag::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
   .card.derived .lbl .tag{opacity:1;transform:none}
+  .lbl .link{margin-left:auto;border:0;background:none;color:var(--accent-ink);font-size:12.5px;font-weight:600;cursor:pointer;padding:4px 0}
 
   /* ---------- Big numbers ---------- */
   .readout{font-family:var(--num);font-variant-numeric:tabular-nums;color:var(--ink);line-height:.9}
@@ -147,18 +148,43 @@
   .card.derived .field input{color:var(--accent)}
   .field span{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-top:8px}
   .colon{font-family:var(--num);font-size:52px;font-weight:600;color:var(--faint);line-height:1;padding-top:10px}
-  .picker.speed .field input{font-size:64px}
+  .picker.sm .field input{font-size:44px}
+  .picker.sm .colon{font-size:36px;padding-top:8px}
+
+  /* Pace with ± steppers */
+  .pacewrap{display:flex;align-items:flex-start;gap:8px}
+  .pacecore{flex:1;min-width:0}
+  .stepbtn{
+    flex:none;width:46px;height:46px;margin-top:27px;border-radius:50%;
+    border:1px solid var(--hair);background:var(--sunk);color:var(--ink);
+    font-family:var(--num);font-size:17px;font-weight:600;cursor:pointer;transition:transform .1s,background .15s;
+  }
+  .stepbtn:active{transform:scale(.92);background:var(--hair)}
+
+  /* ---------- Mini segmented ---------- */
+  .opts{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-top:14px}
+  .optg{display:flex;align-items:center;gap:8px}
+  .opts .ok{font-size:12px;color:var(--muted);font-weight:500}
+  .mini{display:inline-flex;background:var(--sunk);border:1px solid var(--hair);border-radius:11px;padding:3px;gap:2px}
+  .mini button{border:0;background:transparent;color:var(--muted);font-size:12.5px;font-weight:600;padding:6px 10px;border-radius:8px;cursor:pointer}
+  .mini button.on{background:var(--chip-on);color:var(--chip-on-ink)}
+  .note{font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.45}
+  .note b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
 
   /* ---------- Scoreboard ---------- */
   .board{
     background:var(--board);color:var(--board-ink);border-radius:var(--radius);margin-top:12px;
     display:grid;grid-template-columns:1fr 1fr;overflow:hidden;
   }
+  .board.three{grid-template-columns:1fr 1fr 1fr}
   .board .cell{padding:16px 18px 18px}
+  .board.three .cell{padding:14px 14px 16px}
   .board .cell + .cell{border-left:1px solid var(--board-hair)}
   .board .k{font-size:12px;font-weight:500;color:var(--board-muted)}
   .board .v{font-family:var(--num);font-variant-numeric:tabular-nums;font-size:44px;font-weight:600;line-height:1;margin-top:8px}
+  .board.three .v{font-size:32px}
   .board .v small{font-size:17px;color:var(--board-muted);font-weight:500;margin-left:4px}
+  .board .v.hot{color:var(--accent)}
 
   /* ---------- Predictions ---------- */
   .pred{margin-top:8px}
@@ -167,6 +193,19 @@
   .pred .d{font-size:15px;font-weight:600}
   .pred .p{font-family:var(--num);font-variant-numeric:tabular-nums;font-size:16px;color:var(--muted);font-weight:500}
   .pred .t{font-family:var(--num);font-variant-numeric:tabular-nums;font-size:30px;font-weight:600;line-height:1;min-width:92px;text-align:right}
+
+  /* ---------- Race splits ---------- */
+  .rsplits{margin-top:12px}
+  .rs{display:grid;grid-template-columns:1fr auto auto;align-items:baseline;gap:14px;padding:9px 0;border-bottom:1px solid var(--hair)}
+  .rs .d{font-size:14px;font-weight:600;color:var(--muted)}
+  .rs .p{font-family:var(--num);font-variant-numeric:tabular-nums;font-size:15px;color:var(--faint);font-weight:500}
+  .rs .t{font-family:var(--num);font-variant-numeric:tabular-nums;font-size:24px;font-weight:600;line-height:1;min-width:84px;text-align:right}
+  .rs.half{background:var(--accent-soft);border-bottom-color:transparent;border-radius:12px;padding:10px 12px;margin:4px -4px}
+  .rs.half .d,.rs.half .t{color:var(--accent-ink)}
+  .rs.final{background:var(--board);border-radius:14px;padding:12px 14px;margin-top:8px;border-bottom:0}
+  .rs.final .d{color:var(--board-ink)}
+  .rs.final .p{color:var(--board-muted)}
+  .rs.final .t{color:var(--accent);font-size:30px}
 
   /* ---------- Ripetute ---------- */
   .refhead{display:flex;align-items:baseline;justify-content:space-between;margin-top:12px}
@@ -184,14 +223,40 @@
   .split2.final .bar i{background:var(--accent)}
   .split2.final .t{color:var(--accent);font-size:32px}
 
+  /* Session */
+  .sessrow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+  .sessrow .sl{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);text-align:center}
+  .counter{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px}
+  .counter .stepbtn{margin-top:0;width:40px;height:40px;font-size:22px}
+  .counter output{font-family:var(--num);font-variant-numeric:tabular-nums;font-size:44px;font-weight:600;min-width:52px;text-align:center;line-height:1}
+  .sessrow .picker{margin-top:4px}
+
+  /* ---------- Zone ---------- */
+  .ref{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:12px}
+  .ref .rk{font-size:13px;color:var(--muted);line-height:1.5}
+  .ref .rk b{display:block;font-family:var(--num);font-size:26px;font-weight:600;color:var(--ink);line-height:1.1;font-variant-numeric:tabular-nums}
+  .vdot{text-align:right}
+  .vdot .vk{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+  .vdot .vv{font-family:var(--num);font-variant-numeric:tabular-nums;font-size:56px;font-weight:700;color:var(--accent);line-height:.95}
+  .zones{margin-top:6px}
+  .zone{display:grid;grid-template-columns:4px 1fr auto;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--hair)}
+  .zone:last-child{border-bottom:0;padding-bottom:0}
+  .zone .sw{align-self:stretch;border-radius:2px}
+  .zone .zn{font-size:15px;font-weight:600}
+  .zone .zd{font-size:12px;color:var(--muted);margin-top:2px}
+  .zone .zp{font-family:var(--num);font-variant-numeric:tabular-nums;font-size:26px;font-weight:600;line-height:1;text-align:right;white-space:nowrap}
+  .zone .zp small{display:block;font-size:13px;color:var(--faint);font-weight:500;margin-top:3px}
+  .warn{font-size:13px;color:var(--muted);background:var(--sunk);border-radius:12px;padding:12px 14px;margin-top:12px;line-height:1.45}
+
   .view{display:none}
   .view.on{display:block}
 
   .foot{text-align:center;color:var(--faint);font-size:12px;line-height:1.5;margin-top:22px;padding:0 12px}
   @media (max-width:360px){
-    .field input,.picker.speed .field input{font-size:52px}
+    .field input{font-size:52px}
     .colon{font-size:42px}
     .distval{font-size:56px}
+    .stepbtn{width:40px;height:40px;margin-top:24px}
   }
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -212,6 +277,7 @@
       <div class="seg" id="viewTabs">
         <button data-view="calc" class="on">Calcolatore</button>
         <button data-view="reps">Ripetute</button>
+        <button data-view="zones">Zone</button>
       </div>
       <div class="unitRow">
         <span class="ul">Unità</span>
@@ -248,13 +314,19 @@
 
     <section class="card" id="cardPace">
       <div class="lbl"><span class="idx">02</span><span id="paceTitle">Passo</span> <span class="hint" id="paceUnitHint">min/km</span><span class="tag">calcolato</span></div>
-      <div class="picker" id="paceField">
-        <div class="field"><input id="pM" inputmode="numeric" maxlength="2" value="04"><span>min</span></div>
-        <div class="colon">:</div>
-        <div class="field"><input id="pS" inputmode="numeric" maxlength="2" value="00"><span>sec</span></div>
-      </div>
-      <div class="picker speed" id="speedField">
-        <div class="field"><input id="spd" inputmode="decimal" value="15,0"><span>km/h</span></div>
+      <div class="pacewrap">
+        <button class="stepbtn" id="paceMinus" aria-label="Più veloce">−5″</button>
+        <div class="pacecore">
+          <div class="picker" id="paceField">
+            <div class="field"><input id="pM" inputmode="numeric" maxlength="2" value="04"><span>min</span></div>
+            <div class="colon">:</div>
+            <div class="field"><input id="pS" inputmode="numeric" maxlength="2" value="00"><span>sec</span></div>
+          </div>
+          <div class="picker" id="speedField">
+            <div class="field"><input id="spd" inputmode="decimal" value="15,0"><span>km/h</span></div>
+          </div>
+        </div>
+        <button class="stepbtn" id="pacePlus" aria-label="Più lento">+5″</button>
       </div>
     </section>
 
@@ -275,6 +347,26 @@
     </div>
 
     <section class="card">
+      <div class="lbl">Passaggi gara</div>
+      <div class="opts">
+        <div class="optg"><span class="ok">Ogni</span>
+        <div class="mini" id="splitStep">
+          <button data-step="1000">km</button>
+          <button data-step="5000" class="on">5 km</button>
+          <button data-step="1609.344">mi</button>
+        </div></div>
+        <div class="optg"><span class="ok">Ritmo</span>
+        <div class="mini" id="negSplit">
+          <button data-neg="0" class="on">Pari</button>
+          <button data-neg="0.01">−1%</button>
+          <button data-neg="0.02">−2%</button>
+        </div></div>
+      </div>
+      <div class="note" id="negNote"></div>
+      <div class="rsplits" id="rsplits"></div>
+    </section>
+
+    <section class="card">
       <div class="lbl">Previsioni gara <span class="hint">· formula di Riegel</span></div>
       <div class="pred" id="pred"></div>
     </section>
@@ -287,13 +379,19 @@
 
     <section class="card">
       <div class="lbl"><span class="idx">01</span><span id="repPaceTitle">Passo target</span> <span class="hint" id="repPaceUnitHint">min/km</span></div>
-      <div class="picker" id="repPaceField">
-        <div class="field"><input id="rpM" inputmode="numeric" maxlength="2" value="03"><span>min</span></div>
-        <div class="colon">:</div>
-        <div class="field"><input id="rpS" inputmode="numeric" maxlength="2" value="30"><span>sec</span></div>
-      </div>
-      <div class="picker speed" id="repSpeedField">
-        <div class="field"><input id="rspd" inputmode="decimal" value="17,1"><span>km/h</span></div>
+      <div class="pacewrap">
+        <button class="stepbtn" id="repMinus" aria-label="Più veloce">−5″</button>
+        <div class="pacecore">
+          <div class="picker" id="repPaceField">
+            <div class="field"><input id="rpM" inputmode="numeric" maxlength="2" value="03"><span>min</span></div>
+            <div class="colon">:</div>
+            <div class="field"><input id="rpS" inputmode="numeric" maxlength="2" value="30"><span>sec</span></div>
+          </div>
+          <div class="picker" id="repSpeedField">
+            <div class="field"><input id="rspd" inputmode="decimal" value="17,1"><span>km/h</span></div>
+          </div>
+        </div>
+        <button class="stepbtn" id="repPlus" aria-label="Più lento">+5″</button>
       </div>
     </section>
 
@@ -324,7 +422,61 @@
       <div class="splitList" id="repSplits"></div>
     </section>
 
-    <div class="foot">Imposta il passo target e la distanza della ripetuta:<br>vedi il tempo di passaggio a ogni 200 m.</div>
+    <section class="card">
+      <div class="lbl"><span class="idx">04</span>Seduta</div>
+      <div class="sessrow">
+        <div>
+          <div class="sl">Ripetute</div>
+          <div class="counter">
+            <button class="stepbtn" id="cntMinus" aria-label="Una in meno">−</button>
+            <output id="repCount">6</output>
+            <button class="stepbtn" id="cntPlus" aria-label="Una in più">+</button>
+          </div>
+        </div>
+        <div>
+          <div class="sl">Recupero</div>
+          <div class="picker sm">
+            <div class="field"><input id="rcM" inputmode="numeric" maxlength="2" value="01"><span>min</span></div>
+            <div class="colon">:</div>
+            <div class="field"><input id="rcS" inputmode="numeric" maxlength="2" value="30"><span>sec</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="board three">
+      <div class="cell"><div class="k">Lavoro</div><div class="v" id="sessWork">8:24</div></div>
+      <div class="cell"><div class="k">Totale</div><div class="v hot" id="sessTotal">15:54</div></div>
+      <div class="cell"><div class="k">Distanza</div><div class="v" id="sessKm">2,4<small>km</small></div></div>
+    </div>
+
+    <div class="foot">Totale = tempo delle ripetute più i recuperi tra una e l'altra.<br>Distanza = solo i tratti veloci.</div>
+  </div>
+
+  <!-- ============ VISTA ZONE ============ -->
+  <div class="view" id="viewZones">
+
+    <section class="card">
+      <div class="lbl">Risultato di riferimento <button class="link" id="editRef">Modifica</button></div>
+      <div class="ref">
+        <div class="rk"><span id="refDist">12,00 km</span><b id="refTime">48:00</b></div>
+        <div class="vdot"><div class="vk">VDOT</div><div class="vv" id="vdotVal">–</div></div>
+      </div>
+      <div class="opts">
+        <div class="optg"><span class="ok">Metodo</span>
+        <div class="mini" id="zoneMethod">
+          <button data-method="daniels" class="on">Daniels</button>
+          <button data-method="hanson">Hanson</button>
+        </div></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="lbl">Ritmi di allenamento</div>
+      <div class="zones" id="zones"></div>
+    </section>
+
+    <div class="foot" id="zoneFoot"></div>
   </div>
 
 </div>
@@ -337,11 +489,42 @@ const MI = 1609.344;
 let distM = 12000;
 let paceSecKm = 240; // 4:00 /km
 let lastEdited = 'pace';
+let splitStep = 5000;
+let negSplit = 0;
 // Ripetute
 let repPaceSecKm = 210; // 3:30 /km
 let repDistM = 400;
-// Condiviso da entrambe le viste
+let repCount = 6;
+let recSec = 90;
+// Zone
+let zoneMethod = 'daniels';
+// Condiviso
 let unit = 'kmpace';
+let view = 'calc';
+
+/* ================= MEMORIA (ultimo stato) ================= */
+const STORE = 'calcolatore-passo-v1';
+function save(){
+  try{ localStorage.setItem(STORE, JSON.stringify({distM,paceSecKm,lastEdited,splitStep,negSplit,repPaceSecKm,repDistM,repCount,recSec,zoneMethod,unit,view})); }catch(e){}
+}
+function load(){
+  try{
+    const s = JSON.parse(localStorage.getItem(STORE)||'null'); if(!s) return;
+    const num = (v,min,max,def) => (typeof v==='number' && isFinite(v) && v>=min && v<=max) ? v : def;
+    distM = num(s.distM,0,1e6,distM);
+    paceSecKm = num(s.paceSecKm,30,3600,paceSecKm);
+    repPaceSecKm = num(s.repPaceSecKm,30,3600,repPaceSecKm);
+    repDistM = num(s.repDistM,0,2000,repDistM);
+    repCount = num(s.repCount,1,50,repCount);
+    recSec = num(s.recSec,0,3599,recSec);
+    negSplit = [0,0.01,0.02].includes(s.negSplit) ? s.negSplit : negSplit;
+    splitStep = [1000,5000,MI].includes(s.splitStep) ? s.splitStep : splitStep;
+    if(['time','pace','dist'].includes(s.lastEdited)) lastEdited = s.lastEdited;
+    if(['daniels','hanson'].includes(s.zoneMethod)) zoneMethod = s.zoneMethod;
+    if(['kmpace','mipace','kmh'].includes(s.unit)) unit = s.unit;
+    if(['calc','reps','zones'].includes(s.view)) view = s.view;
+  }catch(e){}
+}
 
 /* ================= HELPERS ================= */
 const $ = id => document.getElementById(id);
@@ -361,17 +544,78 @@ function timeSec(){ return (distM/1000) * paceSecKm; }
 function mmss(sec){ sec=Math.round(sec); return Math.floor(sec/60)+':'+pad(sec%60); }
 function clock(sec){ sec=Math.round(sec); const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),s=sec%60;
   return h>0 ? h+':'+pad(m)+':'+pad(s) : m+':'+pad(s); }
-// passo nell'unità scelta, per le righe secondarie
-function paceInUnit(secKm){
-  if(unit==='kmh') return it1(3600/secKm)+' km/h';
-  if(unit==='mipace') return mmss(secKm*MI/1000)+' /mi';
-  return mmss(secKm)+' /km';
+// passo nell'unità scelta
+function paceU(secKm){
+  if(unit==='kmh') return it1(3600/secKm);
+  if(unit==='mipace') return mmss(secKm*MI/1000);
+  return mmss(secKm);
+}
+const unitSuffix = () => unit==='kmh' ? ' km/h' : unit==='mipace' ? ' /mi' : ' /km';
+const paceInUnit = secKm => paceU(secKm)+unitSuffix();
+// intervallo di passi (fast < slow in sec/km)
+function rangeU(fast, slow){
+  if(unit==='kmh') return it1(3600/slow)+'–'+it1(3600/fast);
+  return paceU(fast)+'–'+paceU(slow);
 }
 
 // evita di sovrascrivere l'input che l'utente sta digitando
 function setVal(el,v){ if(document.activeElement!==el) el.value=v; }
 
+// ±5 s nell'unità scelta (o ±0,1 km/h)
+function stepPace(secKm, dir){
+  if(unit==='kmh'){
+    const k = Math.max(1, Math.round((3600/secKm + dir*0.1)*10)/10);
+    return 3600/k;
+  }
+  const f = unit==='mipace' ? MI/1000 : 1;
+  const secU = Math.max(60, Math.round(secKm*f) + dir*5);
+  return secU/f;
+}
+function stepLabels(){
+  // il tasto a sinistra rende sempre più veloce
+  $('paceMinus').textContent = $('repMinus').textContent = unit==='kmh' ? '+0,1' : '−5″';
+  $('pacePlus').textContent = $('repPlus').textContent = unit==='kmh' ? '−0,1' : '+5″';
+}
+
+/* ================= VDOT (Daniels–Gilbert) ================= */
+const vo2 = v => -4.60 + 0.182258*v + 0.000104*v*v;               // v in m/min
+const pmax = tm => 0.8 + 0.1894393*Math.exp(-0.012778*tm) + 0.2989558*Math.exp(-0.1932605*tm);
+const vdotOf = (dM,tSec) => { const tm=tSec/60; return vo2(dM/tm)/pmax(tm); };
+function predictTime(dM, V){
+  let lo = dM/1000*90, hi = dM/1000*1200;
+  for(let i=0;i<80;i++){ const mid=(lo+hi)/2; if(vdotOf(dM,mid)>V) lo=mid; else hi=mid; }
+  return (lo+hi)/2;
+}
+function paceAtFrac(V, f){ // sec/km all'intensità f · VDOT
+  const a=0.000104, b=0.182258, c=-(4.60+f*V);
+  const v = (-b + Math.sqrt(b*b - 4*a*c)) / (2*a);
+  return 60000/v;
+}
+
 /* ================= VISTA CALCOLATORE ================= */
+function raceSplits(D, T, step, x){
+  // prima metà a passo a, seconda a b = a(1-x); tempo totale invariato
+  const a = 2*T/(D*(2-x)), b = a*(1-x), H = D/2;
+  const tAt = d => d<=H ? a*d : a*H + b*(d-H);
+  const marks = [];
+  for(let d=step; d<D-0.5; d+=step) marks.push({d});
+  let halfMerged = false;
+  marks.forEach(m=>{ if(Math.abs(m.d-H)<0.5){ m.half=true; halfMerged=true; } });
+  if(!halfMerged && D>=2000) marks.push({d:H, half:true});
+  marks.push({d:D, final:true});
+  marks.sort((p,q)=>p.d-q.d);
+  let prev = 0;
+  return marks.map(m=>{
+    const t = tAt(m.d), lap = (t - tAt(prev)) / ((m.d-prev)/1000);
+    prev = m.d;
+    return {...m, t, lap};
+  });
+}
+function distLabel(d, step){
+  if(step===MI){ const mi=d/MI; return (Math.abs(mi-Math.round(mi))<1e-6 ? Math.round(mi) : it2(mi))+' mi'; }
+  const km = d/1000; return (Math.abs(km-Math.round(km))<1e-6 ? Math.round(km) : itKm(km))+' km';
+}
+
 function render(){
   const t = timeSec();
 
@@ -422,6 +666,24 @@ function render(){
     $('s2k').textContent='Velocità'; $('s2v').innerHTML=it1(kmh)+'<small>km/h</small>';
   }
 
+  // passaggi gara
+  document.querySelectorAll('#splitStep button').forEach(b=>b.classList.toggle('on', parseFloat(b.dataset.step)===splitStep));
+  document.querySelectorAll('#negSplit button').forEach(b=>b.classList.toggle('on', parseFloat(b.dataset.neg)===negSplit));
+  if(distM>0 && t>0){
+    const rows = raceSplits(distM, t, splitStep, negSplit);
+    $('rsplits').innerHTML = rows.map(r=>{
+      const cls = r.final?' final':r.half?' half':'';
+      const label = r.final ? 'Arrivo · '+distLabel(r.d,splitStep) : r.half ? (Math.abs(r.d % splitStep)<0.5||Math.abs(r.d % splitStep - splitStep)<0.5 ? distLabel(r.d,splitStep)+' · metà' : 'Metà · '+distLabel(r.d,splitStep)) : distLabel(r.d,splitStep);
+      return `<div class="rs${cls}"><span class="d">${label}</span><span class="p">${paceInUnit(r.lap)}</span><span class="t">${clock(r.t)}</span></div>`;
+    }).join('');
+    if(negSplit>0){
+      const a = 2*t/(distM*(2-negSplit))*1000, b = a*(1-negSplit);
+      $('negNote').innerHTML = `Prima metà <b>${paceInUnit(a)}</b> · seconda metà <b>${paceInUnit(b)}</b>`;
+    } else {
+      $('negNote').innerHTML = `Passo costante <b>${paceInUnit(paceSecKm)}</b> dall'inizio alla fine`;
+    }
+  } else { $('rsplits').innerHTML=''; $('negNote').textContent=''; }
+
   // previsioni (Riegel: T2 = T1 · (D2/D1)^1.06)
   const preds=[['5K',5000],['10K',10000],['Mezza',21097.5],['Maratona',42195]];
   $('pred').innerHTML = preds.map(([n,d])=>{
@@ -433,6 +695,9 @@ function render(){
   const derived = lastEdited==='time' ? 'pace' : 'time';
   $('cardPace').classList.toggle('derived', derived==='pace');
   $('cardTime').classList.toggle('derived', derived==='time');
+
+  renderZones();
+  save();
 }
 
 /* ================= VISTA RIPETUTE ================= */
@@ -476,22 +741,94 @@ function renderReps(){
   $('repSplits').innerHTML = repDistM>0 ? repSplits(repDistM, repPaceSecKm).map(r=>
     `<div class="split2${r.final?' final':''}"><span class="d">${Math.round(r.d)} m</span><span class="bar"><i style="width:${Math.min(100,r.d/repDistM*100)}%"></i></span><span class="t">${clock(r.t)}</span></div>`
   ).join('') : '';
+
+  // seduta
+  $('repCount').textContent = repCount;
+  setVal($('rcM'), pad(Math.floor(recSec/60)));
+  setVal($('rcS'), pad(recSec%60));
+  const repT = repDistM*repPaceSecKm/1000;
+  const work = repCount*repT;
+  const total = work + Math.max(0,repCount-1)*recSec;
+  $('sessWork').textContent = clock(work);
+  $('sessTotal').textContent = clock(total);
+  $('sessKm').innerHTML = it1(repCount*repDistM/1000).replace(/,0$/,'')+'<small>km</small>';
+
+  save();
+}
+
+/* ================= VISTA ZONE ================= */
+function renderZones(){
+  const t = timeSec();
+  $('refDist').textContent = distLabel(distM, 1000) + (Math.abs(distM-42195)<0.5?' · maratona':Math.abs(distM-21097.5)<0.5?' · mezza':'');
+  $('refTime').textContent = t>0 ? clock(t) : '–';
+  document.querySelectorAll('#zoneMethod button').forEach(b=>b.classList.toggle('on', b.dataset.method===zoneMethod));
+
+  const V = (distM>=1500 && distM<=50000 && t>=210) ? vdotOf(distM, t) : 0;
+  if(!(V>=20 && V<=90)){
+    $('vdotVal').textContent='–';
+    $('zones').innerHTML = `<div class="warn">Imposta nel Calcolatore un risultato realistico tra 1.500 m e la maratona: da quello calcolo i ritmi di allenamento.</div>`;
+    $('zoneFoot').textContent='';
+    return;
+  }
+  $('vdotVal').textContent = it1(V);
+
+  const mp = predictTime(42195, V)/42.195;
+  const p5 = predictTime(5000, V)/5;
+  const p10 = predictTime(10000, V)/10;
+  const pMile = predictTime(MI, V)/(MI/1000);
+
+  // colori dal più facile al più duro
+  const C = ['#7FA88B','#C9A13B','#E8822E','#FF4F17','#C42D1E'];
+  let zones;
+  if(zoneMethod==='daniels'){
+    zones = [
+      {n:'Facile', d:'Lenti, lunghi e recupero', c:C[0], f:paceAtFrac(V,.74), s:paceAtFrac(V,.59)},
+      {n:'Maratona', d:'Ritmo gara maratona', c:C[1], f:mp},
+      {n:'Soglia', d:'Tempo run e cruise interval', c:C[2], f:paceAtFrac(V,.88)},
+      {n:'Intervalli', d:'Ripetute 800–1.200 m, 3–5′', c:C[3], f:paceAtFrac(V,.98)},
+      {n:'Ripetizioni', d:'Ripetute brevi 200–400 m', c:C[4], f:pMile},
+    ];
+    $('zoneFoot').innerHTML = 'Formule VDOT di Jack Daniels, calcolate dal risultato di riferimento.';
+  } else {
+    zones = [
+      {n:'Facile', d:'Lenti, lunghi e recupero', c:C[0], f:mp+37, s:mp+75},
+      {n:'Ritmo maratona', d:'Tempo run 8–16 km', c:C[1], f:mp},
+      {n:'Strength', d:'Ripetute lunghe 1,6–4,8 km', c:C[2], f:mp-6},
+      {n:'Speed', d:'Ripetute 400–1.200 m', c:C[3], f:p5, s:p10},
+    ];
+    $('zoneFoot').innerHTML = 'Metodo Hanson: tutto parte dal ritmo maratona.<br>Per usare il tuo obiettivo, imposta nel Calcolatore la maratona con il tempo obiettivo.';
+  }
+  $('zones').innerHTML = zones.map(z=>{
+    const val = z.s ? rangeU(z.f, z.s) : paceU(z.f);
+    const sub = z.s ? '' : (unit==='kmh' ? '' : `<small>${mmss(z.f*0.4)} ai 400 m</small>`);
+    return `<div class="zone"><span class="sw" style="background:${z.c}"></span><div><div class="zn">${z.n}</div><div class="zd">${z.d}</div></div><div class="zp">${val}${unit==='kmh'?'<small>km/h</small>':sub || `<small>${unit==='mipace'?'min/mi':'min/km'}</small>`}</div></div>`;
+  }).join('');
 }
 
 /* ================= TABS ================= */
-$('viewTabs').addEventListener('click', e=>{
-  const b=e.target.closest('button'); if(!b) return;
-  document.querySelectorAll('#viewTabs button').forEach(x=>x.classList.toggle('on',x===b));
-  const v=b.dataset.view;
+function showView(v){
+  view = v;
+  document.querySelectorAll('#viewTabs button').forEach(x=>x.classList.toggle('on',x.dataset.view===v));
   $('viewCalc').classList.toggle('on', v==='calc');
   $('viewReps').classList.toggle('on', v==='reps');
+  $('viewZones').classList.toggle('on', v==='zones');
+  save();
+}
+$('viewTabs').addEventListener('click', e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  showView(b.dataset.view);
 });
+$('editRef').addEventListener('click', ()=>{ showView('calc'); window.scrollTo({top:0,behavior:'smooth'}); });
 
 /* ================= UNITÀ (selettore condiviso) ================= */
+function syncUnitButtons(){
+  document.querySelectorAll('#unitSelect button').forEach(x=>x.classList.toggle('on',x.dataset.unit===unit));
+  stepLabels();
+}
 $('unitSelect').addEventListener('click', e=>{
   const b=e.target.closest('button'); if(!b) return;
   unit = b.dataset.unit;
-  document.querySelectorAll('#unitSelect button').forEach(x=>x.classList.toggle('on',x===b));
+  syncUnitButtons();
   render(); renderReps();
 });
 
@@ -504,14 +841,14 @@ $('distFree').addEventListener('input', ()=>{ distM=parseNum($('distFree').value
 
 function onTime(){
   const s=(parseInt($('tH').value||0)*3600)+(parseInt($('tM').value||0)*60)+parseInt($('tS').value||0);
-  if(distM>0) paceSecKm = s/(distM/1000);
+  if(distM>0 && s>0) paceSecKm = s/(distM/1000);
   lastEdited='time'; render();
 }
 ['tH','tM','tS'].forEach(id=>$(id).addEventListener('input', onTime));
 
 function onPace(){
   let secPerUnit=(parseInt($('pM').value||0)*60)+parseInt($('pS').value||0);
-  paceSecKm = unit==='mipace' ? secPerUnit/(MI/1000) : secPerUnit;
+  if(secPerUnit>0) paceSecKm = unit==='mipace' ? secPerUnit/(MI/1000) : secPerUnit;
   lastEdited='pace'; render();
 }
 ['pM','pS'].forEach(id=>$(id).addEventListener('input', onPace));
@@ -519,6 +856,13 @@ function onPace(){
 $('spd').addEventListener('input', ()=>{
   const v=parseNum($('spd').value); if(v>0) paceSecKm=3600/v; lastEdited='pace'; render();
 });
+
+// ±: il tasto a sinistra rende più veloce
+$('paceMinus').addEventListener('click', ()=>{ paceSecKm = stepPace(paceSecKm, unit==='kmh'?1:-1); lastEdited='pace'; render(); });
+$('pacePlus').addEventListener('click', ()=>{ paceSecKm = stepPace(paceSecKm, unit==='kmh'?-1:1); lastEdited='pace'; render(); });
+
+$('splitStep').addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b) return; splitStep=parseFloat(b.dataset.step); render(); });
+$('negSplit').addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b) return; negSplit=parseFloat(b.dataset.neg); render(); });
 
 /* ---- Ripetute: input handlers ---- */
 $('repChips').addEventListener('click', e=>{
@@ -533,7 +877,7 @@ $('repDistFree').addEventListener('input', ()=>{
 
 function onRepPace(){
   let secPerUnit=(parseInt($('rpM').value||0)*60)+parseInt($('rpS').value||0);
-  repPaceSecKm = unit==='mipace' ? secPerUnit/(MI/1000) : secPerUnit;
+  if(secPerUnit>0) repPaceSecKm = unit==='mipace' ? secPerUnit/(MI/1000) : secPerUnit;
   renderReps();
 }
 ['rpM','rpS'].forEach(id=>$(id).addEventListener('input', onRepPace));
@@ -541,13 +885,41 @@ function onRepPace(){
 $('rspd').addEventListener('input', ()=>{
   const v=parseNum($('rspd').value); if(v>0) repPaceSecKm=3600/v; renderReps();
 });
+$('repMinus').addEventListener('click', ()=>{ repPaceSecKm = stepPace(repPaceSecKm, unit==='kmh'?1:-1); renderReps(); });
+$('repPlus').addEventListener('click', ()=>{ repPaceSecKm = stepPace(repPaceSecKm, unit==='kmh'?-1:1); renderReps(); });
+
+$('cntMinus').addEventListener('click', ()=>{ repCount=Math.max(1,repCount-1); renderReps(); });
+$('cntPlus').addEventListener('click', ()=>{ repCount=Math.min(50,repCount+1); renderReps(); });
+function onRec(){ recSec=(parseInt($('rcM').value||0)*60)+parseInt($('rcS').value||0); renderReps(); }
+['rcM','rcS'].forEach(id=>$(id).addEventListener('input', onRec));
+
+$('zoneMethod').addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b) return; zoneMethod=b.dataset.method; renderZones(); save(); });
+
+/* ---- campi a due cifre: solo numeri, poi passa al successivo ---- */
+const NEXT = {pM:'pS', tH:'tM', tM:'tS', rpM:'rpS', rcM:'rcS'};
+['pM','pS','tH','tM','tS','rpM','rpS','rcM','rcS'].forEach(id=>{
+  const el=$(id);
+  el.addEventListener('beforeinput', e=>{ if(e.data && /\D/.test(e.data)) e.preventDefault(); });
+  el.addEventListener('input', ()=>{
+    if(el.value.length>=2 && NEXT[id]) $(NEXT[id]).focus();
+  });
+});
 
 /* ---- generali ---- */
 document.querySelectorAll('input').forEach(el=>el.addEventListener('focus',()=>setTimeout(()=>el.select(),0)));
-['tH','tM','tS','pM','pS','rpM','rpS'].forEach(id=>$(id).addEventListener('blur', ()=>{render();renderReps();}));
+// normalizza i campi solo quando il focus esce dal gruppo (ore:min:sec), così un valore
+// intermedio come 00 ore resta visibile mentre si completano minuti e secondi
+['tH','tM','tS','pM','pS','rpM','rpS','rcM','rcS'].forEach(id=>$(id).addEventListener('blur', e=>{
+  const group = $(id).closest('.picker');
+  if(e.relatedTarget && group.contains(e.relatedTarget)) return;
+  render(); renderReps();
+}));
 $('distFree').addEventListener('blur', render);
 $('repDistFree').addEventListener('blur', renderReps);
 
+load();
+syncUnitButtons();
+showView(view);
 render();
 renderReps();
 </script>
