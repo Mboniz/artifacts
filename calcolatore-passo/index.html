@@ -907,7 +907,13 @@ const NEXT = {pM:'pS', tH:'tM', tM:'tS', rpM:'rpS', rcM:'rcS'};
 
 /* ---- generali ---- */
 document.querySelectorAll('input').forEach(el=>el.addEventListener('focus',()=>setTimeout(()=>el.select(),0)));
-['tH','tM','tS','pM','pS','rpM','rpS','rcM','rcS'].forEach(id=>$(id).addEventListener('blur', ()=>{render();renderReps();}));
+// normalizza i campi solo quando il focus esce dal gruppo (ore:min:sec), così un valore
+// intermedio come 00 ore resta visibile mentre si completano minuti e secondi
+['tH','tM','tS','pM','pS','rpM','rpS','rcM','rcS'].forEach(id=>$(id).addEventListener('blur', e=>{
+  const group = $(id).closest('.picker');
+  if(e.relatedTarget && group.contains(e.relatedTarget)) return;
+  render(); renderReps();
+}));
 $('distFree').addEventListener('blur', render);
 $('repDistFree').addEventListener('blur', renderReps);
 
