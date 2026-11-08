@@ -28,5 +28,10 @@
     "name": "LapManuale",
     "url": "https://lapmanuale.mboniz.com",
     "description": "Il tracker di corsa collegato a Strava: carico, zone FC, personal best, gare e piano settimanale. Accesso con Strava, su approvazione."
+  },
+  {
+    "name": "wrapped",
+    "url": "https://wrapped.mboniz.com",
+    "description": "Le statistiche dei miei ascolti Spotify: classifiche di brani, artisti, album e podcast, e quando ascolto. Si aggiorna da solo ogni 30 minuti. Privato, con login Spotify."
   }
 ]
